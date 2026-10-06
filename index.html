@@ -170,7 +170,12 @@
   /* ===== 양손 평가: 공통 / 손별 구별 ===== */
   .hands .cap{display:none} body:not(.lr)[data-scope="R"] .hands .hL{display:none} body:not(.lr)[data-scope="L"] .hands .hR{display:none}
   .hands .hc{display:flex;flex-direction:column;gap:3px;min-width:0}
-  body.lr .hands{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  body.lr .hands{display:grid;grid-template-columns:1fr;gap:6px}
+  body.lr .hands .hR{order:1} body.lr .hands .hL{order:2}
+  body.lr .hands .hc{flex-direction:row;align-items:center;gap:8px}
+  body.lr .hands .hc .cap{flex:0 0 52px;text-align:center;align-self:center}
+  body.lr .hands .hc>input,body.lr .hands .hc>select{flex:1 1 auto;min-width:0}
+  body.lr .hands .hc>input[type=checkbox]{flex:0 0 auto}
   body.lr .hands .cap{display:block;font-size:11.5px;font-weight:800;color:#fff;background:#5F6B75;border-radius:999px;padding:1px 9px;align-self:flex-start}
   body.lr .hands .hc{border:1px solid var(--rule-2);border-radius:6px;padding:4px 6px 6px;background:var(--sheet)}
   body.lr .hands input[type=checkbox]{align-self:flex-start}
@@ -190,10 +195,15 @@
   .btn[data-go="3"],.btn.go3,#st1 .btn[data-go="3"],#st2 .btn[data-go="3"],#st3 .btn[data-go="3"],#st4 .btn[data-go="3"],#st1 .btn.primary[data-go="3"],#st2 .btn.primary[data-go="3"],#st3 .btn.primary[data-go="3"],#st4 .btn.primary[data-go="3"],#st1 .btn.go3,#st2 .btn.go3,#st3 .btn.go3,#st4 .btn.go3{background:#5B2C8F;border-color:#5B2C8F;color:#fff;font-weight:700}
   .btn[data-go="2"]:hover,.btn.go2:hover,#st1 .btn[data-go="2"]:hover,#st2 .btn[data-go="2"]:hover,#st3 .btn[data-go="2"]:hover,#st4 .btn[data-go="2"]:hover,#st1 .btn.primary[data-go="2"]:hover,#st2 .btn.primary[data-go="2"]:hover,#st3 .btn.primary[data-go="2"]:hover,#st4 .btn.primary[data-go="2"]:hover,#st1 .btn.go2:hover,#st2 .btn.go2:hover,#st3 .btn.go2:hover,#st4 .btn.go2:hover{background:#9A530B;border-color:#9A530B}
   .btn[data-go="3"]:hover,.btn.go3:hover,#st1 .btn[data-go="3"]:hover,#st2 .btn[data-go="3"]:hover,#st3 .btn[data-go="3"]:hover,#st4 .btn[data-go="3"]:hover,#st1 .btn.primary[data-go="3"]:hover,#st2 .btn.primary[data-go="3"]:hover,#st3 .btn.primary[data-go="3"]:hover,#st4 .btn.primary[data-go="3"]:hover,#st1 .btn.go3:hover,#st2 .btn.go3:hover,#st3 .btn.go3:hover,#st4 .btn.go3:hover{background:#4A2375;border-color:#4A2375}
-  /* 양손 평가: 모든 입력창 글씨 70% */
-  body.lr main input[type=number],body.lr main input[type=text],body.lr main select{font-size:10.5px;padding:5px 6px}
-  body.lr .jitem input{font-size:10.5px}
-  @media (max-width:560px){ body.lr main input[type=number],body.lr main input[type=text],body.lr main select,body.lr .jitem input,body.lr .hands select,body.lr .hands input[type=number],body.lr .hands input[type=text]{font-size:11.2px;min-height:38px;padding:6px 5px} }
+  /* 스마트폰 양손: 글씨를 줄이지 않고 왼손 칸·오른손 칸을 위아래로 */
+  @media (max-width:560px){ body.lr .hands{grid-template-columns:1fr;gap:6px}
+    body.lr .hands .hc{flex-direction:row;align-items:center;gap:8px;padding:4px 6px} body.lr .hands .cap{flex:0 0 auto;min-width:46px;text-align:center;align-self:center}
+    body.lr .hands .hc>input,body.lr .hands .hc>select{flex:1 1 auto;min-width:0}
+    body.lr main input[type=number],body.lr main input[type=text],body.lr main select,body.lr .jitem input,body.lr .hands select,body.lr .hands input[type=number],body.lr .hands input[type=text]{font-size:16px;min-height:44px;padding:9px 10px}
+    body.lr .hands input[type=checkbox]{align-self:center} }
+  /* 양손: 손 이름표 글씨 60%(11.5px → 6.9px) */
+  body.lr .hands .cap{font-size:6.9px;padding:1px 6px;line-height:1.5}
+  body.lr .hands .hc .cap{flex:0 0 34px}
 </style>
 </head>
 <body>
@@ -246,7 +256,7 @@
     <label class="f"><span class="lt">작업 이름</span><input type="text" id="jobName" placeholder="예: 아이스크림 포장"></label>
     <label class="f"><span class="lt">평가 범위 <button type="button" class="tip" data-tip="OCRA는 손(상지)마다 따로 평가합니다(EPM 시트는 RIGHT/LEFT 분리, Occhipinti 1998 3.6절). 양손이면 두 손을 각각 입력하고 최종값은 높은 쪽입니다.">?</button></span><select id="evalScope"><option value="R">오른손만</option><option value="L">왼손만</option><option value="LR">양손(각각 입력)</option></select></label>
   </div>
-  <div class="sidebar" id="sideBar" hidden><span class="sidenow">양손 평가 입력 방법</span><span class="help"><b class="hchip com">공통</b> 표시가 있는 질문은 한 번만 적습니다. <b class="hchip lr">왼손 | 오른손</b> 두 칸이 나란히 있는 질문은 손마다 따로 적습니다. 결과는 두 손을 따로 계산하고, 높은 쪽을 최종값으로 씁니다.</span></div>
+  <div class="sidebar" id="sideBar" hidden><span class="sidenow">양손 평가 입력 방법</span><span class="help"><b class="hchip com">공통</b> 표시가 있는 질문은 한 번만 적습니다. <b class="hchip lr">오른손</b>(위)·<b class="hchip lr">왼손</b>(아래) 두 칸이 있는 질문은 손마다 따로 적습니다. 결과는 두 손을 따로 계산하고, 높은 쪽을 최종값으로 씁니다.</span></div>
   <div class="actions"><button class="btn" type="button" id="loadEx">예시 (아이스크림 포장)</button><button class="btn" type="button" id="loadEx44">예시 (테이핑, 사례 4-4)</button><button class="btn" type="button" id="resetBtn">모두 지우기</button><button class="btn" type="button" id="loadSaved">이전 입력 불러오기</button></div>
 
   <div class="sub-h"><span class="stepno">1</span>근무 — 하루 근무는 어떻게 되나요? <button type="button" class="tip" data-tip="세 단계 모두가 같은 값을 씁니다. 한 번만 넣으면 됩니다.">?</button></div>
@@ -644,8 +654,12 @@ function toSide(raw){ const n=v=>v===""||v==null?null:Number(v); const post={}; 
   const lv={}; AF_KEYS.forEach(k=>lv[k]=Number(raw["af-"+k])||0); const checked=AF_KEYS.filter(k=>lv[k]>=AF_MIN[k]); const afDurs={}; AF_KEYS.forEach(k=>{ if(lv[k]>0) afDurs[k]=lv[k]; }); const idxChecked=AF_KEYS.filter(k=>lv[k]>0);
   return {sameLv:Number(raw.same)||0,checked,afDurs,idxChecked,taN:n(raw.taN),taSec:n(raw.taSec)??n($("cycleSec").value),speed:raw.speed,fastUncount:!!raw.fastUncount,bands:{hand:Number(raw.bHand)||0,sh:Number(raw.bSh)||0,wr:Number(raw.bWr)||0,el:Number(raw.bEl)||0},shSlight:!!raw.shSlight,overhead:raw.overhead==="1",modBand:Number(raw.modBand)||0,peakPct:n(raw.peakPct)||0,pauses:raw.pauses==="1",staticBand:Number(raw.staticBand)||0,maxBand:Number(raw.maxBand)||0,borg:n(raw.borg),staticSec:n(raw.staticSec),post,estPending:(raw._est||[]).length>0&&!raw.estOK}; }
 function scopeSides(){ const v=$("evalScope").value; return v==="LR"?["L","R"]:[v]; }
-function paintSide(){ const ss=scopeSides(); curSide=ss.includes("R")?"R":"L"; document.body.classList.toggle("lr",ss.length===2); const vp=document.querySelector('meta[name="viewport"]'); if(vp) vp.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover"+(ss.length===2?", maximum-scale=1":"")); document.body.dataset.scope=ss.length===2?"LR":ss[0]; $("sideBar").hidden=ss.length!==2; }
+function paintSide(){ const ss=scopeSides(); curSide=ss.includes("R")?"R":"L"; document.body.classList.toggle("lr",ss.length===2); document.body.dataset.scope=ss.length===2?"LR":ss[0]; $("sideBar").hidden=ss.length!==2; }
 $("evalScope").addEventListener("input",()=>{ paintSide(); if(openI) prefillAll(); recalc(); });
+/* 스마트폰(560px 이하)에서는 '양손' 선택지를 없앰 */
+(function(){ const sel=$("evalScope"); const lrOpt=[...sel.options].find(o=>o.value==="LR"); if(!lrOpt||!window.matchMedia) return; const mq=window.matchMedia("(max-width:560px)");
+  const apply=()=>{ if(mq.matches){ if(sel.value==="LR"){ sel.value="R"; sel.dispatchEvent(new Event("input",{bubbles:true})); } if(lrOpt.parentNode) lrOpt.remove(); } else if(!lrOpt.parentNode){ sel.appendChild(lrOpt); } };
+  apply(); if(mq.addEventListener) mq.addEventListener("change",apply); else if(mq.addListener) mq.addListener(apply); })();
 
 /* ===== 공통 입력 읽기 ===== */
 function readOrg(){ return {shiftH:num("shiftH"),nonRep:num("nonRepMin")||0,mealN:num("mealN")||0,mealLen:num("mealLen")||0,mealIn:$("mealIn").value==="1",breakN:num("breakN")||0,breakLen:num("breakLen")||0,recWorkMin:num("recWorkMin")||0,shortPeriods:$("shortPeriods").value.split(",").map(v=>Number(v.trim())).filter(v=>!isNaN(v)&&v>0),inCycle:$("inCycle").checked}; }
