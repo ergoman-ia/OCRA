@@ -243,17 +243,17 @@
     <label class="f"><span class="lt">센 힘(5점 이상)이 드는 시간 비율(%) <button type="button" class="tip" data-tip="예: 10분에 2초면 0.3%, 사이클의 1/20이면 5%. Mini는 약 1% 8점, 약 5%(2~9%) 16점, 10% 이상 24점">?</button></span><input type="number" id="peakPct" min="0" max="100" step="0.5" placeholder="0"></label>
   </div>
 
-  <div class="sub-h"><span class="stepno">5</span>조건 — 일을 더 힘들게 하는 조건 <button type="button" class="tip" data-tip="EPM OCRA Mini-Checklist 시트의 규칙: 진동 공구 4점(있으면 다른 물리 조건은 무시), 반동·충격 2점, 손으로 두드리기 2점, 그 밖의 조건(추위·장갑·정밀·눌림·기타)은 몇 개를 체크해도 한 묶음으로 2점. 물리 조건 합이 2를 넘으면 3점으로 묶입니다. 작업속도는 따로 버퍼 1.5·완전 기계 2점.">?</button> <span id="afLive" style="font-weight:500;color:var(--ink-3);font-size:13px"></span></div>
-  <div class="learn">추위, 진동, 장갑, 작은 부품을 정확히 맞추는 일처럼 같은 동작이라도 더 힘들게 만드는 조건입니다. 컨베이어가 속도를 정하면 쉬어 갈 수 없으니 그것도 조건입니다. 점수는 조건마다 다릅니다: 진동 4점, 반동·충격 2점, 손으로 두드리기 2점, 나머지(추위·장갑·정밀·눌림·기타)는 묶어서 2점. 물리 조건을 둘 이상 체크하면 합이 3점에서 멈추고, 진동이 있으면 4점으로 고정되므로 체크를 더 해도 점수가 안 바뀔 수 있습니다(EPM 시트 규칙). OCRA Checklist도 같은 EPM 시트 규칙(2020 자동계산판 R88)을 씁니다. OCRA Index는 요인별로 노출시간(1/3·2/3·내내 → 4/8/12점, 진동 8/12/16점)을 합산하므로 각 조건 옆의 노출시간을 골라 주세요(Index에만 쓰임).</div>
-  <div class="checks" id="afChecks">
-    <label><input type="checkbox" value="vib"> 진동 공구(1/3 이상)</label>
-    <label><input type="checkbox" value="strike"> 반동·충격(절반 넘게)</label>
-    <label><input type="checkbox" value="impact"> 손으로 두드리기(시간당 10회 이상)</label>
-    <label><input type="checkbox" value="cold"> 추위 0 °C 미만(절반 넘게)</label>
-    <label><input type="checkbox" value="glove"> 맞지 않는 장갑(절반 넘게)</label>
-    <label><input type="checkbox" value="precision"> 2~3 mm 정밀작업(절반 넘게)</label>
-    <label><input type="checkbox" value="compress"> 손이 눌려 자국·굳은살</label>
-    <label><input type="checkbox" value="other"> 그 밖(소음, 미끄러운 물건 등)</label>
+  <div class="sub-h"><span class="stepno">5</span>조건 — 일을 더 힘들게 하는 조건 <button type="button" class="tip" data-tip="조건마다 시간 단계를 한 번만 고릅니다. Mini·Checklist는 EPM 기준(진동 1/3 이상, 두드리기·눌림은 있음, 추위·장갑·정밀·반동·그 밖은 절반 넘게)을 넘을 때만 점수 → 진동 4점(있으면 다른 물리 조건 무시), 반동·충격 2, 두드리기 2, 그 밖은 묶어서 2, 합이 2를 넘으면 3(EPM 시트 규칙). Index: 1/3·절반 넘게·내내 → 4/8/12점(진동 8/12/16)을 조건마다 더해 계수로 바꿉니다. 작업속도는 따로.">?</button> <span id="afLive" style="font-weight:500;color:var(--ink-3);font-size:13px"></span></div>
+  <div class="learn">추위, 진동, 장갑, 작은 부품을 정확히 맞추는 일처럼 같은 동작이라도 더 힘들게 만드는 조건입니다. 조건이 있으면 한 바퀴 작업 중 얼마나 오래 나오는지만 고르세요(없으면 그대로 둡니다). 점수를 줄지 말지는 프로그램이 EPM 기준으로 판단합니다.</div>
+  <div class="row" id="afChecks">
+    <label class="f"><span class="lt">진동 공구를 씀</span><select id="af-vib" class="af"><option value="0">없음</option><option value="1">약 1/3</option><option value="2">절반 넘게</option><option value="3">거의 내내</option></select></label>
+    <label class="f"><span class="lt">반동·충격(망치질처럼 되튀는 동작)</span><select id="af-strike" class="af"><option value="0">없음</option><option value="1">약 1/3</option><option value="2">절반 넘게</option><option value="3">거의 내내</option></select></label>
+    <label class="f"><span class="lt">손을 도구처럼 써서 두드림(시간당 10회 이상)</span><select id="af-impact" class="af"><option value="0">없음</option><option value="1">약 1/3</option><option value="2">절반 넘게</option><option value="3">거의 내내</option></select></label>
+    <label class="f"><span class="lt">추위 0 °C 미만에서 일함</span><select id="af-cold" class="af"><option value="0">없음</option><option value="1">약 1/3</option><option value="2">절반 넘게</option><option value="3">거의 내내</option></select></label>
+    <label class="f"><span class="lt">맞지 않는 장갑을 낌</span><select id="af-glove" class="af"><option value="0">없음</option><option value="1">약 1/3</option><option value="2">절반 넘게</option><option value="3">거의 내내</option></select></label>
+    <label class="f"><span class="lt">2~3 mm 정밀작업</span><select id="af-precision" class="af"><option value="0">없음</option><option value="1">약 1/3</option><option value="2">절반 넘게</option><option value="3">거의 내내</option></select></label>
+    <label class="f"><span class="lt">손이 눌려 자국·굳은살이 생김</span><select id="af-compress" class="af"><option value="0">없음</option><option value="1">약 1/3</option><option value="2">절반 넘게</option><option value="3">거의 내내</option></select></label>
+    <label class="f"><span class="lt">그 밖(소음, 미끄러운 물건 등)</span><select id="af-other" class="af"><option value="0">없음</option><option value="1">약 1/3</option><option value="2">절반 넘게</option><option value="3">거의 내내</option></select></label>
   </div>
   <div class="row"><label class="f"><span class="lt">작업속도는 누가 정하나요?</span><select id="pace"><option value="0">작업자가 자유롭게</option><option value="1">기계·라인이 정하지만 버퍼로 조절 가능</option><option value="1.5">라인이 느리게 움직이며 기계가 정함</option><option value="2">기계·라인이 완전히 정함</option></select></label></div>
 
@@ -500,7 +500,7 @@ function idx(org,shared,side,opts){ opts=opts||{};
   if(a!=null&&stSec!=null&&stSec>0&&side.taSec>0){ const imag=stSec/0.6*0.75; ata=Math.max(side.taN,imag)*60/side.taSec; }   // EPM: 정적 유지 cts×0.75 = 초×1.25 (단위 확인 필요)
   const borg=side.borg; const pk=(side.peakPct||0)/100; const ffEpm=borg==null?null:Math.min(fomEpm(borg),look(T.peakEpm,pk,T.peakLast)); const ffIso=borg==null?null:(pk>=0.10?0.01:fomIso(borg));
   const P=postureIdx(side.post||{});
-  const c=shared.checked||[]; const durs=shared.afDurs||{}; let as=0; for(const k of c){ const d=durs[k]||shared.afDur||0; as+=(k==="vib"?[0,8,12,16]:[0,4,8,12])[d]; }
+  const c=shared.idxChecked||shared.checked||[]; const durs=shared.afDurs||{}; let as=0; for(const k of c){ const d=durs[k]||shared.afDur||0; as+=(k==="vib"?[0,8,12,16]:[0,4,8,12])[d]; }
   as+={0:0,1:8,1.5:12,2:12}[shared.pace]??0; const aEpm=look(T.afScore,as,T.afLast);
   const dIso=c.length?Math.max(...c.map(k=>durs[k]||shared.afDur||0)):0; const aIso=(c.length||shared.pace)?[1,.95,.9,.8][(shared.pace&&!c.length)?3:dIso]:1;
   const rf=Math.min([1,.85,.7][shared.sameLv||0], shared.cyc==null?1:(shared.cyc<8?.7:(shared.cyc<=15?.85:1)));
@@ -547,8 +547,9 @@ document.querySelectorAll("select.b5").forEach(s=>B5.forEach(([v,t])=>{const o=d
 /* Index 세부 자세: 사이클 비율(%) 입력 */
 (function(){ const area=$("jointArea"); for(const J of JOINTS){ const box=document.createElement("div"); box.className="jointbox"; box.innerHTML=`<h3>${J.name} <span class="jv" id="jv-${J.key}">—</span></h3><div class="jgrid"></div>`; const g=box.querySelector(".jgrid");
   for(const it of J.items){ const d=document.createElement("div"); d.className="jitem"; d.innerHTML=`<div class="jn">${it.ic?`<svg class="ico"><use href="#ic-${it.ic}"/></svg>`:""}${it.label}</div>`; const s=document.createElement("input"); s.type="number"; s.min="0"; s.max="100"; s.step="1"; s.placeholder="% (사이클 비율)"; s.id="p-"+it.id; s.addEventListener("input",()=>s.classList.remove("est")); d.appendChild(s); g.appendChild(d);} area.appendChild(box);} })();
-/* 부가요인별 노출시간(Index용) 선택 */
-(function(){ document.querySelectorAll("#afChecks label").forEach(l=>{ const c=l.querySelector("input"); const s=document.createElement("select"); s.id="afd-"+c.value; s.className="afd"; s.title="OCRA Index용 노출시간"; [["1","1/3"],["2","2/3"],["3","내내"]].forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;s.appendChild(o);}); s.value=c.value==="vib"?"1":"3"; l.appendChild(s); }); })();
+/* 부가요인: 조건마다 시간 단계 하나(0 없음·1 약 1/3·2 절반 넘게·3 거의 내내). Mini·Checklist는 EPM 시트 기준(진동 ≥1/3, 두드리기·눌림은 있음, 그 밖은 절반 넘게)을 넘으면 체크로 간주 */
+const AF_KEYS=["vib","strike","impact","cold","glove","precision","compress","other"]; const AF_MIN={vib:1,strike:2,impact:1,cold:2,glove:2,precision:2,compress:1,other:2};
+function afLevels(){ const o={}; AF_KEYS.forEach(k=>o[k]=Number($("af-"+k).value)||0); return o; }
 
 /* ===== 좌·우 ===== */
 const SIDE_IDS=["taN","taSec","speed","fastUncount","bHand","bSh","bWr","bEl","shSlight","overhead","modBand","peakPct","pauses","staticBand","maxBand","borg","staticSec","estOK"].concat(JOINTS.flatMap(J=>J.items.map(it=>"p-"+it.id)));
@@ -567,8 +568,8 @@ $("evalScope").addEventListener("input",()=>{ const ss=scopeSides(); if(!ss.incl
 
 /* ===== 공통 입력 읽기 ===== */
 function readOrg(){ return {shiftH:num("shiftH"),nonRep:num("nonRepMin")||0,mealN:num("mealN")||0,mealLen:num("mealLen")||0,mealIn:$("mealIn").value==="1",breakN:num("breakN")||0,breakLen:num("breakLen")||0,recWorkMin:num("recWorkMin")||0,shortPeriods:$("shortPeriods").value.split(",").map(v=>Number(v.trim())).filter(v=>!isNaN(v)&&v>0),inCycle:$("inCycle").checked}; }
-function readShared(){ const checked=[...document.querySelectorAll("#afChecks input:checked")].map(c=>c.value); const afDurs={}; checked.forEach(k=>afDurs[k]=Number($("afd-"+k).value)||3);
-  return {cyc:num("cycleSec"),sameLv:Number($("same").value),pace:Number($("pace").value),checked,afDurs}; }
+function readShared(){ const lv=afLevels(); const checked=AF_KEYS.filter(k=>lv[k]>=AF_MIN[k]); const afDurs={}; AF_KEYS.forEach(k=>{ if(lv[k]>0) afDurs[k]=lv[k]; }); const idxChecked=AF_KEYS.filter(k=>lv[k]>0);
+  return {cyc:num("cycleSec"),sameLv:Number($("same").value),pace:Number($("pace").value),checked,afDurs,idxChecked}; }
 function calcAll(){ const org=readOrg(), shared=readShared(); const out={org,shared,sides:{}};
   for(const s of scopeSides()){ const side=sideInputs(s); const r1=OC.mini(org,shared,side); const r2=openC?OC.chk(org,shared,side):null; const r3=openI?(side.estPending?{ok:false,pending:true}:OC.idx(org,shared,side)):null; out.sides[s]={side,r1,r2,r3}; }
   const pick=(key,val)=>{ let best=null; for(const s of Object.keys(out.sides)){ const r=out.sides[s][key]; if(r&&r.ok&&(best==null||val(r)>val(best.r))) best={s,r}; } return best; };
@@ -612,7 +613,7 @@ function recalc(){
   else { $("r1v").textContent="—"; $("r1kv").innerHTML=""; $("adv1").innerHTML="<b>OCRA Mini-Checklist 분석 결과</b>총 근무시간과 손의 빠르기(또는 기술동작 수)를 넣으면 점수가 나옵니다."; $("next1").innerHTML=""; if(stage===1) showMain("OCRA Mini-Checklist 분석 결과(점수)","—","입력을 기다리는 중",null,null,""); }
   /* TEST-ONLY */ dbg("dbg1",keys.flatMap(s=>{const r=A.sides[s].r1; return r.sc?[`[${SIDE_NAME[s]}] 빈도 ${r.fr.note} → ${r.fr.score}`,`  자세 손 ${T.mini.hand[A.sides[s].side.bands.hand]} 어깨 ${T.mini.sh[A.sides[s].side.bands.sh]} 손목 ${T.mini.wr[A.sides[s].side.bands.wr]} 팔꿈치 ${T.mini.el[A.sides[s].side.bands.el]} → 최댓값 ${r.post} + 정형성 ${r.st}; 힘 보통 ${r.mod} + 센 힘 ${r.intense}; 부가 물리 ${r.physScore} + 조직 ${r.org}`,`  회복: 교대 ${r.sc.shiftMin}분 기준 ${r.sc.base} − 휴식·식사 ${r.sc.breaks} = ${r.sc.unrec}h → ×${r.sc.rcm}; 순 근무 ${r.sc.net}분 → ×${r.sc.du}`,r.ok?`  (${r.fr.score}+${r.posture}+${r.force}+${r.add}) = ${r.partial} × ${r.sc.rcm} × ${r.sc.du} = ${f1(r.score)}; 범위 ${f1(r.min)}~${f1(r.max)}`:""]:["총 근무시간 필요"];})); /* /TEST-ONLY */
   /* --- Checklist --- */
-  if(stage>=2){ const b2=A.best2; $("v2").textContent=b2?`${f1(b2.r.score)}점${sideTag(b2.s)}`:"—";
+  if(openC){ const b2=A.best2; $("v2").textContent=b2?`${f1(b2.r.score)}점${sideTag(b2.s)}`:"—";
     if(b2){ const r2=b2.r, z=czone(r2.score); $("r2v").textContent=`${f1(r2.score)}점${sideTag(b2.s)}`;
       kvTable("r2kv",[["점수",...keys.map(s=>A.sides[s].r2.ok?f1(A.sides[s].r2.score):"—")],["빈도",...keys.map(s=>A.sides[s].r2.freq??"—")],["자세",...keys.map(s=>`${A.sides[s].r2.post}+${A.sides[s].r2.st}`)],["힘",...keys.map(s=>A.sides[s].r2.force)],["부가",...keys.map(s=>A.sides[s].r2.add)],["×회복",...keys.map(s=>A.sides[s].r2.sc?A.sides[s].r2.sc.rcm:"—")],["×지속",...keys.map(s=>A.sides[s].r2.sc?A.sides[s].r2.sc.du:"—")]],keys);
       const act2=r2.score<=7.5?"추가 조사 불필요 — 기록·주기적 재평가":r2.score<=11?"추가 조사 권고 — OCRA Index 활용":"개선 필요 — OCRA Index 활용";
@@ -623,7 +624,7 @@ function recalc(){
     /* TEST-ONLY */ dbg("dbg2",keys.flatMap(s=>{const r=A.sides[s].r2; return r.sc?[`[${SIDE_NAME[s]}] 빈도 ${r.fr.note} 동적 ${r.fr.score} vs 정적 ${r.stat} → ${r.freq}`,`  자세 어깨 ${r.shs}${A.sides[s].side.overhead?"(머리 위 ×2)":""} 팔꿈치 ${T.chk.el[A.sides[s].side.bands.el]} 손목 ${T.chk.wr[A.sides[s].side.bands.wr]} 손 ${T.chk.hand[A.sides[s].side.bands.hand]} → ${r.post} + 정형성 ${r.st}; 힘 보통 ${r.mod} + 큰 힘 ${r.intense} + 거의 최대 ${r.mx}; 부가 물리 ${r.physScore} + 조직 ${r.org}`,r.ok?`  (${r.freq}+${r.posture}+${r.force}+${r.add}) = ${r.partial} × ${r.sc.rcm} × ${r.sc.du} = ${f1(r.score)}`:""]:[];})); /* /TEST-ONLY */
   }
   /* --- Index --- */
-  if(stage>=3){ const b3=A.best3; $("idxNeed").hidden=OC.apm(S)!=null; $("borgHint").textContent=`추정값(참고) ${f1(borgEstimate(S))} — 보통 힘 비율·센 힘 비율로 만든 어림값이며 계산에는 쓰지 않습니다. 동작별 Borg를 시간으로 가중 평균해 직접 넣으세요.`;
+  if(openI){ const b3=A.best3; $("idxNeed").hidden=OC.apm(S)!=null; $("borgHint").textContent=`추정값(참고) ${f1(borgEstimate(S))} — 보통 힘 비율·센 힘 비율로 만든 어림값이며 계산에는 쓰지 않습니다. 동작별 Borg를 시간으로 가중 평균해 직접 넣으세요.`;
     $("estNote").hidden=!(cur.r3&&cur.r3.pending); $("v3").textContent=b3?`EPM ${f1(b3.r.idxE)} · ISO ${f1(b3.r.idxI)}${sideTag(b3.s)}`:"—";
     if(cur.r3&&cur.r3.joints) cur.r3.joints.forEach(j=>$("jv-"+j.key).textContent=`${j.score}점 → EPM ${f2(j.epm)} / ISO ${f2(j.iso)}`); else JOINTS.forEach(J=>$("jv-"+J.key).textContent="—");
     if(b3){ const r3=b3.r, z=izone(r3.idxE), zi=izone(r3.idxI); $("r3v").textContent=`${f1(r3.idxE)} (ISO ${f1(r3.idxI)})${sideTag(b3.s)}`;
@@ -643,9 +644,9 @@ function recalc(){
 let taskList=[]; let mode="single";
 function setMode(m){ mode=m; document.body.classList.toggle("multi",m==="multi"); $("modeSingle").setAttribute("aria-pressed",m==="single"); $("modeMulti").setAttribute("aria-pressed",m==="multi"); $("modeLearn").textContent=m==="multi"?"여러 작업 모드: 작업마다 OCRA Mini-Checklist로 평가하고 하루 시간과 함께 ‘추가’하세요. 작업 목록에서 하루 평가 도구가 정해지면 각 작업을 ‘분석하기’로 열어 그 도구까지 분석합니다.":"한 가지 작업 모드: 이 작업을 평가하고 점수에 따라 OCRA Checklist 또는 OCRA Index로 갑니다."; recalc(); }
 const SHARED_IDS=["cycleSec","same","pace"];
-function sharedSnapshot(){ const o={}; SHARED_IDS.forEach(id=>o[id]=$(id).value); o._checks=[...document.querySelectorAll("#afChecks input:checked")].map(c=>c.value); o._afd={}; document.querySelectorAll("#afChecks select").forEach(s=>o._afd[s.id]=s.value); o.recWorkMin=$("recWorkMin").value; o.shortPeriods=$("shortPeriods").value; o.inCycle=$("inCycle").checked; return o; }
-function applyShared(o){ SHARED_IDS.forEach(id=>{ if(id in o) $(id).value=o[id]; }); document.querySelectorAll("#afChecks input").forEach(c=>c.checked=(o._checks||[]).includes(c.value)); Object.entries(o._afd||{}).forEach(([k,v])=>{ if($(k)) $(k).value=v; }); $("recWorkMin").value=o.recWorkMin??""; $("shortPeriods").value=o.shortPeriods??""; $("inCycle").checked=!!o.inCycle; }
-function clearTaskInputs(){ const d=defaultSide(); writeSideDOM(d); sideStore.L=null; sideStore.R=null; prefilledSide.L=false; prefilledSide.R=false; SHARED_IDS.forEach(id=>{ const e=$(id); if(e.tagName==="SELECT") e.selectedIndex=0; else e.value=""; }); document.querySelectorAll("#afChecks input").forEach(c=>c.checked=false); $("recWorkMin").value=""; $("shortPeriods").value=""; $("inCycle").checked=false; $("jobName").value=""; $("taskMin").value=""; }
+function sharedSnapshot(){ const o={}; SHARED_IDS.forEach(id=>o[id]=$(id).value); o._af=afLevels(); o.recWorkMin=$("recWorkMin").value; o.shortPeriods=$("shortPeriods").value; o.inCycle=$("inCycle").checked; return o; }
+function applyShared(o){ SHARED_IDS.forEach(id=>{ if(id in o) $(id).value=o[id]; }); AF_KEYS.forEach(k=>{ $("af-"+k).value=String((o._af||{})[k]||0); }); $("recWorkMin").value=o.recWorkMin??""; $("shortPeriods").value=o.shortPeriods??""; $("inCycle").checked=!!o.inCycle; }
+function clearTaskInputs(){ const d=defaultSide(); writeSideDOM(d); sideStore.L=null; sideStore.R=null; prefilledSide.L=false; prefilledSide.R=false; SHARED_IDS.forEach(id=>{ const e=$(id); if(e.tagName==="SELECT") e.selectedIndex=0; else e.value=""; }); AF_KEYS.forEach(k=>$("af-"+k).value="0"); $("recWorkMin").value=""; $("shortPeriods").value=""; $("inCycle").checked=false; $("jobName").value=""; $("taskMin").value=""; }
 function currentSnapshot(A){ A=A||calcAll(); const res={}; for(const s of Object.keys(A.sides)){ const {r1,r2,r3}=A.sides[s]; res[s]={mini:r1.ok?{score:r1.score,min:r1.min,max:r1.max}:null,chk:(r2&&r2.ok)?r2.partial:null,idx:(r3&&r3.ok)?{ata:r3.ata,k:r3.k}:null}; }
   const inputs={L:curSide==="L"?readSideDOM():sideStore.L,R:curSide==="R"?readSideDOM():sideStore.R,shared:sharedSnapshot(),scope:$("evalScope").value};
   const worst=k=>{ let w=null; for(const s of Object.keys(res)){ const v=res[s][k]; if(v==null) continue; const val=k==="mini"?v.min:k==="chk"?v:v.ata/v.k; if(w==null||val>w.val) w={s,val,v}; } return w; };
@@ -718,12 +719,12 @@ document.querySelectorAll("main input, main select").forEach(el=>el.addEventList
 $("closeIdx").addEventListener("click",()=>{openI=false; setStage(openC?2:1);});
 document.querySelectorAll(".tip").forEach(t=>{ t.setAttribute("aria-label",t.dataset.tip); t.setAttribute("tabindex","0"); const place=()=>{const r=t.getBoundingClientRect(); t.classList.toggle("flip",r.left+320>window.innerWidth); t.classList.toggle("below",r.top<170);}; t.addEventListener("mouseenter",place); t.addEventListener("focus",place); t.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();place();const on=t.classList.contains("on");document.querySelectorAll(".tip.on").forEach(x=>x.classList.remove("on"));if(!on)t.classList.add("on");}); });
 document.addEventListener("click",e=>{if(!e.target.closest(".tip"))document.querySelectorAll(".tip.on").forEach(x=>x.classList.remove("on"));});
-function clearAll(){ document.querySelectorAll("main input[type=number], main input[type=text]:not([readonly])").forEach(i=>{i.value="";i.classList.remove("est");}); document.querySelectorAll("main select").forEach(s=>s.selectedIndex=0); document.querySelectorAll("#afChecks input").forEach(c=>c.checked=false); document.querySelectorAll("main input[type=checkbox]").forEach(c=>c.checked=false); $("shSlight").checked=true; $("evalScope").value="R"; sideStore.L=null; sideStore.R=null; prefilledSide.L=false; prefilledSide.R=false; curSide="R"; paintSide(); taskList=[]; }
+function clearAll(){ document.querySelectorAll("main input[type=number], main input[type=text]:not([readonly])").forEach(i=>{i.value="";i.classList.remove("est");}); document.querySelectorAll("main select").forEach(s=>s.selectedIndex=0); document.querySelectorAll("main input[type=checkbox]").forEach(c=>c.checked=false); $("shSlight").checked=true; $("evalScope").value="R"; sideStore.L=null; sideStore.R=null; prefilledSide.L=false; prefilledSide.R=false; curSide="R"; paintSide(); taskList=[]; }
 $("resetBtn").addEventListener("click",()=>{clearAll();setStage(1);$("msg").textContent="입력을 지웠습니다.";});
 /* 예시 1: Ergonomiesite 아이스크림 포장(오른손) — Checklist 32, Index 11.2 */
 $("loadEx").addEventListener("click",()=>{ if(mode==="multi") clearTaskInputs(); else clearAll(); $("jobName").value="아이스크림 포장(사이트 사례)"; $("evalScope").value="R"; curSide="R"; paintSide(); $("shiftH").value=9; $("mealN").value=1; $("mealLen").value=60; $("mealIn").value="0"; $("breakN").value=2; $("breakLen").value=10; $("nonRepMin").value=20;
   $("cycleSec").value=37; $("same").value="2"; $("taN").value=40; $("taSec").value=37; $("bHand").value="5"; $("bSh").value="1"; $("bWr").value="3"; $("bEl").value="3"; $("modBand").value="0"; $("peakPct").value=0; $("pauses").value="0";
-  document.querySelector('#afChecks input[value="cold"]').checked=true; $("afd-cold").value="3"; $("pace").value="2"; $("borg").value=0.63;
+  $("af-cold").value="3"; $("pace").value="2"; $("borg").value=0.63;
   const P={hdPalm:60,hdPower:19,elFlex:48,wrRad:41,sh80:15}; Object.entries(P).forEach(([k,v])=>{$("p-"+k).value=v;}); prefilledSide.R=true; $("estOK").checked=true;
   setStage(1); $("msg").textContent="아이스크림 포장(Ergonomiesite 사례) — OCRA Checklist 32, OCRA Index 11.2가 나오는지 확인하세요."; });
 $("loadEx44").addEventListener("click",()=>{ if(mode==="multi") clearTaskInputs(); else clearAll(); $("jobName").value="와이어링 하네스 테이핑(사례 4-4)"; $("shiftH").value=8; $("mealN").value=1; $("mealLen").value=60; $("breakN").value=1; $("breakLen").value=10; $("nonRepMin").value=30;
