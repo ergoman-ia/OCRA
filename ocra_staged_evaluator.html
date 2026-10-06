@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OCRA 단계별 평가 도구 — Mini → Checklist → Index</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<!--
+  OCRA 평가 도구(EPM 엑셀 기준, 2026-10 개정). OCRA Mini-Checklist(EPM 2025-06-20 시트) → OCRA Checklist(EPM 자동계산판 2020-10-19) 또는 OCRA Index(EPM classic 2017-09-01·phases 2017-11-07, 멀티태스크 2014-02-12).
+  앞 도구의 공통 입력(근무·사이클·조건)은 뒤 도구에서 다시 쓰이고, 빈도·자세·힘은 위 단계로 갈수록 더 정밀한 값으로 바꾼다. Index의 자세 비율은 간이 선별 값으로 '추정값'을 미리 넣되 확인 뒤에만 계산한다.
+  좌·우 상지는 따로 입력·계산하며 화면 기준 왼쪽 = 왼손, 오른쪽 = 오른손. 최종값은 높은 쪽. 계산 핵심부(OCRA-CORE 블록)는 DOM 없이 Node에서 실행·검증할 수 있다.
+  [TEST-ONLY] 계산 과정 표시: class="dbg" 요소, #dbgToggle, CSS·JS의 /* TEST-ONLY */ 블록을 지우면 일괄 삭제.
+-->
+<style>
+  :root{--paper:#F6F7F4;--sheet:#FFFFFF;--ink:#1E2B33;--ink-2:#4A5A66;--ink-3:#7E8C96;--rule:#D9DFE3;--rule-2:#C2CBD1;--blue:#174F8C;--blue-2:#E7EFF8;--blue-3:#0F3A69;--z1:#2E8B57;--z2:#9ACD32;--z3:#E6B800;--z4:#F08A5D;--z5:#D63B3B;--z6:#7B2CBF;--warn-bg:#FFF6DD;--warn-ink:#6B4F00;--tip-bg:#1E2B33;--tip-ink:#fff;--lock:#EEF1F3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#131A1F;--sheet:#1B2328;--ink:#EEF2F4;--ink-2:#B8C3CA;--ink-3:#8696A0;--rule:#2C373E;--rule-2:#3B474F;--blue:#8DB8EC;--blue-2:#1D2E40;--blue-3:#BFD8F5;--warn-bg:#3A2E10;--warn-ink:#F3D98A;--tip-bg:#EEF2F4;--tip-ink:#131A1F;--lock:#1A2229}}
+  :root[data-theme="dark"]{--paper:#131A1F;--sheet:#1B2328;--ink:#EEF2F4;--ink-2:#B8C3CA;--ink-3:#8696A0;--rule:#2C373E;--rule-2:#3B474F;--blue:#8DB8EC;--blue-2:#1D2E40;--blue-3:#BFD8F5;--warn-bg:#3A2E10;--warn-ink:#F3D98A;--tip-bg:#EEF2F4;--tip-ink:#131A1F;--lock:#1A2229}
+  html{scroll-padding-top:env(safe-area-inset-top,0px)} *,*::before,*::after{box-sizing:inherit}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;word-break:keep-all}
+  header.top{border-bottom:2px solid var(--ink);padding:22px 24px 16px;background:var(--sheet)}
+  .top-inner{max-width:1440px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  h1{margin:0;font-size:26px;font-weight:900;letter-spacing:-.02em;line-height:1.2} h1 small{display:block;font-size:13px;font-weight:500;color:var(--ink-2);margin-top:4px}
+  main{max-width:1440px;margin:0 auto;padding:22px 24px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
+  @media (max-width:980px){main{grid-template-columns:1fr}}
+  .steps{display:flex;flex-direction:column;gap:14px}
+  section.stage{background:var(--sheet);border:1px solid var(--rule);border-left:6px solid var(--blue);padding:16px 20px 18px}
+  /* 도구별 색: 안내 녹색, OCRA Mini-Checklist 네이비, OCRA Checklist 주황, OCRA Index 보라 */
+  #st1{--acc:#1F3A6E;--acc-bg:rgba(31,58,110,.07)} #st2{--acc:#B5620E;--acc-bg:rgba(181,98,14,.08)} #st3{--acc:#5B2C8F;--acc-bg:rgba(91,44,143,.07)} #st4{--acc:#0F6E6E;--acc-bg:rgba(15,110,110,.07)}
+  #st1,#st2,#st3,#st4{border-left-color:var(--acc);background:var(--acc-bg)}
+  #st1 .stage-head .no,#st2 .stage-head .no,#st3 .stage-head .no,#st4 .stage-head .no{background:var(--acc)} #st1 .stage-head h2,#st2 .stage-head h2,#st3 .stage-head h2,#st4 .stage-head h2{color:var(--acc)}
+  #st1 .sub-h,#st2 .sub-h,#st3 .sub-h{color:var(--acc)} #st1 .advice,#st2 .advice,#st3 .advice,#st4 .advice{border-color:var(--acc)} #st1 .btn.primary,#st2 .btn.primary,#st3 .btn.primary,#st4 .btn.primary{background:var(--acc);border-color:var(--acc)}
+  #st1 fieldset.group,#st1 .jointbox,#st2 fieldset.group,#st3 .jointbox,#st1 .iconrow label.f,#st3 .jitem{background:var(--sheet)}
+  .intro{--acc:#2E8B57;background:rgba(46,139,87,.07)}
+  section.stage.locked{border-left-color:var(--rule-2);background:var(--lock)} section.stage.locked .stage-head h2{color:var(--ink-3)}
+  section.stage.locked .body{display:none}
+  .stage-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .stage-head .no{font-weight:700;font-size:12.5px;color:#fff;background:var(--blue);border-radius:999px;padding:3px 10px} section.locked .stage-head .no{background:var(--ink-3)}
+  .stage-head h2{margin:0;font-size:18px;font-weight:700} .stage-head h2 em{font-style:normal;font-weight:500;color:var(--ink-3);font-size:13px;margin-left:6px}
+  .stage-head .val{margin-left:auto;font-weight:700;font-size:15px;color:var(--blue-3);font-variant-numeric:tabular-nums}
+  .sub-h{font-size:15px;font-weight:700;margin:16px 0 6px;display:flex;align-items:center;gap:8px}
+  .help{color:var(--ink-2);font-size:13.5px;margin:0 0 12px}
+  .row{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px 16px}
+  .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px 16px;align-items:start}
+  fieldset.group{border:1px solid var(--rule);border-radius:6px;margin:0;padding:8px 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px} fieldset.group legend{font-size:13px;font-weight:700;color:var(--blue-3);padding:0 4px} fieldset.group.three{grid-template-columns:1fr 1fr 1fr}
+  label.f{display:flex;flex-direction:column;gap:5px;font-size:13.5px;font-weight:500} label.f .lt{display:flex;align-items:center;gap:6px;white-space:nowrap}
+  input[type=number],input[type=text],select{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--rule-2);border-radius:6px;background:var(--sheet);color:var(--ink);width:100%}
+  input[readonly]{background:var(--blue-2);color:var(--blue-3);font-weight:700}
+  input:focus,select:focus,button:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+  .checks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 14px;margin-bottom:12px}
+  .checks label{display:flex;align-items:center;gap:8px;font-size:14px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;cursor:pointer} .checks label:has(input:checked){background:var(--blue-2);border-color:var(--blue);font-weight:700} .checks input{width:18px;height:18px;accent-color:var(--blue);margin:0}
+  .jointbox{border:1px solid var(--rule);border-radius:6px;padding:8px 12px 10px;margin-top:10px} .jointbox h3{margin:0 0 6px;font-size:14px;font-weight:700;color:var(--blue-3);display:flex;align-items:center;gap:8px} .jointbox h3 .jv{margin-left:auto;font-weight:500;color:var(--ink-3);font-size:12.5px}
+  .jgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px 14px} .jitem{display:flex;flex-direction:column;gap:6px;font-size:13.5px;border:1px solid var(--rule);border-radius:8px;padding:8px} .jitem .jn{display:flex;flex-direction:column;gap:6px;flex:1} .jitem .jn svg.ico{height:120px;margin:0}
+  details{margin-top:10px;border-top:1px dashed var(--rule-2);padding-top:8px} summary{cursor:pointer;font-size:13.5px;font-weight:700;color:var(--blue)}
+  .note{background:var(--warn-bg);color:var(--warn-ink);border-radius:6px;padding:8px 12px;font-size:13px;margin-top:10px}
+  .advice{border:2px solid var(--blue);border-radius:8px;padding:10px 14px;margin-top:14px;font-size:14px;background:var(--blue-2)}
+  .advice b{display:block;margin-bottom:4px} #next1 .advice,#next2 .advice{border-color:var(--rule-2);margin-top:8px}
+  .tip{position:relative;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--blue);color:var(--blue);font-size:11px;font-weight:700;cursor:help;background:transparent;padding:0;font-family:inherit;flex:none;vertical-align:middle}
+  .tip::after{content:attr(data-tip);position:absolute;left:0;bottom:calc(100% + 8px);width:max-content;max-width:min(320px,80vw);background:var(--tip-bg);color:var(--tip-ink);font-size:12.5px;font-weight:400;line-height:1.5;padding:8px 10px;border-radius:6px;box-shadow:0 4px 14px rgba(0,0,0,.18);z-index:20;opacity:0;pointer-events:none;transition:opacity .12s;white-space:normal;text-align:left}
+  .tip::before{content:"";position:absolute;left:5px;bottom:calc(100% + 2px);border:6px solid transparent;border-top-color:var(--tip-bg);opacity:0;transition:opacity .12s;z-index:21}
+  .tip:hover::after,.tip:hover::before,.tip:focus-visible::after,.tip:focus-visible::before,.tip.on::after,.tip.on::before{opacity:1}
+  .tip.flip::after{left:auto;right:0} .tip.flip::before{left:auto;right:5px} .tip.below::after{bottom:auto;top:calc(100% + 8px)} .tip.below::before{bottom:auto;top:calc(100% + 2px);border-top-color:transparent;border-bottom-color:var(--tip-bg)}
+  /* TEST-ONLY */
+  .dbg{margin-top:12px;border:2px dashed #E0801A;background:rgba(224,128,26,.08);border-radius:6px;padding:8px 12px;font-size:12.5px;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.6;color:var(--ink);white-space:pre-wrap} .dbg::before{content:"계산 과정(테스트용)";display:block;font-family:"Noto Sans KR",sans-serif;font-weight:700;color:#B5620E;font-size:12px;margin-bottom:2px} body.nodbg .dbg{display:none}
+  #dbgToggle{font:inherit;font-size:12.5px;padding:6px 10px;border:2px dashed #E0801A;background:transparent;color:#B5620E;border-radius:6px;cursor:pointer;font-weight:700}
+  /* /TEST-ONLY */
+  aside.result{position:sticky;top:calc(12px + env(safe-area-inset-top,0px));background:var(--sheet);border:1px solid var(--rule);padding:18px}
+  .r-title{font-size:13px;font-weight:700;color:var(--ink-2);margin:0 0 6px} .index{font-size:50px;font-weight:900;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .zone{display:inline-block;margin-top:8px;padding:4px 10px;border-radius:4px;font-weight:700;color:#fff;font-size:14px}
+  .band{position:relative;height:22px;display:grid;grid-template-columns:1.5fr .7fr 1.3fr 1fr 4.5fr 2fr;margin:18px 0 4px} .band i{display:block} .band i:first-child{border-radius:4px 0 0 4px} .band i:last-child{border-radius:0 4px 4px 0}
+  .band-ticks{display:grid;grid-template-columns:1.5fr .7fr 1.3fr 1fr 4.5fr 2fr;font-size:11px;color:var(--ink-3)}
+  .marker{position:absolute;top:-6px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid var(--ink);transform:translateX(-50%);transition:left .25s}
+  .sub{margin-top:12px;padding-top:10px;border-top:1px solid var(--rule)} .sub .st{font-size:13px;font-weight:700;color:var(--ink-2)} .sub .si{font-size:24px;font-weight:900;line-height:1.1;font-variant-numeric:tabular-nums}
+  .kv{display:grid;grid-template-columns:auto 1fr auto;gap:3px 10px;font-size:13px;margin-top:8px} .kv .k{color:var(--ink-2)} .kv .v{text-align:right;font-variant-numeric:tabular-nums;font-weight:500} .kv .sym{font-weight:700;color:var(--blue-3)}
+  .formula{font-size:12.5px;color:var(--ink-2);margin-top:12px;line-height:1.5}
+  .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px} .btn{font:inherit;font-size:13.5px;padding:8px 12px;border:1px solid var(--rule-2);background:var(--sheet);color:var(--ink);border-radius:6px;cursor:pointer} .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+  .btn:disabled,.btn.primary:disabled{background:var(--lock)!important;border-color:var(--rule-2)!important;color:var(--ink-3)!important;cursor:not-allowed;opacity:.7;box-shadow:none} .btn.small{font-size:12.5px;padding:4px 8px}
+  .msg{font-size:12.5px;color:var(--ink-3);margin-top:8px;min-height:1.2em;white-space:pre-wrap}
+  table.tasks{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:8px} table.tasks th,table.tasks td{border:1px solid var(--rule);padding:6px;vertical-align:middle} table.tasks th{background:var(--blue-2);font-weight:700;font-size:13px;white-space:nowrap} table.tasks input,table.tasks select{font-size:14px;padding:6px 8px;min-width:84px}
+  .seg{display:flex;flex-wrap:wrap;gap:6px} .seg button{font:inherit;font-size:13.5px;padding:7px 12px;border:1px solid var(--rule-2);background:var(--sheet);color:var(--ink);border-radius:6px;cursor:pointer} .seg button[aria-pressed="true"]{background:var(--acc,var(--blue));border-color:var(--acc,var(--blue));color:#fff;font-weight:700}
+  #modeSingle,#modeMulti{background:#FFF1E3;border-color:#E0A36A;color:#7A3F00;font-weight:700} #modeSingle[aria-pressed="true"],#modeMulti[aria-pressed="true"]{background:#E0801A;border-color:#E0801A;color:#fff} body:not(.multi) #st4{display:none} body.multi #multiCtl{display:block} #multiCtl{display:none}
+  .taskbanner{background:#E0801A;color:#fff;font-weight:900;font-size:18px;padding:12px 16px;border-radius:8px;margin:10px 0 8px;letter-spacing:-.01em} .taskbanner small{display:block;font-size:13px;font-weight:500;opacity:.95;margin-top:2px}
+  .learn{font-size:13px;color:var(--ink-2);background:var(--blue-2);border-left:3px solid var(--blue);padding:6px 10px;margin:6px 0 10px;border-radius:0 6px 6px 0} body:not(.showlearn) .learn{display:none}
+  .intro{background:var(--sheet);border:1px solid var(--rule);border-left:6px solid var(--z1);padding:16px 20px}
+  .intro h2{margin:0 0 8px;font-size:18px} .intro ol{margin:6px 0 0 18px;padding:0;font-size:14px} .intro li{margin:4px 0}
+  .ico{display:block;width:100%;height:170px;border:1px solid var(--rule);border-radius:6px;background:#fff;margin:0 0 6px;flex:none}
+  .iconrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px 16px}
+  .iconrow label.f{flex-direction:column;align-items:stretch;gap:6px;border:1px solid var(--rule);border-radius:8px;padding:8px} .iconrow label.f .lt{white-space:normal}
+  .iconrow select{width:100%}
+  .gloss{background:var(--sheet);border:1px solid var(--rule);padding:16px 20px} .gloss h2{font-size:17px;margin:0 0 8px} .gloss dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:13.5px;margin:0} .gloss dt{font-weight:700;color:var(--blue-3)} .gloss dd{margin:0;color:var(--ink-2)}
+  footer{max-width:1440px;margin:0 auto;padding:10px 24px 40px;color:var(--ink-3);font-size:12.5px;line-height:1.7} footer ul{padding-left:18px;margin:6px 0}
+  @media (prefers-reduced-motion:reduce){.marker{transition:none}.tip::after{transition:none}}
+  @media print{aside.result{position:static}.actions,.msg,details,#dbgToggle{display:none}body{background:#fff}section.stage.locked{display:none}}
+  .sidebar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0 4px;padding:8px 10px;border:2px solid var(--blue);border-radius:8px;background:var(--blue-2)}
+  .sidebar .sidenow{font-weight:700;color:var(--blue-3)} .sidebar.single .seg{display:none} .sidebar .help{margin:0;font-size:12px}
+  input.est{background:#FFF4C2;border-color:#D9A400} :root[data-theme="dark"] input.est,@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) input.est{background:#4A3F12}}
+  .kv2{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:4px} .kv2 th,.kv2 td{border-bottom:1px solid var(--rule);padding:2px 6px;text-align:right;font-variant-numeric:tabular-nums} .kv2 td:first-child,.kv2 th:first-child{text-align:left;color:var(--ink-2)}
+  select.afd{margin-left:6px;font-size:12px;padding:2px 4px;width:auto} label.f input[type=checkbox]{width:20px;height:20px;accent-color:var(--blue)}
+  #estNote{border-color:#D9A400}
+  dialog.modal{border:2px solid var(--blue);border-radius:10px;padding:18px 20px;max-width:420px;background:var(--sheet);color:var(--ink);font-size:16px;line-height:1.6} dialog.modal::backdrop{background:rgba(0,0,0,.45)} dialog.modal b{display:block;margin-bottom:6px;font-size:17px} dialog.modal .actions{margin-top:12px;justify-content:flex-end}
+  /* ===== 질문 구획 표식 ===== */
+  .sub-h{font-size:16.5px;font-weight:800;margin:22px 0 8px;padding:8px 12px;border-left:6px solid var(--acc,var(--blue));border-radius:0 8px 8px 0;background:var(--blue-2);background:color-mix(in srgb,var(--acc,var(--blue)) 12%,var(--sheet))}
+  .sub-h::before{content:"▶";margin-right:4px;font-size:14px}
+  .sub-h .stepno{display:inline-block;min-width:26px;height:26px;line-height:26px;text-align:center;border-radius:50%;background:var(--acc,var(--blue));color:#fff;font-size:13.5px;font-weight:800;margin-right:4px}
+  #st1 .row,#st1 .groups,#st1 .checks,#st2 .row,#st3 .row,#st3 #jointArea,#st1 .sidebar{border-left:3px solid var(--rule-2);margin-left:6px;padding-left:12px}
+  #st1 .learn,#st2 .learn,#st3 .learn{margin-left:6px}
+  label.f .lt::before,.checks label::before,fieldset.group legend::before{content:"▷ ";color:var(--acc,var(--blue));font-weight:800}
+  label.f .lt{font-weight:600;color:var(--ink)} fieldset.group legend{font-weight:800;color:var(--acc,var(--blue));padding:0 6px}
+  .checks label{font-weight:500}
+  .stepguide{font-size:13.5px;color:var(--ink-2);margin:4px 0 0}
+  /* ===== 스마트폰(iPhone SE·12 mini, 375px 기준) ===== */
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+  .mbar{display:none}
+  @media (max-width:560px){
+    html{-webkit-text-size-adjust:100%}
+    header.top{padding:14px 14px 10px} h1{font-size:20px} h1 small{font-size:12px}
+    main{padding:12px 12px 90px;gap:14px} section.stage{padding:12px 12px 14px;border-left-width:5px}
+    .stage-head{gap:8px} .stage-head h2{font-size:16.5px;line-height:1.3} .stage-head h2 em{display:block;font-size:12px} .stage-head .val{margin-left:0;width:100%;font-size:15px}
+    .row,.groups,.jgrid,.iconrow{grid-template-columns:1fr !important;gap:12px} fieldset.group{grid-template-columns:1fr;gap:10px;padding:8px 10px 12px}
+    #st1 .row,#st1 .groups,#st1 .checks,#st2 .row,#st3 .row,#st3 #jointArea,#st1 .sidebar{margin-left:2px;padding-left:10px}
+    label.f{font-size:15px;gap:6px;padding:4px 0} label.f .lt{line-height:1.45}
+    input[type=number],input[type=text],select{font-size:16px;min-height:46px;padding:10px 12px}
+    input[type=checkbox]{width:26px !important;height:26px !important}
+    label.f input[type=checkbox]{width:28px !important;height:28px !important;margin:4px 0}
+    .checks{gap:6px} .checks label{display:flex;align-items:center;gap:10px;min-height:46px;font-size:15px;padding:4px 6px;border:1px solid var(--rule);border-radius:8px;background:var(--sheet)} select.afd{min-height:38px;margin-left:auto}
+    .btn{font-size:15px;min-height:46px;padding:10px 14px} .actions{display:flex;flex-wrap:wrap;gap:8px} .actions .btn{flex:1 1 100%}
+    .seg{gap:8px} .seg button{flex:1 1 45%;min-height:46px;font-size:15px}
+    .sidebar{flex-direction:column;align-items:stretch;gap:8px} .sidebar .help{font-size:12.5px}
+    .sub-h{font-size:15.5px;padding:8px 10px;margin:18px 0 8px;line-height:1.35} .sub-h .stepno{min-width:24px;height:24px;line-height:24px}
+    .learn{font-size:13.5px} .help{font-size:13.5px} .stepguide{font-size:13px}
+    .tip::after{position:fixed;left:12px;right:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));top:auto;width:auto;max-width:none;font-size:14px;line-height:1.55;padding:12px 14px;box-shadow:0 4px 24px rgba(0,0,0,.25);z-index:60}
+    .tip.flip::after,.tip.below::after{left:12px;right:12px;top:auto;bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+    .tip::before{display:none}
+    aside.result{position:static;padding:14px} .index{font-size:40px}
+    .jitem{padding:10px} .jitem .jn{font-size:14.5px} .jitem input{font-size:16px}
+    table.tasks{font-size:13px} table.tasks th,table.tasks td{padding:5px} .kv2{font-size:13px}
+    dialog.modal{max-width:92vw;width:92vw;font-size:15.5px}
+    .dbg,#dbgToggle,.gloss,footer,.glosslink{display:none !important}
+    /* 하단 고정 결과 막대 */
+    .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;align-items:center;gap:10px;padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));background:var(--sheet);border-top:2px solid var(--blue);box-shadow:0 -4px 16px rgba(0,0,0,.12);font-size:13px}
+    .mbar .t{flex:1 1 auto;min-width:0;color:var(--ink-2);line-height:1.3} .mbar .t span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mbar b{font-size:24px;font-variant-numeric:tabular-nums;color:var(--ink)} .mbar .z{color:#fff;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700;background:var(--ink-3);white-space:nowrap}
+    .mbar button{font:inherit;font-size:13px;padding:8px 10px;border-radius:6px;border:1px solid var(--rule-2);background:var(--sheet);color:var(--ink);min-height:40px}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <h1>OCRA 평가 도구 <small>먼저 OCRA Mini-Checklist로 간이 선별하고, 점수에 따라 OCRA Checklist(추가 조사) 또는 OCRA Index(정밀 분석·개선 설계)로 이어집니다. 한 번 넣은 값은 다시 묻지 않습니다. 모든 점수표는 EPM(개발자) 공식 시트 기준입니다.</small></h1>
+    <button type="button" id="dbgToggle">계산 과정 표시 끄기</button>
+  </div>
+</header>
+
+<main>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none"><symbol id="ic-pinch" viewBox="0 0 200 205">
+<!-- 접힌 세 손가락(뒤) -->
+<path d="M96 112 C110 118 116 128 110 136" fill="none" stroke="#1E2B33" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/><path d="M96 112 C110 118 116 128 110 136" fill="none" stroke="#F3E3D3" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M94 122 C106 128 110 136 104 142" fill="none" stroke="#1E2B33" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/><path d="M94 122 C106 128 110 136 104 142" fill="none" stroke="#F3E3D3" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M90 130 C100 136 102 142 96 146" fill="none" stroke="#1E2B33" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><path d="M90 130 C100 136 102 142 96 146" fill="none" stroke="#F3E3D3" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- 손바닥·손등 -->
+<rect x="24" y="94" width="78" height="48" rx="22" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/>
+<!-- 집게손가락: 두 마디 -->
+<path d="M92 102 C112 96 130 94 146 98" fill="none" stroke="#1E2B33" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/><path d="M92 102 C112 96 130 94 146 98" fill="none" stroke="#F3E3D3" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M140 98 C150 99 158 101 164 104" fill="none" stroke="#1E2B33" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/><path d="M140 98 C150 99 158 101 164 104" fill="none" stroke="#F3E3D3" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- 엄지: 아래에서 올라와 끝이 집게손가락 끝 아래 -->
+<path d="M44 136 C60 138 84 134 104 126" fill="none" stroke="#1E2B33" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/><path d="M44 136 C60 138 84 134 104 126" fill="none" stroke="#F3E3D3" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M100 127 C120 120 140 112 160 110" fill="none" stroke="#1E2B33" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/><path d="M100 127 C120 120 140 112 160 110" fill="none" stroke="#F3E3D3" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="160" y="100" width="24" height="8" rx="3" fill="#174F8C"/><path d="M184 104 L194 104" stroke="#174F8C" stroke-width="3" stroke-linecap="round"/>
+<text x="100" y="80" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">집게손가락 끝</text><text x="20" y="166" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">엄지 끝</text><text x="106" y="166" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">나머지는 접음</text></symbol><symbol id="ic-palm" viewBox="0 0 200 205"><ellipse cx="100" cy="118" rx="56" ry="22" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3"/><path d="M44 118 L44 136 A56 22 0 0 0 156 136 L156 118" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3"/><ellipse cx="100" cy="118" rx="56" ry="22" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3"/><line x1="100.0" y1="126.0" x2="100.0" y2="182.0" stroke="#1E2B33" stroke-width="22" stroke-linecap="round"/><line x1="100.0" y1="126.0" x2="100.0" y2="182.0" stroke="#F3E3D3" stroke-width="18" stroke-linecap="round"/><path d="M72 112 Q70 92 86 84 L118 76 Q134 74 136 86 L138 104 Q138 122 120 126 L80 128 Q72 126 72 112 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><path d="M86 84 L92 48 Q94 42 100 42 L124 40 Q130 40 130 46 L128 78" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><path d="M100 82 L104 44 M112 80 L114 42 M122 79 L123 41" stroke="#1E2B33" stroke-width="1.6" fill="none" opacity=".7"/><path d="M130 78 L136 60 Q138 54 144 56 Q148 60 146 68 L140 92" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><path d="M172 118 L172 166" stroke="#D63B3B" stroke-width="4" stroke-linecap="round"/><path d="M162 156 L172 170 L182 156" fill="none" stroke="#D63B3B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="156" y="188" font-family="Noto Sans CJK KR, sans-serif" font-size="11.5" fill="#D63B3B" font-weight="700">힘 ↓</text></symbol><symbol id="ic-power" viewBox="0 0 200 205"><path d="M96 40 L104 150 L160 150 L168 40 Z" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><ellipse cx="132" cy="40" rx="36" ry="9" fill="#fff" stroke="#1E2B33" stroke-width="3"/><line x1="14.0" y1="92.0" x2="74.0" y2="92.0" stroke="#1E2B33" stroke-width="26" stroke-linecap="round"/><line x1="14.0" y1="92.0" x2="74.0" y2="92.0" stroke="#F3E3D3" stroke-width="22" stroke-linecap="round"/><path d="M72 68 L112 62 Q122 62 122 72 L122 120 Q122 130 112 130 L72 126 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><path d="M118 74 C140 70 160 76 166 82" fill="none" stroke="#1E2B33" stroke-width="12" stroke-linecap="round" opacity="1"/><path d="M118 74 C140 70 160 76 166 82" fill="none" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round" opacity="1"/><path d="M118 90 C140 86 160 92 166 98" fill="none" stroke="#1E2B33" stroke-width="12" stroke-linecap="round" opacity="1"/><path d="M118 90 C140 86 160 92 166 98" fill="none" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round" opacity="1"/><path d="M118 106 C140 102 160 108 166 114" fill="none" stroke="#1E2B33" stroke-width="12" stroke-linecap="round" opacity="1"/><path d="M118 106 C140 102 160 108 166 114" fill="none" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round" opacity="1"/><path d="M118 122 C140 118 160 124 166 130" fill="none" stroke="#1E2B33" stroke-width="12" stroke-linecap="round" opacity="1"/><path d="M118 122 C140 118 160 124 166 130" fill="none" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round" opacity="1"/><path d="M100 66 C120 54 146 54 162 60" fill="none" stroke="#1E2B33" stroke-width="12" stroke-linecap="round" opacity="1"/><path d="M100 66 C120 54 146 54 162 60" fill="none" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round" opacity="1"/><text x="110" y="176" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">네 손가락이 감쌈</text><text x="80" y="54" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">엄지</text></symbol><symbol id="ic-narrow" viewBox="0 0 200 205"><path d="M104 96 L190 96 L190 112 L104 112 Z" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3"/><path d="M196 96 L196 112" stroke="#174F8C" stroke-width="2"/><text x="150" y="130" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">두께 2 cm</text><line x1="12.0" y1="112.0" x2="72.0" y2="112.0" stroke="#1E2B33" stroke-width="26" stroke-linecap="round"/><line x1="12.0" y1="112.0" x2="72.0" y2="112.0" stroke="#F3E3D3" stroke-width="22" stroke-linecap="round"/><path d="M70 86 L104 82 Q112 82 112 90 L112 134 Q112 142 104 142 L70 138 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><path d="M108 118 C122 120 134 118 140 112" fill="none" stroke="#1E2B33" stroke-width="11" stroke-linecap="round" opacity="1"/><path d="M108 118 C122 120 134 118 140 112" fill="none" stroke="#F3E3D3" stroke-width="7" stroke-linecap="round" opacity="1"/><path d="M106 128 C116 132 124 130 128 124" fill="none" stroke="#1E2B33" stroke-width="10" stroke-linecap="round" opacity="0.6"/><path d="M106 128 C116 132 124 130 128 124" fill="none" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round" opacity="0.6"/><path d="M104 136 C112 140 120 138 122 132" fill="none" stroke="#1E2B33" stroke-width="9" stroke-linecap="round" opacity="0.4"/><path d="M104 136 C112 140 120 138 122 132" fill="none" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round" opacity="0.4"/><path d="M80 90 C100 86 122 86 140 92" fill="none" stroke="#1E2B33" stroke-width="12" stroke-linecap="round" opacity="1"/><path d="M80 90 C100 86 122 86 140 92" fill="none" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round" opacity="1"/><text x="78" y="72" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">엄지 바닥면</text><text x="20" y="166" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">집게손가락 옆면이 받침</text></symbol><symbol id="ic-shoulder_front" viewBox="0 0 200 205"><circle cx="60" cy="29.8" r="9.8" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/><line x1="60.0" y1="39.5" x2="60.0" y2="47.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="60.0" y1="39.5" x2="60.0" y2="47.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><path d="M69 29.0 L74 31.2 L69 32.8" fill="#F3E3D3" stroke="#1E2B33" stroke-width="2" stroke-linejoin="round"/><path d="M51 47.0 L69 47.0 L67 98.0 L53 98.0 Z" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><line x1="60.0" y1="98.0" x2="63.0" y2="131.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="60.0" y1="98.0" x2="63.0" y2="131.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="63.0" y1="131.0" x2="66.0" y2="170.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="63.0" y1="131.0" x2="66.0" y2="170.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="66.0" y1="170.0" x2="82.0" y2="170.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="66.0" y1="170.0" x2="82.0" y2="170.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><line x1="60.0" y1="47.0" x2="88.1" y2="42.1" stroke="#174F8C" stroke-width="11" stroke-linecap="round"/><line x1="88.1" y1="42.1" x2="110.2" y2="38.1" stroke="#174F8C" stroke-width="10" stroke-linecap="round"/><line x1="110.2" y1="38.1" x2="126.5" y2="35.3" stroke="#174F8C" stroke-width="8" stroke-linecap="round"/><line x1="60.0" y1="47.0" x2="60.0" y2="107.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><path d="M60.0 87.0 A40 40 0 0 0 99.4 40.1" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><text x="90" y="87.0" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">90°↑</text></symbol><symbol id="ic-overhead" viewBox="0 0 200 205"><g transform="translate(20 34) scale(0.86)"><circle cx="60" cy="29.8" r="9.8" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/><line x1="60.0" y1="39.5" x2="60.0" y2="47.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="60.0" y1="39.5" x2="60.0" y2="47.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><path d="M69 29.0 L74 31.2 L69 32.8" fill="#F3E3D3" stroke="#1E2B33" stroke-width="2" stroke-linejoin="round"/><path d="M51 47.0 L69 47.0 L67 98.0 L53 98.0 Z" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><line x1="60.0" y1="98.0" x2="63.0" y2="131.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="60.0" y1="98.0" x2="63.0" y2="131.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="63.0" y1="131.0" x2="66.0" y2="170.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="63.0" y1="131.0" x2="66.0" y2="170.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="66.0" y1="170.0" x2="82.0" y2="170.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="66.0" y1="170.0" x2="82.0" y2="170.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><line x1="60.0" y1="47.0" x2="74.2" y2="22.3" stroke="#174F8C" stroke-width="11" stroke-linecap="round"/><line x1="74.2" y1="22.3" x2="85.5" y2="2.8" stroke="#174F8C" stroke-width="10" stroke-linecap="round"/><line x1="85.5" y1="2.8" x2="93.8" y2="-11.5" stroke="#174F8C" stroke-width="8" stroke-linecap="round"/><line x1="30.0" y1="20.0" x2="130.0" y2="20.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><text x="102" y="16" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">머리 높이</text></g></symbol><symbol id="ic-shoulder_abd" viewBox="0 0 200 205"><circle cx="100" cy="29.8" r="9.8" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/><line x1="100.0" y1="39.5" x2="100.0" y2="47.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="100.0" y1="39.5" x2="100.0" y2="47.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><path d="M82.8 47.0 L117.2 47.0 L113.8 98.0 L86.2 98.0 Z" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><line x1="91.4" y1="98.0" x2="89.7" y2="170.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="91.4" y1="98.0" x2="89.7" y2="170.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="108.6" y1="98.0" x2="110.3" y2="170.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="108.6" y1="98.0" x2="110.3" y2="170.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="82.8" y1="47.0" x2="80.3" y2="75.4" stroke="#1E2B33" stroke-width="11" stroke-linecap="round"/><line x1="82.8" y1="47.0" x2="80.3" y2="75.4" stroke="#F3E3D3" stroke-width="7" stroke-linecap="round"/><line x1="80.3" y1="75.4" x2="79.5" y2="97.9" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="80.3" y1="75.4" x2="79.5" y2="97.9" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><line x1="79.5" y1="97.9" x2="78.9" y2="114.4" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="79.5" y1="97.9" x2="78.9" y2="114.4" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><line x1="117.2" y1="47.0" x2="142.4" y2="60.4" stroke="#174F8C" stroke-width="11" stroke-linecap="round"/><line x1="142.4" y1="60.4" x2="162.3" y2="70.9" stroke="#174F8C" stroke-width="10" stroke-linecap="round"/><line x1="162.3" y1="70.9" x2="176.8" y2="78.7" stroke="#174F8C" stroke-width="8" stroke-linecap="round"/><line x1="117.2" y1="47.0" x2="117.2" y2="107.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><path d="M117.2 89.0 A42 42 0 0 0 154.3 66.7" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><text x="143.25" y="105.0" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">45–80°</text></symbol><symbol id="ic-shoulder_ext" viewBox="0 0 200 205"><circle cx="110" cy="29.8" r="9.8" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/><line x1="110.0" y1="39.5" x2="110.0" y2="47.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="110.0" y1="39.5" x2="110.0" y2="47.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><path d="M101 47.0 L119 47.0 L117 98.0 L103 98.0 Z" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><line x1="110.0" y1="98.0" x2="113.0" y2="131.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="110.0" y1="98.0" x2="113.0" y2="131.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="113.0" y1="131.0" x2="116.0" y2="170.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="113.0" y1="131.0" x2="116.0" y2="170.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="116.0" y1="170.0" x2="132.0" y2="170.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="116.0" y1="170.0" x2="132.0" y2="170.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><path d="M119 29.0 L124 31.2 L119 32.8" fill="#F3E3D3" stroke="#1E2B33" stroke-width="2" stroke-linejoin="round"/><line x1="110.0" y1="47.0" x2="98.0" y2="72.8" stroke="#174F8C" stroke-width="11" stroke-linecap="round"/><line x1="98.0" y1="72.8" x2="88.4" y2="93.2" stroke="#174F8C" stroke-width="10" stroke-linecap="round"/><line x1="88.4" y1="93.2" x2="81.5" y2="108.2" stroke="#174F8C" stroke-width="8" stroke-linecap="round"/><line x1="110.0" y1="47.0" x2="110.0" y2="109.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><path d="M110.0 91.0 A44 44 0 0 1 91.4 86.9" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><text x="48" y="117.0" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">20°↑</text><text x="126" y="57.0" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">앞</text><text x="70" y="27.0" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">뒤</text></symbol><symbol id="ic-wrist_flexext" viewBox="0 0 200 205"><g opacity="1"><line x1="16.0" y1="100.0" x2="96.0" y2="100.0" stroke="#1E2B33" stroke-width="24" stroke-linecap="round"/><line x1="16.0" y1="100.0" x2="96.0" y2="100.0" stroke="#F3E3D3" stroke-width="20" stroke-linecap="round"/></g><g transform="translate(100 100) rotate(-48)" opacity="0.45"><path d="M0 -12 L56 -16 Q64 -16 64 -8 L62 8 Q60 14 52 14 L0 12 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><g opacity="1"><line x1="62.0" y1="-10.0" x2="100.0" y2="-8.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="62.0" y1="-10.0" x2="100.0" y2="-8.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/></g><g opacity="1"><line x1="24.0" y1="12.0" x2="44.0" y2="28.0" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="24.0" y1="12.0" x2="44.0" y2="28.0" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/></g></g><g transform="translate(100 104) rotate(48)" opacity="1"><path d="M0 -12 L56 -16 Q64 -16 64 -8 L62 8 Q60 14 52 14 L0 12 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><g opacity="1"><line x1="62.0" y1="-10.0" x2="100.0" y2="-8.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="62.0" y1="-10.0" x2="100.0" y2="-8.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/></g><g opacity="1"><line x1="24.0" y1="12.0" x2="44.0" y2="28.0" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="24.0" y1="12.0" x2="44.0" y2="28.0" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/></g></g><line x1="100.0" y1="102.0" x2="170.0" y2="102.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><path d="M148.0 102.0 A48 48 0 0 1 132.1 137.7" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><path d="M148.0 102.0 A48 48 0 0 0 132.1 66.3" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><text x="140" y="86" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">45°↑</text><text x="140" y="130" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">45°↓</text><circle cx="100" cy="102" r="4" fill="#174F8C"/><text x="14" y="76" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">전완(팔뚝)</text></symbol><symbol id="ic-wrist_flex" viewBox="0 0 200 205"><g opacity="1"><line x1="16.0" y1="92.0" x2="96.0" y2="92.0" stroke="#1E2B33" stroke-width="24" stroke-linecap="round"/><line x1="16.0" y1="92.0" x2="96.0" y2="92.0" stroke="#F3E3D3" stroke-width="20" stroke-linecap="round"/></g><g transform="translate(100 96) rotate(48)" opacity="1"><path d="M0 -12 L56 -16 Q64 -16 64 -8 L62 8 Q60 14 52 14 L0 12 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><g opacity="1"><line x1="62.0" y1="-10.0" x2="100.0" y2="-8.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="62.0" y1="-10.0" x2="100.0" y2="-8.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/></g><g opacity="1"><line x1="24.0" y1="12.0" x2="44.0" y2="28.0" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="24.0" y1="12.0" x2="44.0" y2="28.0" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/></g></g><line x1="100.0" y1="96.0" x2="170.0" y2="96.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><path d="M148.0 96.0 A48 48 0 0 1 132.1 131.7" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><text x="136" y="78" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">45°↑</text><circle cx="100" cy="96" r="4" fill="#174F8C"/><text x="14" y="68" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">전완(팔뚝)</text></symbol><symbol id="ic-wrist_ext" viewBox="0 0 200 205"><g opacity="1"><line x1="16.0" y1="112.0" x2="96.0" y2="112.0" stroke="#1E2B33" stroke-width="24" stroke-linecap="round"/><line x1="16.0" y1="112.0" x2="96.0" y2="112.0" stroke="#F3E3D3" stroke-width="20" stroke-linecap="round"/></g><g transform="translate(100 108) rotate(-48)" opacity="1"><path d="M0 -12 L56 -16 Q64 -16 64 -8 L62 8 Q60 14 52 14 L0 12 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><g opacity="1"><line x1="62.0" y1="-10.0" x2="100.0" y2="-8.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="62.0" y1="-10.0" x2="100.0" y2="-8.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/></g><g opacity="1"><line x1="24.0" y1="12.0" x2="44.0" y2="28.0" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="24.0" y1="12.0" x2="44.0" y2="28.0" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/></g></g><line x1="100.0" y1="108.0" x2="170.0" y2="108.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><path d="M148.0 108.0 A48 48 0 0 0 132.1 72.3" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><text x="136" y="140" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">45°↑</text><circle cx="100" cy="108" r="4" fill="#174F8C"/><text x="14" y="88" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">전완(팔뚝)</text></symbol><symbol id="ic-wrist_rad" viewBox="0 0 200 205"><line x1="14.0" y1="104.0" x2="96.0" y2="104.0" stroke="#1E2B33" stroke-width="26" stroke-linecap="round"/><line x1="14.0" y1="104.0" x2="96.0" y2="104.0" stroke="#F3E3D3" stroke-width="22" stroke-linecap="round"/><g transform="translate(100 104) rotate(-18) scale(0.9)"><path d="M0 -18 L58 -22 Q66 -22 66 -14 L66 14 Q66 22 58 22 L0 18 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><line x1="64.0" y1="-16.0" x2="100.0" y2="-18.4" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="64.0" y1="-16.0" x2="100.0" y2="-18.4" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/><line x1="64.0" y1="-5.0" x2="106.0" y2="-5.8" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="64.0" y1="-5.0" x2="106.0" y2="-5.8" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/><line x1="64.0" y1="6.0" x2="104.0" y2="6.9" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="64.0" y1="6.0" x2="104.0" y2="6.9" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/><line x1="64.0" y1="16.0" x2="96.0" y2="18.4" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="64.0" y1="16.0" x2="96.0" y2="18.4" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/><line x1="26.0" y1="-20.0" x2="48.0" y2="-42.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="26.0" y1="-20.0" x2="48.0" y2="-42.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/></g><line x1="100.0" y1="104.0" x2="186.0" y2="104.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><path d="M166.0 104.0 A66 66 0 0 0 162.8 83.6" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><text x="150" y="128" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">15°↑</text><circle cx="100" cy="104" r="4" fill="#174F8C"/><text x="12" y="74" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">전완(위에서)</text><text x="120" y="42" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">엄지 쪽</text></symbol><symbol id="ic-wrist_dev" viewBox="0 0 200 205"><line x1="14.0" y1="84.0" x2="96.0" y2="84.0" stroke="#1E2B33" stroke-width="26" stroke-linecap="round"/><line x1="14.0" y1="84.0" x2="96.0" y2="84.0" stroke="#F3E3D3" stroke-width="22" stroke-linecap="round"/><g transform="translate(100 84) rotate(22) scale(0.9)"><path d="M0 -18 L58 -22 Q66 -22 66 -14 L66 14 Q66 22 58 22 L0 18 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><line x1="64.0" y1="-16.0" x2="100.0" y2="-18.4" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="64.0" y1="-16.0" x2="100.0" y2="-18.4" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/><line x1="64.0" y1="-5.0" x2="106.0" y2="-5.8" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="64.0" y1="-5.0" x2="106.0" y2="-5.8" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/><line x1="64.0" y1="6.0" x2="104.0" y2="6.9" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="64.0" y1="6.0" x2="104.0" y2="6.9" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/><line x1="64.0" y1="16.0" x2="96.0" y2="18.4" stroke="#1E2B33" stroke-width="9" stroke-linecap="round"/><line x1="64.0" y1="16.0" x2="96.0" y2="18.4" stroke="#F3E3D3" stroke-width="5" stroke-linecap="round"/><line x1="26.0" y1="-20.0" x2="48.0" y2="-42.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="26.0" y1="-20.0" x2="48.0" y2="-42.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/></g><line x1="100.0" y1="84.0" x2="186.0" y2="84.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><path d="M166.0 84.0 A66 66 0 0 1 161.2 108.7" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><text x="150" y="70" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">20°↑</text><circle cx="100" cy="84" r="4" fill="#174F8C"/><text x="12" y="56" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">전완(위에서)</text><text x="100" y="178" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">새끼손가락 쪽</text></symbol><symbol id="ic-elbow_flex" viewBox="0 0 200 205"><circle cx="60" cy="29.8" r="9.8" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/><line x1="60.0" y1="39.5" x2="60.0" y2="47.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="60.0" y1="39.5" x2="60.0" y2="47.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><path d="M69 29.0 L74 31.2 L69 32.8" fill="#F3E3D3" stroke="#1E2B33" stroke-width="2" stroke-linejoin="round"/><path d="M51 47.0 L69 47.0 L67 98.0 L53 98.0 Z" fill="#DCE3E8" stroke="#1E2B33" stroke-width="3" stroke-linejoin="round"/><line x1="60.0" y1="98.0" x2="63.0" y2="131.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="60.0" y1="98.0" x2="63.0" y2="131.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="63.0" y1="131.0" x2="66.0" y2="170.0" stroke="#1E2B33" stroke-width="12" stroke-linecap="round"/><line x1="63.0" y1="131.0" x2="66.0" y2="170.0" stroke="#F3E3D3" stroke-width="8" stroke-linecap="round"/><line x1="66.0" y1="170.0" x2="82.0" y2="170.0" stroke="#1E2B33" stroke-width="10" stroke-linecap="round"/><line x1="66.0" y1="170.0" x2="82.0" y2="170.0" stroke="#F3E3D3" stroke-width="6" stroke-linecap="round"/><line x1="60.0" y1="47.0" x2="60.0" y2="75.5" stroke="#174F8C" stroke-width="11" stroke-linecap="round"/><line x1="60.0" y1="75.5" x2="80.4" y2="85.0" stroke="#174F8C" stroke-width="10" stroke-linecap="round"/><line x1="80.4" y1="85.0" x2="95.3" y2="92.0" stroke="#174F8C" stroke-width="8" stroke-linecap="round"/><line x1="60.0" y1="75.5" x2="60.0" y2="41.0" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><line x1="60.0" y1="75.5" x2="91.3" y2="90.1" stroke="#174F8C" stroke-width="2" stroke-dasharray="5 4"/><path d="M60.0 49.5 A26 26 0 0 1 83.6 86.5" stroke="#174F8C" stroke-width="2.5" fill="none" stroke-dasharray="5 4"/><text x="96" y="36" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">팔꿈치 각도</text><text x="112" y="100" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">60°↑ 굽힘</text><circle cx="60" cy="47.0" r="3.5" fill="#174F8C"/><circle cx="60.0" cy="75.5" r="3.5" fill="#174F8C"/><text x="26" y="51.0" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">어깨</text><text x="16.0" y="79.5" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">팔꿈치</text></symbol><symbol id="ic-supination" viewBox="0 0 200 205"><line x1="58.0" y1="14.0" x2="58.0" y2="96.0" stroke="#1E2B33" stroke-width="26" stroke-linecap="round"/><line x1="58.0" y1="14.0" x2="58.0" y2="96.0" stroke="#F3E3D3" stroke-width="22" stroke-linecap="round"/><path d="M40 96 L76 96 Q80 96 80 104 L80 136 Q80 142 74 142 L42 142 Q36 142 36 136 L36 104 Q36 96 40 96 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/><line x1="44.0" y1="142.0" x2="42.9" y2="164.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="44.0" y1="142.0" x2="42.9" y2="164.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><line x1="53.0" y1="142.0" x2="52.6" y2="168.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="53.0" y1="142.0" x2="52.6" y2="168.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><line x1="62.0" y1="142.0" x2="62.3" y2="167.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="62.0" y1="142.0" x2="62.3" y2="167.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><line x1="71.0" y1="142.0" x2="72.0" y2="162.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="71.0" y1="142.0" x2="72.0" y2="162.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><line x1="40.0" y1="114.0" x2="24.0" y2="134.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="40.0" y1="114.0" x2="24.0" y2="134.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M46 106 Q58 114 50 130 M56 104 Q72 116 68 132" fill="none" stroke="#1E2B33" stroke-width="1.5" opacity=".55"/><line x1="142.0" y1="14.0" x2="142.0" y2="96.0" stroke="#1E2B33" stroke-width="26" stroke-linecap="round"/><line x1="142.0" y1="14.0" x2="142.0" y2="96.0" stroke="#F3E3D3" stroke-width="22" stroke-linecap="round"/><path d="M124 96 L160 96 Q164 96 164 104 L164 136 Q164 142 158 142 L126 142 Q120 142 120 136 L120 104 Q120 96 124 96 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/><line x1="128.0" y1="142.0" x2="126.9" y2="164.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="128.0" y1="142.0" x2="126.9" y2="164.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><line x1="137.0" y1="142.0" x2="136.6" y2="168.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="137.0" y1="142.0" x2="136.6" y2="168.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><line x1="146.0" y1="142.0" x2="146.3" y2="167.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="146.0" y1="142.0" x2="146.3" y2="167.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><line x1="155.0" y1="142.0" x2="156.0" y2="162.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="155.0" y1="142.0" x2="156.0" y2="162.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><line x1="160.0" y1="114.0" x2="176.0" y2="134.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="160.0" y1="114.0" x2="176.0" y2="134.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M154 106 Q142 114 150 130 M144 104 Q128 116 132 132" fill="none" stroke="#1E2B33" stroke-width="1.5" opacity=".55"/><text x="34" y="200" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">엄지가 바깥으로 → 손바닥이 보임</text><path d="M28 62 A30 11 0 0 1 88 62" stroke="#D63B3B" stroke-width="2.5" fill="none" stroke-dasharray="4 4" opacity=".7"/><path d="M88 62 A30 11 0 0 1 34 67" stroke="#D63B3B" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M40 56 L22 65 L40 75 Z" fill="#D63B3B"/><path d="M172 62 A30 11 0 0 0 112 62" stroke="#D63B3B" stroke-width="2.5" fill="none" stroke-dasharray="4 4" opacity=".7"/><path d="M112 62 A30 11 0 0 0 166 67" stroke="#D63B3B" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M160 56 L178 65 L160 75 Z" fill="#D63B3B"/><text x="8" y="44" font-family="Noto Sans CJK KR, sans-serif" font-size="11.5" fill="#D63B3B" font-weight="700">바깥으로</text><text x="146" y="44" font-family="Noto Sans CJK KR, sans-serif" font-size="11.5" fill="#D63B3B" font-weight="700">바깥으로</text></symbol><symbol id="ic-pronation" viewBox="0 0 200 205"><line x1="58.0" y1="14.0" x2="58.0" y2="96.0" stroke="#1E2B33" stroke-width="26" stroke-linecap="round"/><line x1="58.0" y1="14.0" x2="58.0" y2="96.0" stroke="#F3E3D3" stroke-width="22" stroke-linecap="round"/><line x1="72.0" y1="116.0" x2="92.0" y2="128.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="72.0" y1="116.0" x2="92.0" y2="128.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M40 96 L76 96 Q80 96 80 104 L80 136 Q80 142 74 142 L42 142 Q36 142 36 136 L36 104 Q36 96 40 96 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/><line x1="44.0" y1="142.0" x2="42.9" y2="164.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="44.0" y1="142.0" x2="42.9" y2="164.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M39.5 141 Q44 134 48.5 141" fill="none" stroke="#1E2B33" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="42.9" cy="162.0" rx="2.6" ry="1.8" fill="#fff" stroke="#1E2B33" stroke-width="1"/><line x1="53.0" y1="142.0" x2="52.6" y2="168.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="53.0" y1="142.0" x2="52.6" y2="168.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M48.5 141 Q53 134 57.5 141" fill="none" stroke="#1E2B33" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="52.6" cy="166.0" rx="2.6" ry="1.8" fill="#fff" stroke="#1E2B33" stroke-width="1"/><line x1="62.0" y1="142.0" x2="62.3" y2="167.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="62.0" y1="142.0" x2="62.3" y2="167.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M57.5 141 Q62 134 66.5 141" fill="none" stroke="#1E2B33" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="62.3" cy="165.0" rx="2.6" ry="1.8" fill="#fff" stroke="#1E2B33" stroke-width="1"/><line x1="71.0" y1="142.0" x2="72.0" y2="162.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="71.0" y1="142.0" x2="72.0" y2="162.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M66.5 141 Q71 134 75.5 141" fill="none" stroke="#1E2B33" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="72.0" cy="160.0" rx="2.6" ry="1.8" fill="#fff" stroke="#1E2B33" stroke-width="1"/><line x1="142.0" y1="14.0" x2="142.0" y2="96.0" stroke="#1E2B33" stroke-width="26" stroke-linecap="round"/><line x1="142.0" y1="14.0" x2="142.0" y2="96.0" stroke="#F3E3D3" stroke-width="22" stroke-linecap="round"/><line x1="128.0" y1="116.0" x2="108.0" y2="128.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="128.0" y1="116.0" x2="108.0" y2="128.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M124 96 L160 96 Q164 96 164 104 L164 136 Q164 142 158 142 L126 142 Q120 142 120 136 L120 104 Q120 96 124 96 Z" fill="#F3E3D3" stroke="#1E2B33" stroke-width="3"/><line x1="128.0" y1="142.0" x2="126.9" y2="164.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="128.0" y1="142.0" x2="126.9" y2="164.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M123.5 141 Q128 134 132.5 141" fill="none" stroke="#1E2B33" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="126.9" cy="162.0" rx="2.6" ry="1.8" fill="#fff" stroke="#1E2B33" stroke-width="1"/><line x1="137.0" y1="142.0" x2="136.6" y2="168.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="137.0" y1="142.0" x2="136.6" y2="168.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M132.5 141 Q137 134 141.5 141" fill="none" stroke="#1E2B33" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="136.6" cy="166.0" rx="2.6" ry="1.8" fill="#fff" stroke="#1E2B33" stroke-width="1"/><line x1="146.0" y1="142.0" x2="146.3" y2="167.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="146.0" y1="142.0" x2="146.3" y2="167.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M141.5 141 Q146 134 150.5 141" fill="none" stroke="#1E2B33" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="146.3" cy="165.0" rx="2.6" ry="1.8" fill="#fff" stroke="#1E2B33" stroke-width="1"/><line x1="155.0" y1="142.0" x2="156.0" y2="162.0" stroke="#1E2B33" stroke-width="8" stroke-linecap="round"/><line x1="155.0" y1="142.0" x2="156.0" y2="162.0" stroke="#F3E3D3" stroke-width="4" stroke-linecap="round"/><path d="M150.5 141 Q155 134 159.5 141" fill="none" stroke="#1E2B33" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="156.0" cy="160.0" rx="2.6" ry="1.8" fill="#fff" stroke="#1E2B33" stroke-width="1"/><text x="34" y="200" font-family="Noto Sans CJK KR, Noto Sans KR, sans-serif" font-size="11.5" fill="#174F8C" font-weight="700">엄지가 안쪽으로 → 손등이 보임</text><path d="M88 62 A30 11 0 0 0 28 62" stroke="#D63B3B" stroke-width="2.5" fill="none" stroke-dasharray="4 4" opacity=".7"/><path d="M28 62 A30 11 0 0 0 82 67" stroke="#D63B3B" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M76 56 L94 65 L76 75 Z" fill="#D63B3B"/><path d="M112 62 A30 11 0 0 1 172 62" stroke="#D63B3B" stroke-width="2.5" fill="none" stroke-dasharray="4 4" opacity=".7"/><path d="M172 62 A30 11 0 0 1 118 67" stroke="#D63B3B" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M124 56 L106 65 L124 75 Z" fill="#D63B3B"/><text x="8" y="44" font-family="Noto Sans CJK KR, sans-serif" font-size="11.5" fill="#D63B3B" font-weight="700">안쪽으로</text><text x="146" y="44" font-family="Noto Sans CJK KR, sans-serif" font-size="11.5" fill="#D63B3B" font-weight="700">안쪽으로</text></symbol></svg>
+<div class="steps">
+<section class="intro" id="intro" style="border-left-color:#2E8B57"><details><summary style="font-size:17px;font-weight:700;color:var(--ink)">처음이신가요? 3분 안내 (눌러서 펼치기)</summary>
+  <div style="margin-top:8px"><button class="btn small" type="button" id="learnToggle">질문마다 쉬운 설명 보이기</button></div>
+  <p class="help" style="margin:0 0 6px">OCRA는 “손과 팔을 되풀이해서 쓰는 일이 얼마나 힘든가”를 숫자로 바꾸는 방법입니다. 보는 것은 다섯 가지뿐입니다.</p>
+  <ol>
+    <li><b>얼마나 자주 움직이나</b> — 1분에 손이 몇 번 움직이는지(집기, 놓기, 돌리기 하나하나가 ‘동작’).</li>
+    <li><b>어떤 자세로</b> — 팔을 높이 들거나, 손목을 꺾거나, 손가락 끝으로 집는 시간이 얼마나 되는지.</li>
+    <li><b>얼마나 힘이 드나</b> — 작업자에게 “0(전혀)부터 10(최대)까지 얼마나 힘든가요?”라고 물어본 답(Borg 점수).</li>
+    <li><b>얼마나 쉬나</b> — 1시간마다 8~10분은 손을 쉬어야 ‘제대로 쉰 것’.</li>
+    <li><b>하루에 얼마나 오래</b> — 식사·휴식·다른 일을 뺀 순수 반복작업 시간.</li>
+  </ol>
+  <p class="help" style="margin:8px 0 0"><b>준비할 것:</b> 작업을 두세 바퀴 지켜보기(가능하면 휴대전화로 1~2분 촬영), 작업자에게 “얼마나 힘든가요?”와 “쉬는 시간은 언제인가요?” 두 가지 물어보기. 그 뒤 OCRA Mini-Checklist 질문 12개에 답하면 됩니다. 결과가 ‘허용’이면 거기서 끝이고, 애매하면 OCRA Checklist(추가 질문 5개)로 확정하며, 확실히 높으면(등가 OCRA Index 3.5 초과) OCRA Index로 바로 가서 개선안을 설계합니다. 모르는 말은 <a href="#gloss" class="glosslink">맨 아래 쉬운 용어 풀이</a>나 각 질문의 ? 도움말을 보세요.</p></details>
+</section>
+
+<!-- ================= OCRA Mini-Checklist ================= -->
+<section class="stage" id="st1">
+  <div class="stage-head"><span class="no">간이 선별</span><h2>OCRA Mini-Checklist <em>EPM 시트 2025-06-20</em></h2><span class="val" id="v1">—</span></div>
+  <div class="body">
+  <div class="seg" role="tablist" style="margin-top:10px"><button type="button" id="modeSingle" aria-pressed="true">한 가지 작업만 주로 반복</button><button type="button" id="modeMulti" aria-pressed="false">여러 작업을 번갈아 함(작업 목록으로 평가)</button></div>
+  <p class="stepguide">입력은 <b>▶ 0 작업 정보 → 1 근무 → 2 반복 → 3 자세 → 4 힘 → 5 조건</b> 순서로 내려가며, 각 칸의 질문은 ▷ 표시로 구분됩니다. 추가 조사(Checklist)는 ▶ 6, 정밀 분석(Index)은 ▶ 7·8을 더 묻습니다.</p>
+  <div class="learn" id="modeLearn">한 가지 작업만 반복하면 그 작업을 평가하고 점수에 따라 다음 도구로 갑니다. 여러 작업을 번갈아 하면 작업마다 평가해 하루 시간과 함께 목록에 넣고, 목록의 결과로 하루 평가 도구가 정해집니다.</div>
+  <div class="sub-h"><span class="stepno">0</span>작업 정보 — 어떤 작업을, 어느 손으로 평가하나요?</div>
+  <div class="row" style="margin-top:10px">
+    <label class="f"><span class="lt">작업 이름</span><input type="text" id="jobName" placeholder="예: 아이스크림 포장"></label>
+    <label class="f"><span class="lt">평가 범위 <button type="button" class="tip" data-tip="OCRA는 손(상지)마다 따로 평가합니다(EPM 시트는 RIGHT/LEFT 분리, Occhipinti 1998 3.6절). 양손이면 두 손을 각각 입력하고 최종값은 높은 쪽입니다.">?</button></span><select id="evalScope"><option value="R">오른손만</option><option value="L">왼손만</option><option value="LR">양손(각각 입력)</option></select></label>
+  </div>
+  <div class="sidebar" id="sideBar"><span class="sidenow">지금 입력 중: 오른손</span><div class="seg" role="tablist"><button type="button" data-side="L" aria-pressed="false">왼손(화면 왼쪽)</button><button type="button" data-side="R" aria-pressed="true">오른손(화면 오른쪽)</button></div><span class="help">근무·사이클·같은 동작 비율·조건·작업속도는 두 손 공통. 기술동작 수·자세·힘과 Checklist·Index 추가 입력은 손마다 따로 저장됩니다. 결과 패널도 왼쪽 열 = 왼손, 오른쪽 열 = 오른손입니다.</span></div>
+  <div class="actions"><button class="btn" type="button" id="loadEx">예시 (아이스크림 포장)</button><button class="btn" type="button" id="loadEx44">예시 (테이핑, 사례 4-4)</button><button class="btn" type="button" id="resetBtn">모두 지우기</button><button class="btn" type="button" id="loadSaved">이전 입력 불러오기</button></div>
+
+  <div class="sub-h"><span class="stepno">1</span>근무 — 하루 근무는 어떻게 되나요? <button type="button" class="tip" data-tip="세 단계 모두가 같은 값을 씁니다. 한 번만 넣으면 됩니다.">?</button></div>
+  <div class="learn">예: 아침 8시 출근, 저녁 5시 퇴근, 점심 1시간(무급), 오전·오후 10분 휴식 → 총 9시간, 식사 1회 60분 미포함, 휴식 2회 10분. 손을 거의 안 쓰는 일(청소, 자재 가져오기)이 하루 20분이면 ‘반복작업 아닌 일 20’.</div>
+  <div class="groups">
+    <fieldset class="group"><legend>근무</legend>
+      <label class="f"><span class="lt">총 근무시간(시간) <button type="button" class="tip" data-tip="출근부터 퇴근까지, 식사시간을 포함한 시간. 예: 8시간 일하고 점심 1시간이면 9">?</button></span><input type="number" id="shiftH" min="0" step="0.5" placeholder="예: 9"></label>
+      <label class="f"><span class="lt">반복작업 아닌 일(분) <button type="button" class="tip" data-tip="청소, 자재 가져오기, 회의처럼 손을 되풀이해서 쓰지 않는 일">?</button></span><input type="number" id="nonRepMin" min="0" step="5" placeholder="예: 20"></label>
+    </fieldset>
+    <fieldset class="group three"><legend>식사</legend>
+      <label class="f"><span class="lt">횟수</span><input type="number" id="mealN" min="0" step="1" placeholder="1"></label>
+      <label class="f"><span class="lt">1회(분) <button type="button" class="tip" data-tip="30분 이상인 식사만 식사로 봅니다(원저·Ergo/IBV). 30분 미만이면 휴식 1회로 취급합니다.">?</button></span><input type="number" id="mealLen" min="0" step="5" placeholder="60"></label>
+      <label class="f"><span class="lt">유급 포함? <button type="button" class="tip" data-tip="식사시간이 근무시간 안에 들어 있으면(유급) ‘포함’, 무급으로 근무 밖이면 ‘미포함’(한국의 일반적 경우). Mini-Checklist의 교대 길이 계산에 쓰입니다.">?</button></span><select id="mealIn"><option value="0">미포함</option><option value="1">포함</option></select></label>
+    </fieldset>
+    <fieldset class="group"><legend>휴식(식사 제외)</legend>
+      <label class="f"><span class="lt">횟수 <button type="button" class="tip" data-tip="회사가 정한 공식 휴식뿐 아니라 작업자가 임의로 쉬는 비공식 휴식도 포함합니다.">?</button></span><input type="number" id="breakN" min="0" step="1" placeholder="2"></label>
+      <label class="f"><span class="lt">1회(분) <button type="button" class="tip" data-tip="8분 이상이어야 쉰 것으로 봅니다(Ergo/IBV·EPM).">?</button></span><input type="number" id="breakLen" min="0" step="1" placeholder="10"></label>
+    </fieldset>
+  </div>
+
+  <div class="sub-h"><span class="stepno">2</span>반복 — 작업은 어떻게 반복되나요?</div>
+  <div class="learn">‘사이클’은 제품 하나를 끝내고 다음 제품을 시작할 때까지의 시간입니다(상자 하나를 다 채우는 데 30초면 30초). ‘동작’은 집기, 놓기, 돌리기, 밀기처럼 손이 하는 조작 하나하나입니다. 세기 어려우면 ‘손의 빠르기’만 골라도 OCRA Mini-Checklist는 계산됩니다.</div>
+  <div class="row">
+    <label class="f"><span class="lt">한 사이클 길이(초) <button type="button" class="tip" data-tip="제품 하나를 끝내고 다음 제품을 시작할 때까지의 시간. 사이클이 없고 같은 동작만 되풀이되면 비워 두세요.">?</button></span><input type="number" id="cycleSec" min="0.1" step="0.1" placeholder="예: 30"></label>
+    <label class="f"><span class="lt">같은 동작이 되풀이되는 비율 <button type="button" class="tip" data-tip="똑같은 동작이 사이클에서 차지하는 비율. 사이클 길이와 함께 ‘정형성’ 점수(OCRA Mini-Checklist·OCRA Checklist)와 반복성 계수(OCRA Index)가 됩니다.">?</button></span><select id="same"><option value="0">절반 이하</option><option value="1">51~80%</option><option value="2">80% 넘게 거의 같은 동작</option></select></label>
+    <label class="f"><span class="lt">손의 빠르기 <button type="button" class="tip" data-tip="Mini-Checklist의 정성 판단. 2초에 한 번도 안 움직이면 ‘느림’(1점), 1초에 한 번 이상이라 세기 어려우면 ‘매우 빠름’(9점), 그 사이나 물건을 오래 쥐고 있으면 ‘중간’(5점). 아래에 실제로 센 동작 수를 넣으면 그 값이 우선합니다.">?</button></span><select id="speed"><option value="">— 고르세요 —</option><option value="1">느림(2초에 1회 미만)</option><option value="5">중간, 또는 물건을 오래 쥐고 있음</option><option value="9">매우 빠름(1초에 1회 이상, 셀 수 없음)</option></select></label>
+    <label class="f"><span class="lt">기술동작 수(회, 선택) <button type="button" class="tip" data-tip="영상에서 이 손의 조작(집기·놓기·돌리기·밀기…)을 하나씩 센 수(힘이 센 동작만이 아니라 모든 기술동작). 넣으면 세 도구 모두 이 값을 씁니다. 4사이클마다 1회면 0.25처럼 소수도 됩니다.">?</button></span><input type="number" id="taN" min="0" step="0.01" placeholder="예: 40"></label>
+    <label class="f"><span class="lt">센 구간의 시간(초) <button type="button" class="tip" data-tip="동작을 센 구간의 길이(한 사이클이면 사이클 길이). 비우면 사이클 길이를 씁니다.">?</button></span><input type="number" id="taSec" min="1" step="0.1" placeholder="예: 37"></label>
+    <label class="f"><span class="lt">1분당 동작 수(자동)</span><input type="text" id="ataShow" readonly value="—"></label>
+    <label class="f"><span class="lt">너무 빨라 셀 수 없음 <button type="button" class="tip" data-tip="70회/분을 넘어 셀 수 없으면 체크. EPM Checklist 시트와 같이 72회/분을 대입합니다(중단 가능 9점, 불가 10점; Mini 9점).">?</button></span><input type="checkbox" id="fastUncount"></label>
+  </div>
+
+  <div class="sub-h"><span class="stepno">3</span>자세 — 불편한 자세가 한 바퀴 작업 중 얼마나 오래 나오나요? <button type="button" class="tip" data-tip="관절마다 가장 심한 자세 하나를 기준으로 시간 비율을 고릅니다. OCRA Index에서 세부 항목으로 나눌 수 있습니다.">?</button></div>
+  <div class="learn">그림의 자세가 한 바퀴 작업(사이클) 중 몇 분의 몇이나 나오는지 고릅니다. 예: 아이스크림을 손바닥으로 감싸 집는 시간이 사이클의 60% → 손은 ‘약 2/3’.</div>
+  <div class="row iconrow">
+    <label class="f"><svg class="ico"><use href="#ic-pinch"/></svg><span class="lt">손: 손가락 끝·손바닥·갈고리로 쥐기 <button type="button" class="tip" data-tip="핀치(엄지와 검지로 집기), 손바닥으로 누르듯 쥐기, 손가락을 걸어 들기. 손 전체로 감싸 쥐는 파워 그립은 제외">?</button></span><select id="bHand" class="b5"></select></label>
+    <label class="f"><svg class="ico"><use href="#ic-shoulder_front"/></svg><span class="lt">어깨: 팔을 어깨 높이 이상 또는 극단으로 <button type="button" class="tip" data-tip="팔을 앞·옆으로 어깨 높이 이상 들기, 옆으로 45° 넘게 벌리기, 몸 뒤로 보내기">?</button></span><select id="bSh" class="b5"></select></label>
+    <label class="f"><span class="lt">어깨: 팔을 받치지 않고 조금 든 채로 일하는 시간이 절반을 넘나요? <button type="button" class="tip" data-tip="OCRA Checklist의 어깨 1점 항목입니다(있다/없다만 묻습니다). 바로 위 ‘어깨’ 비율을 ‘없음’으로 골랐을 때만 1점이 더해지고, 다른 단계를 고르면 무시됩니다. EPM 시트는 표시가 없으면 기본 1점을 두므로 처음에 체크되어 있습니다. 팔을 책상이나 팔걸이에 받치고 일하면 체크를 풀어 주세요.">?</button></span><input type="checkbox" id="shSlight" checked></label>
+    <label class="f"><svg class="ico"><use href="#ic-overhead"/></svg><span class="lt">손이 머리보다 높이 올라감? <button type="button" class="tip" data-tip="OCRA Checklist에서 어깨 점수를 2배로 합니다.">?</button></span><select id="overhead"><option value="0">아니요</option><option value="1">예</option></select></label>
+    <label class="f"><svg class="ico"><use href="#ic-wrist_flexext"/></svg><span class="lt">손목: 크게 꺾기 <button type="button" class="tip" data-tip="손목을 위·아래로 45° 넘게 꺾거나 엄지·새끼손가락 쪽으로 15~20° 넘게 꺾기">?</button></span><select id="bWr" class="b5"></select></label>
+    <label class="f"><svg class="ico"><use href="#ic-elbow_flex"/></svg><span class="lt">팔꿈치: 비틀거나 크게 굽혔다 펴기 <button type="button" class="tip" data-tip="손바닥을 위·아래로 60° 넘게 돌리기(드라이버 돌리듯), 팔꿈치를 60° 넘게 급히 굽혔다 펴기">?</button></span><select id="bEl" class="b5"></select></label>
+  </div>
+
+  <div class="sub-h"><span class="stepno">4</span>힘 — 힘이 드나요? <button type="button" class="tip" data-tip="작업자에게 Borg 척도로 묻습니다. 보통 힘 = 3~4(물건을 꽉 쥐거나 누르는 정도), 센 힘 = 5 이상.">?</button></div>
+  <div class="learn">작업자에게 “0은 전혀 힘들지 않음, 10은 최대로 힘듦이면 이 일은 몇 점인가요?”라고 묻습니다. 3~4점(보통)이 드는 시간 비율과, 5점 이상(센 힘)이 드는 시간 비율을 넣습니다. 가벼운 1~2점은 세지 않습니다.</div>
+  <div class="row">
+    <label class="f"><span class="lt">보통 힘(3~4점)이 드는 시간</span><select id="modBand"><option value="0">없음</option><option value="1">1/3 미만(약간; Checklist 1점)</option><option value="2">약 1/3</option><option value="3">약 절반</option><option value="4">약 2/3</option><option value="5">거의 내내</option></select></label>
+    <label class="f"><span class="lt">센 힘(5점 이상)이 드는 시간 비율(%) <button type="button" class="tip" data-tip="예: 10분에 2초면 0.3%, 사이클의 1/20이면 5%. Mini는 약 1% 8점, 약 5%(2~9%) 16점, 10% 이상 24점">?</button></span><input type="number" id="peakPct" min="0" max="100" step="0.5" placeholder="0"></label>
+  </div>
+
+  <div class="sub-h"><span class="stepno">5</span>조건 — 일을 더 힘들게 하는 조건 <button type="button" class="tip" data-tip="EPM OCRA Mini-Checklist 시트의 규칙: 진동 공구 4점(있으면 다른 물리 조건은 무시), 반동·충격 2점, 손으로 두드리기 2점, 그 밖의 조건(추위·장갑·정밀·눌림·기타)은 몇 개를 체크해도 한 묶음으로 2점. 물리 조건 합이 2를 넘으면 3점으로 묶입니다. 작업속도는 따로 버퍼 1.5·완전 기계 2점.">?</button> <span id="afLive" style="font-weight:500;color:var(--ink-3);font-size:13px"></span></div>
+  <div class="learn">추위, 진동, 장갑, 작은 부품을 정확히 맞추는 일처럼 같은 동작이라도 더 힘들게 만드는 조건입니다. 컨베이어가 속도를 정하면 쉬어 갈 수 없으니 그것도 조건입니다. 점수는 조건마다 다릅니다: 진동 4점, 반동·충격 2점, 손으로 두드리기 2점, 나머지(추위·장갑·정밀·눌림·기타)는 묶어서 2점. 물리 조건을 둘 이상 체크하면 합이 3점에서 멈추고, 진동이 있으면 4점으로 고정되므로 체크를 더 해도 점수가 안 바뀔 수 있습니다(EPM 시트 규칙). OCRA Checklist도 같은 EPM 시트 규칙(2020 자동계산판 R88)을 씁니다. OCRA Index는 요인별로 노출시간(1/3·2/3·내내 → 4/8/12점, 진동 8/12/16점)을 합산하므로 각 조건 옆의 노출시간을 골라 주세요(Index에만 쓰임).</div>
+  <div class="checks" id="afChecks">
+    <label><input type="checkbox" value="vib"> 진동 공구(1/3 이상)</label>
+    <label><input type="checkbox" value="strike"> 반동·충격(절반 넘게)</label>
+    <label><input type="checkbox" value="impact"> 손으로 두드리기(시간당 10회 이상)</label>
+    <label><input type="checkbox" value="cold"> 추위 0 °C 미만(절반 넘게)</label>
+    <label><input type="checkbox" value="glove"> 맞지 않는 장갑(절반 넘게)</label>
+    <label><input type="checkbox" value="precision"> 2~3 mm 정밀작업(절반 넘게)</label>
+    <label><input type="checkbox" value="compress"> 손이 눌려 자국·굳은살</label>
+    <label><input type="checkbox" value="other"> 그 밖(소음, 미끄러운 물건 등)</label>
+  </div>
+  <div class="row"><label class="f"><span class="lt">작업속도는 누가 정하나요?</span><select id="pace"><option value="0">작업자가 자유롭게</option><option value="1">기계·라인이 정하지만 버퍼로 조절 가능</option><option value="1.5">라인이 느리게 움직이며 기계가 정함</option><option value="2">기계·라인이 완전히 정함</option></select></label></div>
+
+  <div class="advice" id="adv1"><b>OCRA Mini-Checklist 분석 결과</b>입력을 채우면 점수와 다음에 할 일이 나옵니다.</div>
+  <div id="next1"></div>
+  <div id="multiCtl" class="advice"><b>이 작업을 목록에 넣기</b>이 작업을 하루에 하는 시간(분)을 적고 ‘목록에 넣기’를 누르세요. 그다음 ‘다음 작업 입력하기’를 누르면 근무·식사·휴식은 그대로 두고 작업별 입력(동작 수·자세·힘 등)만 비워져 다음 작업을 넣을 수 있습니다.
+  <div class="row">
+    <label class="f"><span class="lt">이 작업을 하루에 하는 시간(분) <button type="button" class="tip" data-tip="하루 중 이 작업만 하는 시간을 분으로 적습니다. 예: 오전 2시간, 오후 2시간이면 240. 목록에 넣은 작업들의 시간을 모두 더하면 하루 순 반복작업 시간과 같아야 합니다.">?</button></span><input type="number" id="taskMin" min="0" step="5" placeholder="예: 200"></label>
+    <label class="f"><span class="lt">이 작업의 이름</span><input type="text" id="taskNameShow" readonly value="—"></label>
+    <label class="f"><span class="lt">이 작업의 지금까지 결과</span><input type="text" id="taskSnapShow" readonly value="—"></label>
+  </div>
+  <div class="actions"><button class="btn primary" type="button" id="taskAdd">이 작업을 목록에 넣기(같은 이름이면 덮어쓰기)</button><button class="btn" type="button" id="taskNew">다음 작업 입력하기(근무·식사·휴식은 그대로)</button></div>
+  </div>
+  <details><summary>OCRA Mini-Checklist 점수표(EPM 시트 2025-06-20)</summary><p class="formula">빈도: 정성 1/5/9 또는 분당 동작 수 표(22.5 미만 0 · 22.5~ 0.5 · 27.5~ 1 · 32.5~ 2 · 37.5~ 3 · 42.5~ 4 · 47.5~ 5 · 52.5~ 6 · 57.5~ 7 · 62.5~ 8 · 67.5~ 9 · 72.5 이상 10). 자세(없음·1/3 미만·약 1/3·약 절반·약 2/3·거의 내내): 손·손목·팔꿈치 0/0/2/3.5/4/8, 어깨 0/2/6/8/12/24 → 최댓값 + 정형성(사이클 ≤8초 3, 9~15초 1.5; 같은 동작 >80% 3, 50~80% 1.5 중 최댓값). 힘: 보통 0/0/2/4/6/8 + 센 힘 약 1% 8, 약 5%(2~9%) 16, 10% 이상 24. 부가: 진동 4(단독), 반동·충격 2, 두드리기 2, 그 밖 묶음 2, 합 2 초과 시 3; 속도 버퍼 1.5·완전 2. 점수 = (빈도+자세+힘+부가) × 회복 승수(교대 길이 기준표 − 휴식·식사 횟수 → 1.00~3.0) × 지속시간 승수(≤120분 0.5 … ≤480 1, 초과 1.5). 예상 Checklist 범위 −0.31+0.93x ~ 1.8+1.07x.</p></details>
+  <div class="dbg" id="dbg1"></div>
+  </div>
+</section>
+
+<!-- ================= 작업 목록(멀티태스크) ================= -->
+<section class="stage" id="st4">
+  <div class="stage-head"><span class="no">여러 작업</span><h2>작업 목록 — OCRA Mini-Checklist 결과와 하루 평가 도구 결정</h2><span class="val" id="v4">—</span></div>
+  <div class="body">
+  <p class="help" style="margin-top:10px">작업마다 OCRA Mini-Checklist로 평가해 하루 시간과 함께 넣습니다. 목록이 모이면 가장 나쁜 작업의 결과로 하루 평가 도구가 정해지고, 그 도구의 맨 위에 이 목록이 나타나 작업을 하나씩 골라 분석합니다. 모든 작업을 분석한 뒤 ‘결과 보고’를 누르면 최종 멀티태스크 점수가 나옵니다.</p>
+  <div class="scroll"><table class="tasks"><thead><tr><th>작업</th><th>하루에 하는 시간(분)</th><th>Mini 점수(예상 범위)</th><th>Mini 판정</th><th></th></tr></thead><tbody id="taskListBody"></tbody></table></div>
+  <div class="note" id="taskTime">—</div>
+  <div class="row" style="margin-top:10px"><label class="f" style="max-width:420px"><span class="lt">하루 평가 도구 <button type="button" class="tip" data-tip="‘자동’이면 목록의 Mini 결과 중 가장 나쁜 작업으로 정합니다(모두 허용 → 종료, 하나라도 경계 → 모든 작업을 OCRA Checklist, 하나라도 개선 필요 확정 → 모든 작업을 OCRA Index). 직접 고를 수도 있습니다.">?</button></span><select id="dayTool"><option value="auto">자동(목록의 Mini 결과로 결정)</option><option value="chk">OCRA Checklist</option><option value="idx">OCRA Index</option></select></label></div>
+  <div class="advice" id="adv4"><b>하루 평가 도구</b>—</div>
+  <div class="dbg" id="dbg4"></div>
+  </div>
+</section>
+
+<!-- ================= OCRA Checklist ================= -->
+<section class="stage locked" id="st2">
+  <div class="stage-head"><span class="no">추가 조사</span><h2>OCRA Checklist <em>개정판 2013 · EPM 자동계산판 2020-10-19</em></h2><span class="val" id="curTaskC" style="margin-left:0;color:#0F6E6E"></span><span class="val" id="v2">—</span></div>
+  <div class="body">
+  <div id="listSlotC"></div>
+  <div id="taskBannerC" class="taskbanner" hidden></div>
+  <p class="help" style="margin-top:10px">OCRA Mini-Checklist의 공통 입력을 다시 쓰고, 아래 질문 세 가지만 더 묻습니다. 자세·힘 표는 EPM 자동계산판 2020 값으로 바뀝니다(1/3 미만 1점 등). 어깨 1점 항목은 간이 선별의 ③ 자세 칸에 있습니다.</p>
+  <div class="sub-h"><span class="stepno">6</span>추가 질문 — 중단·버티기·최대 힘</div>
+  <div class="row">
+    <label class="f"><span class="lt">사이클 중 짧은 중단이 가능한가요? <button type="button" class="tip" data-tip="손을 잠깐 멈출 여유가 있으면 빈도 점수가 낮아집니다(개정 Checklist의 ‘중단 가능/불가’ 구분). 센 동작 수가 없을 때는 간이 선별의 손 빠르기를 씁니다.">?</button></span><select id="pauses"><option value="1">예, 가끔 멈출 수 있음</option><option value="0">아니요, 멈출 수 없음(라인 속도)</option></select></label>
+    <label class="f"><span class="lt">5초 이상 물건을 쥐고 버티는 동작 <button type="button" class="tip" data-tip="정적 동작 점수: 5초 이상 유지가 사이클의 51~80%면 2.5, 80% 초과면 4.5. 동적 점수와 큰 값을 씁니다.">?</button></span><select id="staticBand"><option value="0">거의 없음</option><option value="1">사이클의 51~80%</option><option value="2">80% 넘게</option></select></label>
+    <label class="f"><span class="lt">거의 최대 힘(Borg 8 이상)이 드는 시간 <button type="button" class="tip" data-tip="10분마다 2초 6점, 시간의 1% 12점, 5% 24점, 10% 이상 32점. 간이 선별의 센 힘(5 이상) 비율은 ‘큰 힘(5~7)’ 점수(4/8/16/24)로 쓰입니다.">?</button></span><select id="maxBand"><option value="0">없음</option><option value="1">10분마다 2초</option><option value="2">시간의 1%</option><option value="3">시간의 5%</option><option value="4">10% 이상</option></select></label>
+  </div>
+  <div class="note">회복·지속시간 승수는 Mini와 같은 EPM 표. 빈도는 EPM 2020 시트의 두 표(중단 가능: 상한 9점 / 중단 불가: 37.5회/분부터 +1점, 상한 10점)를 그대로 씁니다. 어깨 0/2/6/8/12/24(표시 없음 + 약간 든 자세 1점, 머리 위 ×2), 손·손목·팔꿈치 0/1/2/3.5/4/8, 보통 힘 0/1/2/4/6/8. 부가요인은 Mini와 같은 시트 규칙(진동 4, 그 밖 2점 항목 합 상한 3; 속도 1/1.5/2).</div>
+  <div class="advice" id="adv2"><b>OCRA Checklist 분석 결과</b>—</div>
+  <div id="next2"></div>
+  <div id="bottomSlotC"></div>
+  <details><summary>OCRA Checklist 점수표(EPM 자동계산판 2020-10-19)</summary><p class="formula">빈도(동적, 중단 가능): 22.5~ 0.5 · 27.5~ 1 · 32.5~ 2 · 37.5~ 3 · 42.5~ 4 · 47.5~ 5 · 52.5~ 6 · 57.5~ 7 · 62.5~ 8 · 67.5 이상 9. 중단 불가: 37.5~ 4 · 42.5~ 5 · 47.5~ 6 · 52.5~ 7 · 57.5~ 8 · 62.5~ 9 · 67.5 이상 10. 정적 2.5/4.5; 동적·정적 중 큰 값. 힘: 보통(3–4) 1/3 미만 1 · 1/3 2 · 절반 4 · 2/3 6 · 내내 8; 큰 힘(5–7) 10분당 2초 4 · 1% 8 · 5% 16 · 10% 이상 24; 거의 최대(≥8) 6 · 12 · 24 · 32 → 합산. 자세: 어깨 1/3 미만 2 · 1/3 6 · 절반 8 · 2/3 12 · 내내 24(표시 없음 1, 머리 위 ×2), 팔꿈치·손목·손 1/3 미만 1 · 1/3 2 · 절반 3.5 · 2/3 4 · 내내 8 → 최댓값 + 정형성(1.5/3). 부가: Mini와 같은 규칙. 점수 = (빈도+힘+자세+부가) × 회복 승수 × 지속시간 승수. 등급: ≤5 최적 · ≤7.5 허용 · ≤11 불확실 · ≤14 경도 · ≤22.5 중등도 · 초과 고도(등가 Index 1.5/2.2/3.5/4.5/9는 구간 대응이며 띠 위 위치는 시각화용 보간).</p></details>
+  <div class="dbg" id="dbg2"></div>
+  </div>
+</section>
+
+<!-- ================= OCRA Index ================= -->
+<section class="stage locked" id="st3">
+  <div class="stage-head"><span class="no">정밀 분석·개선 설계</span><h2>OCRA Index <em>EPM 공식 시트 2017(classic·phases)</em></h2><span class="val" id="curTaskI" style="margin-left:0;color:#0F6E6E"></span><span class="val" id="v3">—</span></div>
+  <div class="body">
+  <div id="listSlotI"></div>
+  <div id="taskBannerI" class="taskbanner" hidden></div>
+  <p class="help" style="margin-top:10px">재설계와 개선 전후 비교용. 근무·사이클·반복성·조건은 공통 입력을 다시 쓰고, 자세는 관절별 세부 항목의 사이클 비율(%)로, 힘은 시간가중 평균 Borg로 넣습니다. 처음 열면 간이 선별의 자세 비율이 각 관절의 대표 항목에 <b>추정값(노란색)</b>으로 들어갑니다. 실제 작업을 보고 확인·수정한 뒤 아래 ‘추정값 확인’에 체크해야 계산합니다.</p><div class="note" id="idxNeed" hidden><b>센 동작 수가 필요합니다.</b> OCRA Index는 1분당 실제 동작 수(ATA)로 계산하므로, 위 ‘반복’ 칸의 ‘센 동작 수(회)’와 ‘센 구간의 시간(초)’을 채워 주세요. 손의 빠르기(정성)만으로는 계산할 수 없습니다.</div>
+  <div class="sub-h"><span class="stepno">7</span>세부 자세 — 관절별 항목이 한 바퀴 작업 중 몇 %나 나오나요? <button type="button" class="tip" data-tip="EPM 2017 시트: 항목별로 25/51/81%(어깨 80° 거상은 10/20/30/40/50%) 단계 점수를 관절 안에서 합산하고, 25% 미만이어서 0점인 항목들은 시간을 합쳐 한 번 더 점수화합니다(저빈도 합산). 관절 점수 → 계수(3.5 미만 1, 7.5 미만 0.7, 11.5 미만 0.6, 15.5 미만 0.5, 19.5 미만 0.33, 23.5 미만 0.1, 27.5 미만 0.07, 이상 0.03), 네 관절 중 최솟값.">?</button></div>
+  <div id="jointArea"></div>
+  <div class="note" id="estNote" hidden><b>노란색 칸은 간이 선별 값으로 만든 추정값입니다.</b> 영상이나 현장 관찰로 각 항목의 비율을 확인·수정한 뒤 체크하세요. 체크 전에는 Index를 계산하지 않습니다.</div>
+  <label class="checks" style="margin:8px 0 0"><span style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;font-size:14px"><input type="checkbox" id="estOK" style="width:18px;height:18px;accent-color:var(--blue)"> 추정값을 확인·수정했습니다(이 손)</span></label>
+  <div class="sub-h"><span class="stepno">8</span>힘과 쉼 — 평균 힘든 정도와 그 밖의 선택 입력</div>
+  <div class="row">
+    <label class="f"><span class="lt">평균 힘든 정도(Borg 0.5~5) <button type="button" class="tip" data-tip="동작별 Borg를 시간으로 가중 평균한 값(EPM Index 시트 J열, Occhipinti 1998 3.2절). 자동으로 채우지 않으며 아래 추정값은 참고용입니다. EPM 함수(구간선형): 0.5→1.00, 1→0.85, 2→0.65, 3→0.45, 4→0.20, 5→0.01. 센 힘(Borg≥5) 비율이 10% 이상이면 0.01, 1~9%는 phases 시트 표(0.55~0.1)와 작은 값.">?</button></span><input type="number" id="borg" min="0.5" max="5" step="0.01"><span class="help" id="borgHint" style="font-size:12px;margin:4px 0 0"></span></label>
+    <label class="f"><span class="lt">5초 이상 쥐고 버티는 시간(초, 선택) <button type="button" class="tip" data-tip="EPM 시트: 5초(8 cts) 이상 유지한 시간(cts, 1/100분) × 0.75를 가상 기술동작 수로 보고 실제 동작 수와 큰 값을 씁니다. 이 칸은 초로 받아 cts로 바꿉니다(초 × 1.25). 단위 해석은 확인 필요.">?</button></span><input type="number" id="staticSec" min="0" step="0.1" placeholder="보통 비움"></label>
+    <label class="f"><span class="lt">휴식으로 볼 수 있는 일(분) <button type="button" class="tip" data-tip="눈으로만 검사하기, 기계 대기처럼 손을 완전히 쉬게 하는 비반복 작업">?</button></span><input type="number" id="recWorkMin" min="0" step="5" placeholder="0"></label>
+    <label class="f"><span class="lt">출근·식사 후 첫 작업 구간(분, 선택) <button type="button" class="tip" data-tip="첫 휴식까지 1시간보다 짧게 일하는 구간 길이. 20분 미만 쉰 것으로, 20~40분 0.5시간, 40~80분 1시간(Ergo/IBV). 둘이면 쉼표로.">?</button></span><input type="text" id="shortPeriods" placeholder="예: 30, 50"></label>
+  </div>
+  <label class="checks" style="margin:10px 0 0"><span style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;font-size:14px"><input type="checkbox" id="inCycle" style="width:18px;height:18px;accent-color:var(--blue)"> 매 사이클 손이 10초 이상 연속으로 쉬고, 일하는 시간이 쉬는 시간의 5~6.5배 이하 <button type="button" class="tip" data-tip="예: 기계가 30초 동작하는 동안 손을 놓고 기다림. 해당하면 회복 계수 1.00">?</button></span></label>
+  <div class="note">EPM 시트 기준(힘 구간선형 함수, 관절별 가중 점수, 부가요인 점수 합산 → 1/0.95/0.9/0.85/0.8, 회복 0.5시간 단위). ISO 11228-3(2007) Annex C 간이표 값(힘 보간, 자세 1/0.7/0.6/0.5, 부가 1/0.95/0.9/0.8)은 참고용으로 결과 패널에 함께 표시합니다. 예측 유병률 PA = 2.16·2.39·2.62 × Index(Index ≥ 2.25일 때; Occhipinti & Colombini 2007, EPM 멀티태스크 시트).</div>
+  <div id="afStore" hidden>
+  <div id="toolList" class="advice" style="background:var(--sheet);margin:10px 0 14px"><b id="toolListTitle">작업 목록 — 각 작업을 이 도구로 분석하세요</b>
+    <div id="nowTask" class="note" style="font-weight:700"></div>
+    <div class="scroll"><table class="tasks"><thead><tr><th>작업</th><th>하루에 하는 시간(분)</th><th>Mini 점수</th><th id="toolColHead">이 도구의 결과(작업 단독)</th><th>상태</th><th></th></tr></thead><tbody id="toolListBody"></tbody></table></div>
+    <div class="row" style="margin-top:8px"><label class="f"><span class="lt">작업 교대 간격 <button type="button" class="tip" data-tip="약 1시간마다(90분 이내) 바꾸면 시간가중 평균(Occhipinti 1998, EN 1005-5). 90분을 넘으면 복합식(Occhipinti·Colombini·Occhipinti 2008, EPM 2014 시트): 가장 부담이 큰 과업의 지수에서 출발해 OCRA₁(DuM₁) + ΔOCRA₁ × K, K = Σ(OCRAᵢmax × FTᵢ) ÷ OCRA₁max(FTᵢ는 총 반복시간 대비 비율, 과업 1 포함).">?</button></span><select id="rotSlow"><option value="0">90분 이내(시간가중 평균)</option><option value="1">90분 초과(복합식 Multi-GEI)</option></select></label></div>
+    <div class="actions" style="margin-top:8px"><button class="btn primary" type="button" id="toolReport">결과 보고 — 최종 멀티태스크 점수</button></div>
+    <div id="multiResult" class="note" hidden>—</div>
+  </div>
+  <div id="toolBottom" class="advice" style="background:var(--sheet)"><b>이 작업의 입력이 끝났으면</b><div class="actions" style="margin-top:6px"><button class="btn primary" type="button" id="toolSave">이 작업의 결과를 목록에 저장</button></div></div></div>
+  <div class="advice" id="adv3"><b>OCRA Index 분석 결과</b>—</div>
+  <div id="bottomSlotI"></div>
+  <div class="actions"><button class="btn" type="button" id="closeIdx">OCRA Index 닫기</button></div>
+  <div class="dbg" id="dbg3"></div>
+  </div>
+</section>
+</div>
+
+<aside class="result" aria-live="polite">
+  <p class="r-title" id="rTitle">OCRA Mini-Checklist 분석 결과(점수)</p>
+  <div class="index" id="idxOut">—</div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><span class="zone" id="zoneOut" style="background:var(--ink-3);margin:0">입력을 기다리는 중</span><span class="zone" id="actChip" style="margin:0;background:transparent;color:var(--blue-3);border:2px solid var(--blue)"></span></div>
+  <div class="band" aria-hidden="true"><i style="background:var(--z1)"></i><i style="background:var(--z2)"></i><i style="background:var(--z3)"></i><i style="background:var(--z4)"></i><i style="background:var(--z5)"></i><i style="background:var(--z6)"></i><div class="marker" id="marker" style="left:0;display:none"></div></div>
+  <div class="band-ticks" aria-hidden="true"><span>0</span><span>1.5</span><span>2.2</span><span>3.5</span><span>4.5</span><span>9.0+</span></div>
+    <p class="formula" style="margin-top:4px">색 띠는 OCRA Index 척도입니다. OCRA Mini-Checklist·OCRA Checklist 점수는 공식 등가표의 구간 대응(≤5↔1.5, 7.5↔2.2, 11↔3.5, 14↔4.5, 22.5↔9)을 선형 보간한 <b>등가 위치(시각화용)</b>로 표시하며 공식 환산값이 아닙니다. 양손 평가 시 왼쪽 열 = 왼손, 오른쪽 열 = 오른손, 큰 숫자는 두 손 중 높은 쪽입니다. 위험 등급 이름(최적·허용·불확실·경도·중등도·고도)은 세 도구가 같은 체계를 씁니다.</p>
+  <div class="sub" id="rMulti" hidden style="border:2px solid #0F6E6E;border-radius:8px;padding:8px 10px;margin-top:12px"><div class="st" style="color:#0F6E6E">멀티태스크(하루 전체)</div><div id="rMultiText" style="font-size:13px"></div></div>
+  <div class="sub" id="r1"><div class="st" style="color:#1F3A6E">OCRA Mini-Checklist 분석 결과</div><div class="si" id="r1v">—</div><div class="kv" id="r1kv"></div></div>
+  <div class="sub" id="r2" hidden><div class="st" style="color:#B5620E">OCRA Checklist 분석 결과</div><div class="si" id="r2v">—</div><div class="kv" id="r2kv"></div></div>
+  <div class="sub" id="r3" hidden><div class="st" style="color:#5B2C8F">OCRA Index 분석 결과</div><div class="si" id="r3v">—</div><div class="kv" id="r3kv"></div></div>
+  <div class="actions"><button class="btn primary" type="button" id="copyBtn">결과 복사</button><button class="btn" type="button" onclick="window.print()">인쇄</button></div>
+  <p class="msg" id="msg"></p>
+</aside>
+</main>
+
+<section class="gloss" id="gloss" style="max-width:1440px;margin:0 auto 20px;padding:16px 24px"><details><summary style="font-size:17px;font-weight:700">쉬운 용어 풀이 (눌러서 펼치기)</summary>
+  <dl style="margin-top:8px">
+    <dt>사이클(한 바퀴 작업)</dt><dd>제품 하나를 끝내고 다음 제품을 시작할 때까지. 사이클이 없고 같은 동작만 이어지면 ‘센 구간’으로 대신합니다.</dd>
+    <dt>동작(기술동작)</dt><dd>집기, 놓기, 돌리기, 밀기, 당기기, 바꿔 쥐기처럼 손이 하는 조작 하나. 그냥 손을 펴서 떨어뜨리기, 걷기, 눈으로 보기는 동작이 아닙니다.</dd>
+    <dt>Borg 점수(힘든 정도)</dt><dd>작업자가 느끼는 힘든 정도를 0(전혀)~10(최대)으로 말한 값. 3~4 보통, 5~7 셈, 8 이상 거의 최대.</dd>
+    <dt>정형성(같은 동작 되풀이)</dt><dd>사이클이 짧거나(8초 이하, 9~15초) 같은 동작이 사이클의 절반 넘게·거의 내내 나오면 더 위험하게 봅니다.</dd>
+    <dt>제대로 쉰 시간</dt><dd>반복작업 1시간마다 8~10분 손을 쉬면 ‘제대로 쉼’. 점심 직전 1시간과 퇴근 직전 1시간도 쉰 것으로 칩니다.</dd>
+    <dt>쉬는 시간 보정(회복 승수)</dt><dd>제대로 쉬지 못한 시간이 길수록 점수에 곱하는 값이 커집니다(1.00 → 2.5).</dd>
+    <dt>하루 작업시간 보정(지속시간 승수)</dt><dd>순수 반복작업이 하루 8시간이면 1.0, 짧으면 작아지고(2시간 0.5), 8시간을 넘으면 커집니다.</dd>
+    <dt>더 힘들게 하는 조건(부가요인)</dt><dd>추위, 진동, 반동·충격, 맞지 않는 장갑, 정밀작업, 손이 눌림, 기계가 정하는 속도.</dd>
+    <dt>OCRA Checklist 점수와 OCRA Index</dt><dd>OCRA Mini-Checklist와 OCRA Checklist는 점수를 더해 구하고(5 이하 최적 … 22.5 초과 높음), OCRA Index는 ‘실제 동작 수 ÷ 허용 동작 수’입니다(2.2 이하 허용 … 9 초과 높음). 두 척도는 서로 대응합니다.</dd>
+  </dl></details>
+</section>
+<div class="mbar" id="mbar"><div class="t"><span id="mbarTitle">결과</span></div><b id="mbarVal">—</b><span class="z" id="mbarZone">입력 중</span><button type="button" id="mbarGo">결과 보기</button></div>
+<dialog class="modal" id="modal"><b id="modalTitle">안내</b><div id="modalText"></div><div class="actions"><button class="btn primary" type="button" id="modalOk">확인</button></div></dialog>
+<footer><b>출처</b><ul>
+<li>OCRA Mini-Checklist: EPM International Ergonomics School(Colombini D, Cerbai M, Occhipinti E, Placci M). ERGOepmEN_MINIcheckOCRAmonotaskBIL 시트(2025-06-20 배포). 빈도·자세·힘·부가요인·회복·지속시간 표와 수식을 그대로 옮김.</li>
+<li>OCRA Checklist: EPM ERGOepmENChecklistOCRAauto(2020-10-19, 개정 OCRA Checklist 2013 기반). 빈도 2열 표(중단 가능/불가), 자세·힘 5단계 표(1/3 미만 1점), 어깨 기본 1점, 부가요인 합산 규칙. 머리 위 ×2는 ISO/핸드북 Checklist 규칙. 고정밀판(2020-10-10)의 % 보간표는 쓰지 않음(밴드 입력이므로).</li>
+<li>OCRA Index: EPM ERGOepmIndexOCRA classic(2017-09-01)·phases(2017-11-07). 힘 구간선형 함수, 피크 힘 표(phases), 관절별 가중 점수와 저빈도 합산(classic N40:AC43), 부가요인 합산, 회복 0.5시간 표, 지속시간 표. 좌·우 분리는 시트 구조와 Occhipinti E. Ergonomics 1998;41(9):1290-1311 3.6절. 원안(1998) 대비 현행과 다른 점: 지속시간 계수 추가, 어깨를 계수 최솟값에 포함, 부가요인 0.85 단계, 위험 구간 6단계(1.5/2.2/3.5/4.5/9), 예측 유병률 2.39×Index(Occhipinti & Colombini, Ergonomics 2007). 1998 원안은 역사적 기준으로만 참고.</li>
+<li>멀티태스크: 시간가중 식 Occhipinti 1998·EN 1005-5(Ergonomiesite 예제 2.62). 복합식 Occhipinti E, Colombini D, Occhipinti M. Med Lav 2008;99(3):234-241; EPM ErgoEpmOCRAmultiCLASSICO(2014-02-12) D52:D62; Ergo/IBV OCRA Multitask 모듈 매뉴얼(2022). 교대 90분 기준은 ISO 11228-3 Annex C 요약·Ergonomiesite.</li>
+<li>회복 없는 시간: EPM Mini·Checklist 시트 기준표(교대 길이 → 기준 시간 − 8분 이상 휴식·식사 횟수). ISO Annex C·Ergo/IBV 규칙(매 시간 10분 이상 또는 5:1, 점심 직전·퇴근 직전 1시간은 회복 있음)과 같은 뜻. Index 전용 보정(출근·식사 후 짧은 첫 구간, 사이클 내 회복)은 이 도구의 규칙.</li>
+<li>검산 사례: Ergonomiesite 아이스크림 포장(Checklist 32, Index 11.2, 2시간 순환 13), EN 1005-5 멀티태스크 2.62, Occhipinti 1998 부록 B(좌 5.6 / 우 1.50, Dc = 1). ISO 11228-3:2026 원문은 대조하지 못했고 EPM 엑셀을 기준으로 함.</li>
+<li>자세 그림: EPM 시트의 그림(Daniela Colombini 저작권)을 복제하지 않고, ISO 11228-3·EPM이 정한 각도 기준(어깨 80°·45–80°, 손목 45°·15–20°, 팔꿈치 60°)만 같은 원작 픽토그램.</li>
+<li>단계 전환 기준: 저자들의 권고(Mini는 빠른 평가, Checklist는 선별·관리, Index는 재설계)와 Mini 시트의 예상 범위식(−0.31 + 0.93x ~ 1.8 + 1.07x)을 조합한 <b>이 도구의 권고 흐름</b>(OCRA 공식 규칙이 아님). 예상 범위 최댓값 ≤ 7.5 → 종료, 범위가 7.5 또는 11을 걸침 → Checklist로 확정, 범위 최솟값 > 11 → Index로 직행. Checklist 7.6–11 → Index 권고, > 11 → Index 필요.</li>
+</ul></footer>
+
+<script>
+/* ===== OCRA-CORE-BEGIN ===== */
+/* 순수 계산부. DOM을 쓰지 않으므로 Node에서 그대로 검증할 수 있다.
+   기준 자료: EPM Mini-Checklist 2025-06-20, EPM Checklist 자동계산판 2020-10-19, EPM Index classic 2017-09-01·phases 2017-11-07, EPM Multi-task 2014-02-12,
+   Occhipinti 1998, Occhipinti·Colombini·Occhipinti 2008(복합식), Ergo/IBV OCRA Multitask 매뉴얼, ISO 11228-3(2007) Annex C 요약. */
+const OC=(()=>{
+const T={
+  /* 빈도: 분당 기술동작 수 → 점수. look(): v<lim이면 val. */
+  freqMini:[[22.5,0],[27.5,0.5],[32.5,1],[37.5,2],[42.5,3],[47.5,4],[52.5,5],[57.5,6],[62.5,7],[67.5,8],[72.5,9]], freqMiniLast:10,          // Mini 시트 AB42:AZ43
+  freqInt:[[22.5,0],[27.5,0.5],[32.5,1],[37.5,2],[42.5,3],[47.5,4],[52.5,5],[57.5,6],[62.5,7],[67.5,8],[72.5,9]], freqIntLast:9,              // Checklist 2020 X26:AZ27(중단 가능)
+  freqNoInt:[[22.5,0],[27.5,0.5],[32.5,1],[37.5,2],[42.5,4],[47.5,5],[52.5,6],[57.5,7],[62.5,8],[67.5,9],[72.5,10]], freqNoIntLast:10,        // Checklist 2020 X29:AZ30(중단 불가)
+  fastUncount:72,                                                                                                                              // '셀 수 없이 빠름' 체크 시 대입(I43)
+  /* 자세 6단계: 0 없음(10% 미만) · 1 1/3 미만(10–24%) · 2 약 1/3(25–45%) · 3 약 절반(45–50%) · 4 약 2/3(51–80%) · 5 거의 내내(>80%) */
+  mini:{hand:[0,0,2,3.5,4,8],sh:[0,2,6,8,12,24],wr:[0,0,2,3.5,4,8],el:[0,0,2,3.5,4,8],mod:[0,0,2,4,6,8]},                                   // Mini 시트 R49:V52, R58:V58
+  chk:{hand:[0,1,2,3.5,4,8],sh:[0,2,6,8,12,24],wr:[0,1,2,3.5,4,8],el:[0,1,2,3.5,4,8],mod:[0,1,2,4,6,8],intense:[0,4,8,16,24],max:[0,6,12,24,32]}, // Checklist 2020 R55:V58, R72:V74
+  chkShSlight:1,                                                                                                                               // Checklist 2020 Q56: 어깨 표시 없음 + 지지 없이 약간 들림 → 1
+  stat:[0,2.5,4.5],
+  /* 회복: 교대 길이(분) → 기준 시간(EPM Mini AG/AH열), 휴식·식사 횟수를 빼서 '회복 없는 시간' */
+  rcBase:[[600,9],[540,8],[480,7],[460,7],[440,6.5],[420,6],[390,5.5],[360,5],[330,4.5],[300,4],[270,3.5],[250,3],[240,3],[210,2.5],[180,2],[120,1]],
+  rcMult:{0:1,0.5:1.025,1:1.05,1.5:1.086,2:1.12,2.5:1.16,3:1.2,3.5:1.265,4:1.33,4.5:1.4,5:1.48,5.5:1.58,6:1.7,6.5:1.83,7:2,7.5:2.25,8:2.5,9:3},
+  du:[[120,0.5],[180,0.65],[240,0.75],[300,0.85],[360,0.925],[420,0.95],[480,1]], duLast:1.5,                                                  // EPM X16:Y23 (≤120 → 0.5 … ≤480 → 1, 초과 1.5)
+  rcIdx:[[0.5,1],[1,.9],[1.5,.85],[2,.8],[2.5,.75],[3,.7],[3.5,.65],[4,.6],[4.5,.52],[5,.45],[5.5,.3],[6,.25],[6.5,.17],[7,.1],[7.5,.05]],      // Index 2017 C18:E18
+  dcIdx:[[120,2],[180,1.7],[240,1.5],[300,1.3],[360,1.2],[420,1.1],[480,1]], dcLast:0.5,                                                        // Index 2017 C39
+  jointMult:[[3.5,1],[7.5,.7],[11.5,.6],[15.5,.5],[19.5,.33],[23.5,.1],[27.5,.07]], jointLast:0.03,                                            // Index 2017 P43
+  afScore:[[4,1],[8,.95],[12,.9],[16,.85]], afLast:0.8,                                                                                         // Index 2017 AJ44
+  peakEpm:[[0.01,1],[0.02,.55],[0.03,.45],[0.04,.35],[0.05,.2],[0.10,.1]], peakLast:0.01,                                                      // Index phases 2017-11 R31 (classic 2017-09은 ≥10% → 0.01만)
+  ffIso:[[0.5,1],[1,.85],[2,.65],[3,.35],[4,.2],[5,.01]],
+  sc80:{0:0,10:4,20:8,30:12,40:16,50:24}, iso80:{0:1,10:.7,20:.6,30:.5,40:.33,50:.07}, iso4:[1,.7,.6,.5],
+  czones:[[5,"최적",1.5,"--z1"],[7.5,"허용",2.2,"--z2"],[11,"불확실(매우 낮음)",3.5,"--z3"],[14,"경도 허용 불가(낮음)",4.5,"--z4"],[22.5,"중등도 허용 불가(중간)",9,"--z5"]],
+  izones:[[1.5,"녹색(최적)","--z1"],[2.2,"녹색-황색(허용)","--z2"],[3.5,"황색(경계)","--z3"],[4.5,"연적색(낮음)","--z4"],[9,"적색(중간)","--z5"]],
+  paMult:[2.16,2.39,2.62]                                                                                                                       // 예측 유병률(EPM 멀티 시트 D67:F67; Occhipinti & Colombini 2007: 2.39±0.14 SE)
+};
+/* Index 세부 자세 항목: w = 25/51/81% 단계당 점수(EPM 2017 N38:AC38). sh80는 10/20/30/40/50% 특수표. agg = 25% 미만 항목 합산 가산점(EPM 2017 O41/R41/U41/Y41) */
+const JOINTS=[
+ {key:"shoulder",name:"어깨",agg:4,items:[{id:"sh80",label:"팔을 어깨 높이 이상으로 들기(80° 초과)",special:true,ic:"shoulder_front"},{id:"shAbd",label:"팔을 옆으로 45~80° 벌리기",w:4,ic:"shoulder_abd"},{id:"shExt",label:"팔을 몸 뒤로 20° 넘게 보내기(윗팔 신전)",w:4,ic:"shoulder_ext"}]},
+ {key:"elbow",name:"팔꿈치",agg:3,items:[{id:"elPro",label:"손바닥을 아래로 60° 넘게 돌리기(회내)",w:2,ic:"pronation"},{id:"elSup",label:"손바닥을 위로 60° 넘게 돌리기(회외)",w:4,ic:"supination"},{id:"elFlex",label:"60° 넘게 급히 굽혔다 펴기",w:2,ic:"elbow_flex"}]},
+ {key:"wrist",name:"손목",agg:3,items:[{id:"wrFlex",label:"아래로(손바닥 쪽) 45° 넘게 굽히기(굴곡)",w:3,ic:"wrist_flex"},{id:"wrExt",label:"뒤로(손등 쪽) 45° 넘게 젖히기(신전)",w:4,ic:"wrist_ext"},{id:"wrRad",label:"엄지 쪽으로 15° 넘게 꺾기(요측 편위)",w:2,ic:"wrist_rad"},{id:"wrUln",label:"새끼손가락 쪽으로 20° 넘게 꺾기(척측 편위)",w:2,ic:"wrist_dev"}]},
+ {key:"hand",name:"손",agg:3,items:[{id:"hdPower",label:"꽉 쥐기(파워 그립)",w:1,isoNone:true,ic:"power"},{id:"hdNarrow",label:"폭 2 cm보다 얇은 것 꽉 쥐기",w:2,ic:"narrow"},{id:"hdPinch",label:"손가락 끝으로 집기(핀치)",w:3,ic:"pinch"},{id:"hdPalm",label:"손바닥으로 누르듯 쥐기",w:4,ic:"palm"},{id:"hdHook",label:"손가락을 걸어 들기(갈고리)",w:4},{id:"hdFine",label:"손가락의 미세한 움직임",w:3}]}];
+const look=(tab,v,last)=>{for(const [lim,val] of tab){if(v<lim) return val;} return last;};
+const lookLE=(tab,v,last)=>{for(const [lim,val] of tab){if(v<=lim) return val;} return last;};
+const r1=v=>Math.round(v*10)/10;
+function czone(s){ for(const [lim,n,eq,c] of T.czones){ if(s<=lim) return {name:n,eq,color:c}; } return {name:"고도 허용 불가(높음)",eq:Infinity,color:"--z6"}; }
+function izone(i){ for(const [lim,n,c] of T.izones){ if(i<=lim) return {name:n,color:c}; } return {name:"자색(높음)",color:"--z6"}; }
+/* 등가 Index '위치'(시각화용). 공식 등가표는 구간만 대응하며(≤5↔1.5, 7.5↔2.2, 11↔3.5, 14↔4.5, 22.5↔9) 구간 안은 이 도구의 선형 보간이다. */
+function eqIndex(s){ return s<=5?s/5*1.5:s<=7.5?1.5+(s-5)/2.5*.7:s<=11?2.2+(s-7.5)/3.5*1.3:s<=14?3.5+(s-11)/3:s<=22.5?4.5+(s-14)/8.5*4.5:9+(s-22.5)/22.5*9; }
+function bandPos(idx){ const e=[0,1.5,2.2,3.5,4.5,9], w=[1.5,.7,1.3,1,4.5,2]; let acc=0; for(let i=0;i<5;i++){ if(idx<=e[i+1]) return ((acc+w[i]*(idx-e[i])/(e[i+1]-e[i]))/11)*100; acc+=w[i]; } return ((acc+w[5]*Math.min(1,(idx-9)/9))/11)*100; }
+function fomEpm(x){ if(x<0.5) return 1; if(x<1) return -0.3*x+1.15; if(x<3.5) return -0.2*x+1.05; if(x<4) return -0.3*x+1.4; if(x<4.5) return -0.2*x+1; if(x<=5) return -0.18*x+0.91; return 0; }   // Index 2017 L39 (= Occhipinti 1998 표 1의 구간선형)
+function fomIso(b){ const p=T.ffIso; if(b<=0.5) return 1; if(b>=5) return 0.01; for(let i=0;i<p.length-1;i++){const [x0,y0]=p[i],[x1,y1]=p[i+1]; if(b>=x0&&b<=x1) return y0+(y1-y0)*(b-x0)/(x1-x0);} return 0.01; }
+function ster(cyc,sameLv){ return Math.max(cyc==null?0:(cyc<=8?3:(cyc<=15?1.5:0)), [0,1.5,3][sameLv||0]); }   // Mini T55 = MAX(사이클 점수, 같은 동작 점수)
+
+/* ---------- 근무·회복·지속시간(세 도구 공통) ----------
+   org = {shiftH(시간, 식사 포함 총 체류), nonRep(분), mealN, mealLen, mealIn(유급 포함 여부), breakN, breakLen, recWorkMin, shortPeriods[], inCycle}
+   회복 없는 시간: EPM Mini/Checklist 시트 방식(교대 길이 기준표 − 8분 이상 휴식 횟수 − 식사 횟수). Index도 같은 값을 쓰고, Index 전용 보정(짧은 첫 구간, 사이클 내 회복)만 더한다. */
+function shift(org){
+  const sh=org.shiftH; if(sh==null||sh<=0) return null;
+  const mealN=org.mealN||0, mealLen=org.mealLen||0, bN=org.breakN||0, bL=org.breakLen||0, nonRep=org.nonRep||0;
+  const shiftMin=org.mealIn?sh*60:sh*60-mealN*mealLen;                       // Mini K15: 식사가 근무 밖(무급)이면 K15는 식사를 뺀 길이
+  const breaks=(bL>=8?bN:0)+(org.mealIn?(mealLen>=8?mealN:0):(mealLen>=30?mealN:0));   // K19 + Y52(유급 식사 1) 또는 K25(무급 30분 이상 식사)
+  let base=0; for(const [lim,v] of T.rcBase){ if(shiftMin>=lim){base=v;break;} }
+  const unrec=Math.min(9,Math.round(Math.max(0,base-breaks)*2)/2);
+  const net=shiftMin-nonRep-bN*bL-(org.mealIn?mealN*mealLen:0);                // K27 = K15 − K17 − K21 − K23
+  const du=net<=0?null:lookLE(T.du,net,T.duLast);
+  /* Index 전용 보정: 출근·식사 후 첫 작업 구간(<20분 0, 20~40분 −0.5, 40~80분 −1 … 이 도구/Ergo-IBV 규칙), 사이클 내 회복이면 0 */
+  let adj=0; for(const p of (org.shortPeriods||[])){ if(p<20) adj-=1; else if(p<=40) adj-=0.5; }
+  let unrecIdx=Math.min(8,Math.max(0,Math.round((unrec+adj)*2)/2)); if(org.inCycle) unrecIdx=0;
+  const netIdx=net-(org.recWorkMin||0);
+  return {shiftMin,base,breaks,unrec,rcm:T.rcMult[unrec]??1,net,du,unrecIdx,rc:unrecIdx<=0?1:lookLE(T.rcIdx,unrecIdx,0),netIdx,dc:netIdx<=0?null:lookLE(T.dcIdx,netIdx,T.dcLast)};
+}
+/* ---------- 빈도 ---------- */
+function apm(side){ if(side.fastUncount) return T.fastUncount; if(side.taN!=null&&side.taSec!=null&&side.taSec>0) return side.taN*60/side.taSec; return null; }
+function freqMini(side){ const a=apm(side); if(a!=null) return {score:look(T.freqMini,a,T.freqMiniLast),apm:a,note:`${r1(a)}회/분`}; if(side.speed!==""&&side.speed!=null) return {score:Number(side.speed),apm:null,note:"정성 빠르기"}; return {score:null,apm:null,note:"빠르기 또는 동작 수 필요"}; }
+function freqChk(side){ const a=apm(side); if(a!=null){ const t=side.pauses?[T.freqInt,T.freqIntLast]:[T.freqNoInt,T.freqNoIntLast]; return {score:look(t[0],a,t[1]),apm:a,note:`${r1(a)}회/분, ${side.pauses?"중단 가능":"중단 불가"}`}; } if(side.speed!==""&&side.speed!=null) return {score:Number(side.speed),apm:null,note:"정성 빠르기(Mini)"}; return {score:null,apm:null,note:"빠르기 또는 동작 수 필요"}; }
+/* ---------- 부가요인 ---------- */
+function addMini(shared){ const c=shared.checked||[]; let phys=0; if(c.includes("strike")) phys+=2; if(c.includes("impact")) phys+=2; if(["cold","glove","precision","compress","other"].some(k=>c.includes(k))) phys+=2;
+  const physScore=c.includes("vib")?4:(phys>2?3:phys); const org={0:0,1:1.5,1.5:1.5,2:2}[shared.pace]??0; return {physScore,org,add:physScore+org}; }   // Mini S67, O67
+function addChk(shared){ const c=shared.checked||[]; let phys=0; if(c.includes("strike")) phys+=2; if(c.includes("impact")) phys+=2; if(["cold","glove","precision","compress","other"].some(k=>c.includes(k))) phys+=2;
+  const physScore=c.includes("vib")?4:(phys>2?3:phys); const org={0:0,1:1,1.5:1.5,2:2}[shared.pace]??0; return {physScore,org,add:physScore+org}; }   // Checklist 2020 R88, O86
+/* ---------- OCRA Mini-Checklist ---------- */
+function mini(org,shared,side){
+  const sc=shift(org); const fr=freqMini(side); const st=ster(shared.cyc,shared.sameLv);
+  const b=side.bands; const post=Math.max(T.mini.hand[b.hand],T.mini.sh[b.sh],T.mini.wr[b.wr],T.mini.el[b.el]); const posture=post+st;
+  const mod=T.mini.mod[side.modBand]; const pk=side.peakPct||0; const intense=pk<1?0:(pk<2?8:(pk<10?16:24)); const force=mod+intense;   // Mini E59/H59/K59
+  const a=addMini(shared);
+  const ok=!!(sc&&sc.du!=null&&fr.score!=null); const partial=ok?fr.score+posture+force+a.add:null; const score=ok?partial*sc.rcm*sc.du:null;
+  return {ok,sc,fr,st,post,posture,mod,intense,force,physScore:a.physScore,org:a.org,add:a.add,partial,score,min:ok?-0.31+0.93*score:null,max:ok?1.8+1.07*score:null};
+}
+/* ---------- OCRA Checklist(EPM 자동계산판 2020) ---------- */
+function chk(org,shared,side){
+  const sc=shift(org); const fr=freqChk(side); const stat=T.stat[side.staticBand||0]; const freq=fr.score==null?null:Math.max(fr.score,stat); const st=ster(shared.cyc,shared.sameLv);
+  const b=side.bands; let shs=b.sh===0?(side.shSlight?T.chkShSlight:0):T.chk.sh[b.sh]; if(side.overhead) shs*=2;   // 머리 위 ×2: 핸드북 5.3(ISO Checklist)
+  const post=Math.max(shs,T.chk.el[b.el],T.chk.wr[b.wr],T.chk.hand[b.hand]); const posture=post+st;
+  const mod=T.chk.mod[side.modBand]; const pk=side.peakPct||0; const intBand=pk<=0?0:(pk<1?1:(pk<5?2:(pk<10?3:4))); const intense=T.chk.intense[intBand]; const mx=T.chk.max[side.maxBand||0]; const force=mod+intense+mx;
+  const a=addChk(shared);
+  const ok=!!(sc&&sc.du!=null&&freq!=null); const partial=ok?freq+posture+force+a.add:null; const score=ok?partial*sc.rcm*sc.du:null;
+  return {ok,sc,fr,stat,freq,st,shs,post,posture,mod,intense,mx,force,physScore:a.physScore,org:a.org,add:a.add,partial,score};
+}
+/* ---------- OCRA Index(EPM 2017) ----------
+   side.post = {항목id: 사이클 비율 %}. shared.afDurs = {요인key: 1~3}(1/3·2/3·내내). opts.dcFixed = Dc 고정값(검산용). */
+function postureIdx(post){
+  let pEpm=1,pIso=1; const joints=[];
+  for(const J of JOINTS){ let score=0,isoMin=1,low=0; const parts=[];
+    for(const it of J.items){ const p=Number(post[it.id]||0); if(!p) continue; let s;
+      if(it.special){ s=p<10?0:p<20?4:p<30?8:p<40?12:p<50?16:24; const lv=p<10?0:p<20?10:p<30?20:p<40?30:p<50?40:50; isoMin=Math.min(isoMin,T.iso80[lv]); }
+      else { const lv=p<25?0:p<51?1:p<81?2:3; s=it.w*lv; if(!it.isoNone) isoMin=Math.min(isoMin,T.iso4[lv]); }
+      if(s===0) low+=p; score+=s; if(s) parts.push(`${it.label.split("(")[0]}→${s}`); }
+    const aggS=low<25?0:low<51?J.agg:low<81?2*J.agg:3*J.agg; if(aggS) parts.push(`저빈도 합산 ${r1(low)}%→${aggS}`); score+=aggS;   // EPM 2017 N40:Y41
+    const jm=look(T.jointMult,score,T.jointLast); joints.push({name:J.name,key:J.key,score,epm:jm,iso:isoMin,parts}); pEpm=Math.min(pEpm,jm); pIso=Math.min(pIso,isoMin); }
+  return {pEpm,pIso,joints};
+}
+function idx(org,shared,side,opts){ opts=opts||{};
+  const sc=shift(org); const a=apm(side); const stSec=side.staticSec; let ata=a;
+  if(a!=null&&stSec!=null&&stSec>0&&side.taSec>0){ const imag=stSec/0.6*0.75; ata=Math.max(side.taN,imag)*60/side.taSec; }   // EPM: 정적 유지 cts×0.75 = 초×1.25 (단위 확인 필요)
+  const borg=side.borg; const pk=(side.peakPct||0)/100; const ffEpm=borg==null?null:Math.min(fomEpm(borg),look(T.peakEpm,pk,T.peakLast)); const ffIso=borg==null?null:(pk>=0.10?0.01:fomIso(borg));
+  const P=postureIdx(side.post||{});
+  const c=shared.checked||[]; const durs=shared.afDurs||{}; let as=0; for(const k of c){ const d=durs[k]||shared.afDur||0; as+=(k==="vib"?[0,8,12,16]:[0,4,8,12])[d]; }
+  as+={0:0,1:8,1.5:12,2:12}[shared.pace]??0; const aEpm=look(T.afScore,as,T.afLast);
+  const dIso=c.length?Math.max(...c.map(k=>durs[k]||shared.afDur||0)):0; const aIso=(c.length||shared.pace)?[1,.95,.9,.8][(shared.pace&&!c.length)?3:dIso]:1;
+  const rf=Math.min([1,.85,.7][shared.sameLv||0], shared.cyc==null?1:(shared.cyc<8?.7:(shared.cyc<=15?.85:1)));
+  const dc=opts.dcFixed!=null?opts.dcFixed:(sc?sc.dc:null); const rc=sc?sc.rc:null;
+  const ok=!!(sc&&dc!=null&&ata!=null&&ffEpm!=null); let rtaE=null,rtaI=null,idxE=null,idxI=null,k=null;
+  if(ok){ k=30*rf*P.pEpm*aEpm*ffEpm; const base=30*rf*rc*dc; rtaE=base*P.pEpm*aEpm*ffEpm; rtaI=base*P.pIso*aIso*ffIso; idxE=rtaE>0?ata/rtaE:Infinity; idxI=rtaI>0?ata/rtaI:Infinity; }
+  const pa=idxE!=null&&idxE>=2.25?T.paMult.map(m=>m*idxE):null;
+  return {ok,sc,ata,borg,ffEpm,ffIso,pEpm:P.pEpm,pIso:P.pIso,joints:P.joints,as,aEpm,aIso,rf,rc,dc,k,rtaE,rtaI,idxE,idxI,pa};
+}
+/* ---------- 멀티태스크 ----------
+   tasks: [{name,min,partial(Checklist 부분점수) | ata(회/분), k(30×Rf×Pf×Af×Ff)}]
+   90분 이내 교대: 시간가중(Occhipinti 1998 식, EN 1005-5). 90분 초과: 복합식(Occhipinti·Colombini·Occhipinti 2008; EPM 2014 시트 D52:D62; Ergo/IBV):
+   결과 = OCRA₁(DuM₁) + ΔOCRA₁×K, K = Σ(OCRAᵢmax×FTᵢ)/OCRA₁max, FTᵢ = 과업ᵢ 시간/총 반복시간(과업 1 포함). */
+function multiChk(tasks,org){
+  const V=tasks.filter(t=>t.min>0&&t.partial!=null); const sc=shift(org); if(!V.length||!sc||sc.du==null) return null;
+  const total=V.reduce((s,t)=>s+t.min,0); const duT=lookLE(T.du,total,T.duLast);
+  const fast=(V.reduce((s,t)=>s+t.partial*t.min,0)/total)*sc.rcm*duT;
+  const own=t=>t.partial*sc.rcm*lookLE(T.du,t.min,T.duLast), mx=t=>t.partial*sc.rcm*duT;
+  const S=[...V].sort((a,b)=>own(b)-own(a)); const t1=S[0]; const delta=mx(t1)-own(t1); const K=V.reduce((s,t)=>s+mx(t)*(t.min/total),0)/mx(t1);
+  return {total,duT,fast,complex:own(t1)+delta*K,t1:t1.name,K,delta,own:S.map(t=>({name:t.name,own:own(t),max:mx(t)}))};
+}
+function multiIdx(tasks,org,opts){ opts=opts||{};
+  const V=tasks.filter(t=>t.min>0&&t.ata!=null&&t.k!=null); const sc=shift(org); if(!V.length||!sc) return null;
+  const total=V.reduce((s,t)=>s+t.min,0); const rc=sc.rc; const dcT=opts.dcFixed!=null?opts.dcFixed:lookLE(T.dcIdx,total,T.dcLast);
+  const ATA=V.reduce((s,t)=>s+t.ata*t.min,0), RTA=V.reduce((s,t)=>s+t.k*t.min,0)*rc*dcT; const fast=RTA>0?ATA/RTA:null;
+  const own=t=>t.ata/(t.k*lookLE(T.dcIdx,t.min,T.dcLast)), mx=t=>t.ata/(t.k*dcT);                   // RcM 없이(EPM 2014 D47/D48), 마지막에 ÷RcM
+  const S=[...V].sort((a,b)=>own(b)-own(a)); const t1=S[0]; const delta=mx(t1)-own(t1); const K=V.reduce((s,t)=>s+mx(t)*(t.min/total),0)/mx(t1);
+  const complex=rc>0?(own(t1)+delta*K)/rc:Infinity;
+  return {total,dcT,rc,ATA,RTA,fast,complex,t1:t1.name,K,delta,own:S.map(t=>({name:t.name,own:own(t)/rc,max:mx(t)/rc}))};
+}
+return {T,JOINTS,look,lookLE,czone,izone,eqIndex,bandPos,fomEpm,fomIso,ster,shift,apm,freqMini,freqChk,mini,chk,idx,postureIdx,multiChk,multiIdx};
+})();
+if(typeof module!=="undefined") module.exports=OC;
+/* ===== OCRA-CORE-END ===== */
+
+/* ===== UI ===== */
+const T=OC.T, JOINTS=OC.JOINTS, look=OC.look, lookLE=OC.lookLE, czone=OC.czone, izone=OC.izone, eqIndex=OC.eqIndex, bandPos=OC.bandPos;
+const $=id=>document.getElementById(id); const num=id=>{const e=$(id); if(!e) return null; const v=e.value; return v===""?null:Number(v);};
+const f2=v=>v==null||!isFinite(v)?"—":(Math.round(v*100)/100).toFixed(2), f1=v=>v==null||!isFinite(v)?"—":(Math.round(v*10)/10).toFixed(1);
+const B5=[["0","없음(10% 미만)"],["1","1/3 미만(10–24%)"],["2","약 1/3(25–45%)"],["3","약 절반(45–50%)"],["4","약 2/3(51–80%)"],["5","거의 내내(80% 초과)"]];
+const SIDE_NAME={L:"왼손",R:"오른손"};
+/* TEST-ONLY */ function dbg(id,lines){const el=$(id); if(el) el.textContent=lines.filter(Boolean).join("\n");} $("dbgToggle").addEventListener("click",()=>{document.body.classList.toggle("nodbg");$("dbgToggle").textContent=document.body.classList.contains("nodbg")?"계산 과정 표시 켜기":"계산 과정 표시 끄기";}); /* /TEST-ONLY */
+document.querySelectorAll("select.b5").forEach(s=>B5.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;s.appendChild(o);}));
+/* Index 세부 자세: 사이클 비율(%) 입력 */
+(function(){ const area=$("jointArea"); for(const J of JOINTS){ const box=document.createElement("div"); box.className="jointbox"; box.innerHTML=`<h3>${J.name} <span class="jv" id="jv-${J.key}">—</span></h3><div class="jgrid"></div>`; const g=box.querySelector(".jgrid");
+  for(const it of J.items){ const d=document.createElement("div"); d.className="jitem"; d.innerHTML=`<div class="jn">${it.ic?`<svg class="ico"><use href="#ic-${it.ic}"/></svg>`:""}${it.label}</div>`; const s=document.createElement("input"); s.type="number"; s.min="0"; s.max="100"; s.step="1"; s.placeholder="% (사이클 비율)"; s.id="p-"+it.id; s.addEventListener("input",()=>s.classList.remove("est")); d.appendChild(s); g.appendChild(d);} area.appendChild(box);} })();
+/* 부가요인별 노출시간(Index용) 선택 */
+(function(){ document.querySelectorAll("#afChecks label").forEach(l=>{ const c=l.querySelector("input"); const s=document.createElement("select"); s.id="afd-"+c.value; s.className="afd"; s.title="OCRA Index용 노출시간"; [["1","1/3"],["2","2/3"],["3","내내"]].forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;s.appendChild(o);}); s.value=c.value==="vib"?"1":"3"; l.appendChild(s); }); })();
+
+/* ===== 좌·우 ===== */
+const SIDE_IDS=["taN","taSec","speed","fastUncount","bHand","bSh","bWr","bEl","shSlight","overhead","modBand","peakPct","pauses","staticBand","maxBand","borg","staticSec","estOK"].concat(JOINTS.flatMap(J=>J.items.map(it=>"p-"+it.id)));
+let curSide="R"; const sideStore={L:null,R:null}; const prefilledSide={L:false,R:false};
+function defaultSide(){ const o={}; SIDE_IDS.forEach(id=>{ const e=$(id); o[id]=e.type==="checkbox"?(id==="shSlight"):(e.tagName==="SELECT"?e.options[0].value:""); }); o._est=[]; return o; }
+function readSideDOM(){ const o={}; SIDE_IDS.forEach(id=>{ const e=$(id); o[id]=e.type==="checkbox"?e.checked:e.value; }); o._est=SIDE_IDS.filter(id=>$(id).classList.contains("est")); return o; }
+function writeSideDOM(o){ SIDE_IDS.forEach(id=>{ const e=$(id); if(e.type==="checkbox") e.checked=!!o[id]; else e.value=o[id]??""; e.classList.toggle("est",(o._est||[]).includes(id)); }); }
+function sideInputs(s){ const raw=s===curSide?readSideDOM():(sideStore[s]||defaultSide()); return toSide(raw); }
+function toSide(raw){ const n=v=>v===""||v==null?null:Number(v); const post={}; JOINTS.forEach(J=>J.items.forEach(it=>post[it.id]=n(raw["p-"+it.id])||0));
+  return {taN:n(raw.taN),taSec:n(raw.taSec)??n($("cycleSec").value),speed:raw.speed,fastUncount:!!raw.fastUncount,bands:{hand:Number(raw.bHand)||0,sh:Number(raw.bSh)||0,wr:Number(raw.bWr)||0,el:Number(raw.bEl)||0},shSlight:!!raw.shSlight,overhead:raw.overhead==="1",modBand:Number(raw.modBand)||0,peakPct:n(raw.peakPct)||0,pauses:raw.pauses==="1",staticBand:Number(raw.staticBand)||0,maxBand:Number(raw.maxBand)||0,borg:n(raw.borg),staticSec:n(raw.staticSec),post,estPending:(raw._est||[]).length>0&&!raw.estOK}; }
+function switchSide(s){ if(s===curSide) return; sideStore[curSide]=readSideDOM(); curSide=s; writeSideDOM(sideStore[s]||defaultSide()); if(openI&&!prefilledSide[s]) prefill3(); paintSide(); recalc(); }
+function paintSide(){ $("sideBar").classList.toggle("single",scopeSides().length===1); document.querySelectorAll("[data-side]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.side===curSide)); document.querySelectorAll(".sidenow").forEach(e=>e.textContent=`지금 입력 중: ${SIDE_NAME[curSide]}`); document.body.dataset.side=curSide; }
+function scopeSides(){ const v=$("evalScope").value; return v==="LR"?["L","R"]:[v]; }
+document.querySelectorAll("[data-side]").forEach(b=>b.addEventListener("click",()=>switchSide(b.dataset.side)));
+$("evalScope").addEventListener("input",()=>{ const ss=scopeSides(); if(!ss.includes(curSide)) switchSide(ss[0]); paintSide(); recalc(); });
+
+/* ===== 공통 입력 읽기 ===== */
+function readOrg(){ return {shiftH:num("shiftH"),nonRep:num("nonRepMin")||0,mealN:num("mealN")||0,mealLen:num("mealLen")||0,mealIn:$("mealIn").value==="1",breakN:num("breakN")||0,breakLen:num("breakLen")||0,recWorkMin:num("recWorkMin")||0,shortPeriods:$("shortPeriods").value.split(",").map(v=>Number(v.trim())).filter(v=>!isNaN(v)&&v>0),inCycle:$("inCycle").checked}; }
+function readShared(){ const checked=[...document.querySelectorAll("#afChecks input:checked")].map(c=>c.value); const afDurs={}; checked.forEach(k=>afDurs[k]=Number($("afd-"+k).value)||3);
+  return {cyc:num("cycleSec"),sameLv:Number($("same").value),pace:Number($("pace").value),checked,afDurs}; }
+function calcAll(){ const org=readOrg(), shared=readShared(); const out={org,shared,sides:{}};
+  for(const s of scopeSides()){ const side=sideInputs(s); const r1=OC.mini(org,shared,side); const r2=openC?OC.chk(org,shared,side):null; const r3=openI?(side.estPending?{ok:false,pending:true}:OC.idx(org,shared,side)):null; out.sides[s]={side,r1,r2,r3}; }
+  const pick=(key,val)=>{ let best=null; for(const s of Object.keys(out.sides)){ const r=out.sides[s][key]; if(r&&r.ok&&(best==null||val(r)>val(best.r))) best={s,r}; } return best; };
+  out.best1=pick("r1",r=>r.score); out.best2=pick("r2",r=>r.score); out.best3=pick("r3",r=>r.idxE); return out; }
+
+/* ===== 표시 ===== */
+let stage=1, lastOut={}; let openC=false, openI=false;
+function setStage(n){ if(n===1){openC=false;openI=false;} if(n===2){openC=true;} if(n===3){openI=true;} stage=openI?3:(openC?2:1);
+  $("st2").classList.toggle("locked",!openC); $("st3").classList.toggle("locked",!openI); $("r2").hidden=!openC; $("r3").hidden=!openI;
+  if(openI){ for(const s of scopeSides()){ if(s===curSide&&!prefilledSide[s]) prefill3(); } } recalc();
+  const tgt=n===3?"st3":n===2?"st2":"st1"; if($(tgt).scrollIntoView) $(tgt).scrollIntoView({behavior:"smooth",block:"start"}); }
+function prefill3(){ prefilledSide[curSide]=true; const b={hand:Number($("bHand").value),sh:Number($("bSh").value),wr:Number($("bWr").value),el:Number($("bEl").value)}; const mid=[0,17,35,48,65,90];   // 밴드 → 대표 비율(%) 추정값
+  const set=(id,v)=>{ const e=$("p-"+id); if(e.value===""){ e.value=v; e.classList.add("est"); } };
+  set("hdPinch",mid[b.hand]); set("wrFlex",mid[b.wr]); set("elFlex",mid[b.el]); set("sh80",b.sh?Math.min(50,[0,10,20,30,40,50][b.sh]):0); $("estOK").checked=false; }
+function borgEstimate(side){ return Math.min(5,Math.round(([0.5,0.8,1.3,1.8,2.2,3][side.modBand]+(side.peakPct>=10?1.5:side.peakPct>=1?0.5:0))*10)/10); }
+function kvTable(id,rows,sides){ const el=$(id); const cols=sides; el.innerHTML=`<table class="kv2"><thead><tr><th></th>${cols.map(s=>`<th>${SIDE_NAME[s]}</th>`).join("")}</tr></thead><tbody>${rows.map(([k,...v])=>`<tr><td>${k}</td>${v.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table>`; }
+function showMain(title,val,zoneName,color,idxPos,act){ $("rTitle").textContent=title; $("idxOut").textContent=val; if($("mbarVal")){ $("mbarTitle").textContent=title.replace(" 분석 결과","").replace("(점수)","").replace("(EPM)",""); $("mbarVal").textContent=val; $("mbarZone").textContent=zoneName.replace("위험 등급: ",""); $("mbarZone").style.background=color?`var(${color})`:"var(--ink-3)"; } const z=$("zoneOut"); z.textContent=zoneName; z.style.background=color?`var(${color})`:"var(--ink-3)"; const mk=$("marker"); if(idxPos==null){mk.style.display="none";} else {mk.style.display="block"; mk.style.left=`${bandPos(idxPos)}%`;} const ac=$("actChip"); ac.textContent=act||""; ac.style.display=act?"inline-block":"none"; }
+function orderSides(keys){ return ["L","R"].filter(s=>keys.includes(s)); }   // 화면 기준: 왼쪽 열 = 왼손
+const Q_CHK="추가 질문: ① 사이클 중 짧은 중단이 가능한지 ② 5초 이상 물건을 쥐고 버티는 동작 ③ 거의 최대 힘(Borg 8 이상)이 드는 시간 ④ 어깨를 지지 없이 약간 든 채 일하는지. 이미 넣은 근무·반복·자세·힘·조건 값은 다시 씁니다(부가요인은 EPM 시트 규칙으로 자동 환산).";
+function qIndex(apm){ const items=[]; if(apm==null) items.push("기술동작 수와 센 구간의 시간(‘반복’ 칸, 필수)"); items.push("세부 자세 15항목의 사이클 비율(%)(간이 선별 값으로 추정값이 미리 들어가며 노란색 표시 → 확인·수정 후 ‘추정값 확인’ 체크)","평균 힘든 정도(Borg, 직접 입력; 추정값은 참고로만 표시)","선택: 5초 이상 쥐고 버티는 시간, 휴식으로 볼 수 있는 일, 출근·식사 후 첫 작업 구간, 사이클 안의 휴식, 부가요인별 노출시간"); return `추가 입력: ${items.map((t,i)=>`${i+1}) ${t}`).join(" ")}`; }
+function renderNext(id,btns){ $(id).innerHTML=btns.map(b=>`<div class="advice" style="background:var(--sheet)"><b>${b.title}</b>${b.desc}<div class="actions" style="margin-top:8px"><button class="btn ${b.primary?"primary":""}" type="button" data-go="${b.go}">${b.label}</button></div></div>`).join(""); $(id).querySelectorAll("[data-go]").forEach(x=>x.addEventListener("click",()=>{ const g=Number(x.dataset.go); if(g===4){ if($("st4").scrollIntoView) $("st4").scrollIntoView({behavior:"smooth",block:"start"}); } else setStage(g); })); }
+
+function recalc(){
+  const A=calcAll(); lastOut=A; const keys=orderSides(Object.keys(A.sides)); const cur=A.sides[curSide]||A.sides[keys[0]]; const S=cur.side;
+  $("ataShow").value=OC.apm(S)==null?"—":`${f1(OC.apm(S))} 회/분`;
+  const sideTag=s=>keys.length>1?` [${SIDE_NAME[s]}]`:"";
+  /* --- Mini --- */
+  const b1=A.best1; $("v1").textContent=b1?`${f1(b1.r.score)}점${sideTag(b1.s)}`:"—"; $("afLive").textContent="— "+(cur.r1.add!=null?`조건 점수 ${cur.r1.add}점(물리 ${cur.r1.physScore} + 속도 ${cur.r1.org})`:"");
+  if(b1){ const r1=b1.r, z=czone(r1.score); $("r1v").textContent=`${f1(r1.score)}점 (${f1(r1.min)}~${f1(r1.max)})${sideTag(b1.s)}`;
+    kvTable("r1kv",[["점수",...keys.map(s=>A.sides[s].r1.ok?f1(A.sides[s].r1.score):"—")],["빈도",...keys.map(s=>A.sides[s].r1.fr.score??"—")],["자세",...keys.map(s=>`${A.sides[s].r1.post}+${A.sides[s].r1.st}`)],["힘",...keys.map(s=>A.sides[s].r1.force)],["부가",...keys.map(s=>A.sides[s].r1.add)],["×회복",...keys.map(s=>A.sides[s].r1.sc?A.sides[s].r1.sc.rcm:"—")],["×지속",...keys.map(s=>A.sides[s].r1.sc?A.sides[s].r1.sc.du:"—")]],keys);
+    let advice, short; const mn=Math.max(...keys.map(s=>A.sides[s].r1.ok?A.sides[s].r1.min:-1)), mx=Math.max(...keys.map(s=>A.sides[s].r1.ok?A.sides[s].r1.max:-1));
+    if(mx<=7.5){advice=`예상 범위 전체가 ‘허용’ 이하(최대 ${f1(mx)} ≤ 7.5)입니다. 기록하고 종료해도 됩니다.`; short="추가 조사 불필요 — 기록 후 종료";}
+    else if(mn>11){advice=`예상 범위 전체가 ‘개선 필요’(최소 ${f1(mn)} > 11, 등가 OCRA Index 위치 3.5 초과)입니다. 등급은 이미 확정이므로 OCRA Checklist는 건너뛰고 OCRA Index로 가서 원인 요인을 정량화하고 개선안을 설계·비교하세요.`; short="개선 필요 — OCRA Index 활용(OCRA Checklist 생략 가능)";}
+    else {advice=`예상 범위(${f1(r1.min)}~${f1(r1.max)})가 등급 경계(7.5 또는 11)를 걸칩니다. OCRA Checklist로 확정하세요.`; short="추가 조사 필요 — OCRA Checklist 활용";}
+    $("adv1").innerHTML=`<b>OCRA Mini-Checklist 분석 결과: ${f1(r1.score)}점${sideTag(b1.s)} — 위험 등급 ${z.name}</b>${advice}${keys.length>1?" 최종값은 두 손 중 높은 쪽입니다.":""}`;
+    if(mode==="multi") $("next1").innerHTML="";
+    else if(mx<=7.5) renderNext("next1",[{title:"추천: 기록하고 종료",desc:"오른쪽 ‘결과 복사’로 점수·범위를 기록하세요. 작업 조건이 바뀌면 다시 평가합니다. 원하면 OCRA Checklist를 열어 점수를 확정할 수도 있습니다. "+Q_CHK,label:"OCRA Checklist로 확인(선택)",go:2,primary:false}]);
+    else if(mn>11) renderNext("next1",[{title:"추천: OCRA Index로 개선 설계",desc:"등급이 ‘개선 필요’로 확정되었으므로 OCRA Checklist는 건너뜁니다. OCRA Index는 요인별 계수(힘·자세·부가요인·반복성·회복·지속시간)를 따로 보여 주어 무엇부터 고칠지 정할 수 있습니다. "+qIndex(OC.apm(S)),label:"OCRA Index 열기",go:3,primary:true},{title:"선택: OCRA Checklist로 점수 확정",desc:"기록용 점수나 직무 순환 계획에 Checklist 점수가 필요할 때만 엽니다. "+Q_CHK,label:"OCRA Checklist 열기(선택)",go:2,primary:false}]);
+    else renderNext("next1",[{title:"추천: OCRA Checklist로 추가 조사",desc:"예상 범위가 등급 경계를 걸치므로 Checklist로 점수를 확정합니다. "+Q_CHK,label:"OCRA Checklist 열기",go:2,primary:true}]);
+    if(stage===1) showMain("OCRA Mini-Checklist 분석 결과(점수)",f1(r1.score),`위험 등급: ${z.name}${sideTag(b1.s)}`,z.color,eqIndex(r1.score),short); }
+  else { $("r1v").textContent="—"; $("r1kv").innerHTML=""; $("adv1").innerHTML="<b>OCRA Mini-Checklist 분석 결과</b>총 근무시간과 손의 빠르기(또는 기술동작 수)를 넣으면 점수가 나옵니다."; $("next1").innerHTML=""; if(stage===1) showMain("OCRA Mini-Checklist 분석 결과(점수)","—","입력을 기다리는 중",null,null,""); }
+  /* TEST-ONLY */ dbg("dbg1",keys.flatMap(s=>{const r=A.sides[s].r1; return r.sc?[`[${SIDE_NAME[s]}] 빈도 ${r.fr.note} → ${r.fr.score}`,`  자세 손 ${T.mini.hand[A.sides[s].side.bands.hand]} 어깨 ${T.mini.sh[A.sides[s].side.bands.sh]} 손목 ${T.mini.wr[A.sides[s].side.bands.wr]} 팔꿈치 ${T.mini.el[A.sides[s].side.bands.el]} → 최댓값 ${r.post} + 정형성 ${r.st}; 힘 보통 ${r.mod} + 센 힘 ${r.intense}; 부가 물리 ${r.physScore} + 조직 ${r.org}`,`  회복: 교대 ${r.sc.shiftMin}분 기준 ${r.sc.base} − 휴식·식사 ${r.sc.breaks} = ${r.sc.unrec}h → ×${r.sc.rcm}; 순 근무 ${r.sc.net}분 → ×${r.sc.du}`,r.ok?`  (${r.fr.score}+${r.posture}+${r.force}+${r.add}) = ${r.partial} × ${r.sc.rcm} × ${r.sc.du} = ${f1(r.score)}; 범위 ${f1(r.min)}~${f1(r.max)}`:""]:["총 근무시간 필요"];})); /* /TEST-ONLY */
+  /* --- Checklist --- */
+  if(stage>=2){ const b2=A.best2; $("v2").textContent=b2?`${f1(b2.r.score)}점${sideTag(b2.s)}`:"—";
+    if(b2){ const r2=b2.r, z=czone(r2.score); $("r2v").textContent=`${f1(r2.score)}점${sideTag(b2.s)}`;
+      kvTable("r2kv",[["점수",...keys.map(s=>A.sides[s].r2.ok?f1(A.sides[s].r2.score):"—")],["빈도",...keys.map(s=>A.sides[s].r2.freq??"—")],["자세",...keys.map(s=>`${A.sides[s].r2.post}+${A.sides[s].r2.st}`)],["힘",...keys.map(s=>A.sides[s].r2.force)],["부가",...keys.map(s=>A.sides[s].r2.add)],["×회복",...keys.map(s=>A.sides[s].r2.sc?A.sides[s].r2.sc.rcm:"—")],["×지속",...keys.map(s=>A.sides[s].r2.sc?A.sides[s].r2.sc.du:"—")]],keys);
+      const act2=r2.score<=7.5?"추가 조사 불필요 — 기록·주기적 재평가":r2.score<=11?"추가 조사 권고 — OCRA Index 활용":"개선 필요 — OCRA Index 활용";
+      $("adv2").innerHTML=`<b>OCRA Checklist 분석 결과: ${f1(r2.score)}점${sideTag(b2.s)} — 위험 등급 ${z.name}</b>${r2.score<=7.5?"허용 범위입니다. 기록하고 종료합니다.":r2.score<=11?"불확실 구간입니다. OCRA Index로 요인별 계수를 확인하거나 개선 후 재평가를 권고합니다.":"개선이 필요합니다. OCRA Index로 요인별 우선순위를 정하고 개선 전후를 비교하세요."}`;
+      if(mode==="multi"||r2.score<=7.5) $("next2").innerHTML=""; else renderNext("next2",[{title:r2.score<=11?"추천: OCRA Index로 원인 정량화":"추천: OCRA Index로 개선 설계",desc:(r2.score<=11?"불확실 구간이므로 요인별 계수로 원인을 확인합니다. ":"개선이 필요하므로 요인별 계수로 우선순위를 정하고 개선 전후를 비교합니다. ")+qIndex(OC.apm(S)),label:"OCRA Index 열기",go:3,primary:true}]);
+      if(stage===2) showMain("OCRA Checklist 분석 결과(점수)",f1(r2.score),`위험 등급: ${z.name}${sideTag(b2.s)}`,z.color,eqIndex(r2.score),act2); }
+    else { $("r2v").textContent="—"; $("r2kv").innerHTML=""; $("adv2").innerHTML="<b>OCRA Checklist 분석 결과</b>빈도(기술동작 수 또는 빠르기)와 근무시간이 필요합니다."; $("next2").innerHTML=""; }
+    /* TEST-ONLY */ dbg("dbg2",keys.flatMap(s=>{const r=A.sides[s].r2; return r.sc?[`[${SIDE_NAME[s]}] 빈도 ${r.fr.note} 동적 ${r.fr.score} vs 정적 ${r.stat} → ${r.freq}`,`  자세 어깨 ${r.shs}${A.sides[s].side.overhead?"(머리 위 ×2)":""} 팔꿈치 ${T.chk.el[A.sides[s].side.bands.el]} 손목 ${T.chk.wr[A.sides[s].side.bands.wr]} 손 ${T.chk.hand[A.sides[s].side.bands.hand]} → ${r.post} + 정형성 ${r.st}; 힘 보통 ${r.mod} + 큰 힘 ${r.intense} + 거의 최대 ${r.mx}; 부가 물리 ${r.physScore} + 조직 ${r.org}`,r.ok?`  (${r.freq}+${r.posture}+${r.force}+${r.add}) = ${r.partial} × ${r.sc.rcm} × ${r.sc.du} = ${f1(r.score)}`:""]:[];})); /* /TEST-ONLY */
+  }
+  /* --- Index --- */
+  if(stage>=3){ const b3=A.best3; $("idxNeed").hidden=OC.apm(S)!=null; $("borgHint").textContent=`추정값(참고) ${f1(borgEstimate(S))} — 보통 힘 비율·센 힘 비율로 만든 어림값이며 계산에는 쓰지 않습니다. 동작별 Borg를 시간으로 가중 평균해 직접 넣으세요.`;
+    $("estNote").hidden=!(cur.r3&&cur.r3.pending); $("v3").textContent=b3?`EPM ${f1(b3.r.idxE)} · ISO ${f1(b3.r.idxI)}${sideTag(b3.s)}`:"—";
+    if(cur.r3&&cur.r3.joints) cur.r3.joints.forEach(j=>$("jv-"+j.key).textContent=`${j.score}점 → EPM ${f2(j.epm)} / ISO ${f2(j.iso)}`); else JOINTS.forEach(J=>$("jv-"+J.key).textContent="—");
+    if(b3){ const r3=b3.r, z=izone(r3.idxE), zi=izone(r3.idxI); $("r3v").textContent=`${f1(r3.idxE)} (ISO ${f1(r3.idxI)})${sideTag(b3.s)}`;
+      const g=(s,fn)=>{const r=A.sides[s].r3; return r&&r.ok?fn(r):"—";};
+      kvTable("r3kv",[["Index(EPM/ISO)",...keys.map(s=>g(s,r=>`${f1(r.idxE)} / ${f1(r.idxI)}`))],["ATA",...keys.map(s=>g(s,r=>f1(r.ata)+"/분"))],["Ff",...keys.map(s=>g(s,r=>`${f2(r.ffEpm)} / ${f2(r.ffIso)}`))],["Pf",...keys.map(s=>g(s,r=>`${f2(r.pEpm)} / ${f2(r.pIso)}`))],["Rf",...keys.map(s=>g(s,r=>f2(r.rf)))],["Af",...keys.map(s=>g(s,r=>`${f2(r.aEpm)} / ${f2(r.aIso)}`))],["Rc",...keys.map(s=>g(s,r=>f2(r.rc)))],["Dc",...keys.map(s=>g(s,r=>f2(r.dc)))],["RTA",...keys.map(s=>g(s,r=>`${f2(r.rtaE)} / ${f2(r.rtaI)}`))],["예측 유병률 PA",...keys.map(s=>g(s,r=>r.pa?`${f1(r.pa[0])}~${f1(r.pa[2])}% (평균 ${f1(r.pa[1])}%)`:"≤2.2: 4~5%"))]],keys);
+      const pri=[["힘",r3.ffEpm],["자세",r3.pEpm],["부가요인",r3.aEpm],["반복성",r3.rf],["회복",r3.rc]].sort((a,b)=>a[1]-b[1]).slice(0,2).map(x=>`${x[0]} ${f2(x[1])}`).join(", ");
+      const act3=r3.idxE<=2.2?"허용 — 기록하고 주기적으로 재평가":r3.idxE<=3.5?"경계 — 개선 권고, 건강 감시":r3.idxE<=4.5?"개선 필요 — 우선 개선 요인: "+pri:r3.idxE<=9?"조속한 개선 — 우선 개선 요인: "+pri:"즉시 개선 — 우선 개선 요인: "+pri;
+      $("adv3").innerHTML=`<b>OCRA Index 분석 결과: ${f1(r3.idxE)}${sideTag(b3.s)} — 위험 등급 ${z.name}</b>ISO 간이표 기준 ${f1(r3.idxI)}(${zi.name}). 요인별 계수에서 가장 낮은 것이 개선 우선순위입니다: ${pri}.`;
+      showMain("OCRA Index 분석 결과(EPM)",f1(r3.idxE),`위험 등급: ${z.name}${sideTag(b3.s)}`,z.color,r3.idxE,act3); }
+    else { $("r3v").textContent="—"; $("r3kv").innerHTML=""; $("adv3").innerHTML="<b>OCRA Index 분석 결과</b>"+(cur.r3&&cur.r3.pending?"노란색 추정값(자세 비율)을 확인·수정한 뒤 ‘추정값 확인’에 체크해야 계산합니다.":"기술동작 수·센 구간의 시간과 평균 힘든 정도(Borg)가 필요합니다."); showMain("OCRA Index 분석 결과(EPM)","—","입력을 기다리는 중",null,null,""); }
+    /* TEST-ONLY */ dbg("dbg3",keys.flatMap(s=>{const r=A.sides[s].r3; if(!r||!r.sc) return [`[${SIDE_NAME[s]}] ${r&&r.pending?"추정값 확인 대기":"입력 부족"}`]; return [`[${SIDE_NAME[s]}] ATA ${f1(r.ata)}/분; Ff Borg ${r.borg} → EPM ${f2(r.ffEpm)} / ISO ${f2(r.ffIso)} (피크 ${A.sides[s].side.peakPct}%)`,...r.joints.map(j=>`  ${j.name}: ${j.parts.join(" + ")||"없음"} = ${j.score} → ${f2(j.epm)} / ${f2(j.iso)}`),`  Af 점수 ${r.as} → ${f2(r.aEpm)} / ISO ${f2(r.aIso)}; Rc ${r.sc.unrecIdx}h → ${f2(r.rc)}; Dc ${r.sc.netIdx}분 → ${f2(r.dc)}; Rf ${f2(r.rf)}`,r.ok?`  RTA EPM ${f2(r.rtaE)} → ${f1(r.idxE)}; RTA ISO ${f2(r.rtaI)} → ${f1(r.idxI)}`:""];})); /* /TEST-ONLY */
+  }
+  renderTaskList(A); refreshSnapShow(A); save();
+}
+
+/* ===== 작업 목록(멀티태스크) ===== */
+let taskList=[]; let mode="single";
+function setMode(m){ mode=m; document.body.classList.toggle("multi",m==="multi"); $("modeSingle").setAttribute("aria-pressed",m==="single"); $("modeMulti").setAttribute("aria-pressed",m==="multi"); $("modeLearn").textContent=m==="multi"?"여러 작업 모드: 작업마다 OCRA Mini-Checklist로 평가하고 하루 시간과 함께 ‘추가’하세요. 작업 목록에서 하루 평가 도구가 정해지면 각 작업을 ‘분석하기’로 열어 그 도구까지 분석합니다.":"한 가지 작업 모드: 이 작업을 평가하고 점수에 따라 OCRA Checklist 또는 OCRA Index로 갑니다."; recalc(); }
+const SHARED_IDS=["cycleSec","same","pace"];
+function sharedSnapshot(){ const o={}; SHARED_IDS.forEach(id=>o[id]=$(id).value); o._checks=[...document.querySelectorAll("#afChecks input:checked")].map(c=>c.value); o._afd={}; document.querySelectorAll("#afChecks select").forEach(s=>o._afd[s.id]=s.value); o.recWorkMin=$("recWorkMin").value; o.shortPeriods=$("shortPeriods").value; o.inCycle=$("inCycle").checked; return o; }
+function applyShared(o){ SHARED_IDS.forEach(id=>{ if(id in o) $(id).value=o[id]; }); document.querySelectorAll("#afChecks input").forEach(c=>c.checked=(o._checks||[]).includes(c.value)); Object.entries(o._afd||{}).forEach(([k,v])=>{ if($(k)) $(k).value=v; }); $("recWorkMin").value=o.recWorkMin??""; $("shortPeriods").value=o.shortPeriods??""; $("inCycle").checked=!!o.inCycle; }
+function clearTaskInputs(){ const d=defaultSide(); writeSideDOM(d); sideStore.L=null; sideStore.R=null; prefilledSide.L=false; prefilledSide.R=false; SHARED_IDS.forEach(id=>{ const e=$(id); if(e.tagName==="SELECT") e.selectedIndex=0; else e.value=""; }); document.querySelectorAll("#afChecks input").forEach(c=>c.checked=false); $("recWorkMin").value=""; $("shortPeriods").value=""; $("inCycle").checked=false; $("jobName").value=""; $("taskMin").value=""; }
+function currentSnapshot(A){ A=A||calcAll(); const res={}; for(const s of Object.keys(A.sides)){ const {r1,r2,r3}=A.sides[s]; res[s]={mini:r1.ok?{score:r1.score,min:r1.min,max:r1.max}:null,chk:(r2&&r2.ok)?r2.partial:null,idx:(r3&&r3.ok)?{ata:r3.ata,k:r3.k}:null}; }
+  const inputs={L:curSide==="L"?readSideDOM():sideStore.L,R:curSide==="R"?readSideDOM():sideStore.R,shared:sharedSnapshot(),scope:$("evalScope").value};
+  const worst=k=>{ let w=null; for(const s of Object.keys(res)){ const v=res[s][k]; if(v==null) continue; const val=k==="mini"?v.min:k==="chk"?v:v.ata/v.k; if(w==null||val>w.val) w={s,val,v}; } return w; };
+  return {name:$("jobName").value||`작업 ${taskList.length+1}`,min:num("taskMin"),res,inputs,mini:worst("mini")?.v||null,chkDone:Object.values(res).some(r=>r.chk!=null)&&Object.values(res).every(r=>r.chk!=null),idxDone:Object.values(res).some(r=>r.idx)&&Object.values(res).every(r=>r.idx)}; }
+function applyTask(t){ applyShared(t.inputs.shared||{}); $("evalScope").value=t.inputs.scope||"R"; sideStore.L=t.inputs.L||null; sideStore.R=t.inputs.R||null; const ss=scopeSides(); curSide=ss.includes(curSide)?curSide:ss[0]; writeSideDOM(sideStore[curSide]||defaultSide()); prefilledSide.L=!!(t.inputs.L&&t.inputs.L["p-hdPinch"]!==""); prefilledSide.R=!!(t.inputs.R&&t.inputs.R["p-hdPinch"]!==""); paintSide(); $("jobName").value=t.name; $("taskMin").value=t.min??""; }
+function dayDecision(){ const M=taskList.filter(t=>t.mini); if(!M.length) return {tool:null,text:"목록에 OCRA Mini-Checklist 결과가 있는 작업이 없습니다."};
+  const worst=M.reduce((a,t)=>t.mini.min>a.mini.min?t:a); const anyHigh=M.some(t=>t.mini.min>11), allOK=M.every(t=>t.mini.max<=7.5);
+  if(anyHigh) return {tool:"idx",text:`‘${worst.name}’의 Mini 예상 범위 최솟값 ${f1(worst.mini.min)} > 11 → 개선 필요가 확정. 모든 작업을 OCRA Index까지 분석해 하루 지수를 냅니다(Checklist 생략 가능).`};
+  if(allOK) return {tool:null,text:"모든 작업의 Mini 예상 범위가 7.5 이하 → 하루 전체도 허용. 기록하고 종료합니다(원하면 OCRA Checklist로 확정 가능)."};
+  return {tool:"chk",text:`일부 작업의 Mini 예상 범위가 등급 경계를 걸침(가장 높은 작업 ‘${worst.name}’ ${f1(worst.mini.min)}~${f1(worst.mini.max)}) → 모든 작업을 OCRA Checklist까지 분석해 하루 점수를 확정하고, 그래도 11을 넘거나 개선 설계가 필요하면 OCRA Index로 올립니다.`}; }
+function dayTool(){ const dec=dayDecision(); const sel=$("dayTool").value; return {tool:sel==="auto"?dec.tool:sel,dec,sel}; }
+function taskSideVal(t,tool,org){ const sc=OC.shift(org); const vals={}; for(const s of Object.keys(t.res)){ const r=t.res[s]; if(tool==="chk"&&r.chk!=null&&sc) vals[s]=r.chk*sc.rcm*lookLE(T.du,t.min||0,T.duLast); if(tool==="idx"&&r.idx&&sc) vals[s]=r.idx.ata/(r.idx.k*sc.rc*lookLE(T.dcIdx,t.min||0,T.dcLast)); } return vals; }
+function renderTaskList(A){
+  const tb=$("taskListBody"); tb.innerHTML=""; const total=taskList.reduce((a,t)=>a+(t.min||0),0); const sc=OC.shift(A.org); const {tool,dec,sel}=dayTool();
+  taskList.forEach((t,i)=>{ const tr=document.createElement("tr"); const verdict=!t.mini?"—":t.mini.max<=7.5?"허용":t.mini.min>11?"개선 필요 확정 → OCRA Index":"등급 경계 → OCRA Checklist 이상";
+    const miniTxt=orderSides(Object.keys(t.res)).map(s=>t.res[s].mini?`${SIDE_NAME[s]} ${f1(t.res[s].mini.score)} (${f1(t.res[s].mini.min)}~${f1(t.res[s].mini.max)})`:`${SIDE_NAME[s]} —`).join("<br>");
+    tr.innerHTML=`<td>${t.name}</td><td><input type="number" class="m-min" min="0" step="5" value="${t.min??""}"></td><td class="idx">${miniTxt||"—"}</td><td>${verdict}</td><td><button type="button" class="btn small" data-edit="${i}">Mini 다시 보기</button> <button type="button" class="btn small" data-del="${i}">삭제</button></td>`;
+    tr.querySelector(".m-min").addEventListener("input",e=>{ t.min=e.target.value===""?null:Number(e.target.value); recalc(); });
+    tr.querySelector("[data-edit]").addEventListener("click",()=>{ applyTask(t); openC=false; openI=false; setStage(1); });
+    tr.querySelector("[data-del]").addEventListener("click",()=>{ taskList.splice(i,1); recalc(); }); tb.appendChild(tr); });
+  const netI=sc?sc.netIdx:null;
+  $("taskTime").textContent=taskList.length?`목록의 시간 합 ${total}분 / 근무 조건의 순 반복작업 시간 ${netI!=null?netI:"—"}분${netI!=null&&total!==netI?`  ⚠ 시간 배분을 다시 확인하세요(차이 ${total-netI}분). EPM 시트는 합이 같아야 계산을 인정합니다.`:(netI!=null?"  ✓ 일치":"")}`:"목록이 비어 있습니다.";
+  let html="<b>하루 평가 도구</b>"+(sel==="auto"?dec.text:(tool==="chk"?"직접 선택: 모든 작업을 OCRA Checklist까지 분석":"직접 선택: 모든 작업을 OCRA Index까지 분석"));
+  if(tool) html+=`<div class="actions" style="margin-top:8px"><button class="btn primary" type="button" id="goTool">${tool==="chk"?"OCRA Checklist 열기 — 작업 목록과 함께":"OCRA Index 열기 — 작업 목록과 함께"}</button></div>`;
+  $("adv4").innerHTML=html; const gt=$("goTool"); if(gt) gt.addEventListener("click",()=>setStage(tool==="chk"?2:3));
+  $("v4").textContent=tool?(tool==="chk"?"→ OCRA Checklist":"→ OCRA Index"):(taskList.length?"허용·종료":"—");
+  const curName=$("jobName").value; const curT=taskList.find(t=>t.name===curName);
+  const tl=$("toolList"); const slot=tool==="chk"&&openC?$("listSlotC"):tool==="idx"&&openI?$("listSlotI"):$("afStore"); slot.appendChild(tl);
+  const tbm=$("toolBottom"); (tool==="chk"&&openC?$("bottomSlotC"):tool==="idx"&&openI?$("bottomSlotI"):$("afStore")).appendChild(tbm);
+  $("curTaskC").textContent=(mode==="multi"&&tool==="chk"&&openC&&curT)?`분석 중: ‘${curT.name}’`:""; $("curTaskI").textContent=(mode==="multi"&&tool==="idx"&&openI&&curT)?`분석 중: ‘${curT.name}’`:"";
+  const bC=$("taskBannerC"), bI=$("taskBannerI"); const bannerOn=mode==="multi"&&curT; const bHtml=curT?`▶ 지금 분석하는 작업: ${curT.name}<small>하루 ${curT.min??"—"}분 · Mini ${curT.mini?f1(curT.mini.score)+"점":"—"} · 아래 입력을 이 작업 기준으로 채우고, 맨 아래 ‘저장(갱신)’을 누르세요</small>`:"";
+  bC.hidden=!(bannerOn&&tool==="chk"&&openC); bI.hidden=!(bannerOn&&tool==="idx"&&openI); bC.innerHTML=bHtml; bI.innerHTML=bHtml;
+  $("toolListTitle").textContent=tool==="chk"?"작업 목록 — 각 작업을 OCRA Checklist로 분석하세요":"작업 목록 — 각 작업을 OCRA Index로 분석하세요";
+  const tlb=$("toolListBody"); tlb.innerHTML=""; $("toolColHead").textContent=tool==="chk"?"OCRA Checklist 점수(작업 단독)":"OCRA Index(작업 단독)"; $("nowTask").textContent=curT?`지금 분석 중인 작업: ‘${curT.name}’ — 하루 ${curT.min??"—"}분. 분석을 마치면 아래 ‘현재 작업 결과를 목록에 저장’을 누르세요.`:"목록에서 ‘분석’을 눌러 작업을 고르세요.";
+  let doneN=0;
+  taskList.forEach((t,i)=>{ const done=tool==="chk"?t.chkDone:t.idxDone; if(done) doneN++; const cur=curName===t.name; const tr=document.createElement("tr"); if(cur) tr.style.background="rgba(15,110,110,.12)";
+    const vals=taskSideVal(t,tool,A.org); const res=orderSides(Object.keys(vals)).map(s=>`${SIDE_NAME[s]} ${f1(vals[s])} (${tool==="chk"?czone(vals[s]).name:izone(vals[s]).name})`).join("<br>")||"—";
+    tr.innerHTML=`<td>${cur?"▶ ":""}${t.name}</td><td class="idx">${t.min??"—"}</td><td class="idx">${t.mini?f1(t.mini.score):"—"}</td><td class="idx">${res}</td><td>${done?"✓ 분석 완료":"분석 필요"}</td><td><button type="button" class="btn small" data-an="${i}">${done?"다시 열기":"분석"}</button></td>`;
+    tr.querySelector("[data-an]").addEventListener("click",()=>{ applyTask(t); if(tool==="idx"){openI=true;} setStage(tool==="chk"?2:3); $("msg").textContent=`‘${t.name}’을(를) 엽니다. 입력을 고친 뒤 맨 아래 ‘저장(갱신)’을 눌러야 분석 완료로 기록됩니다.`; }); tlb.appendChild(tr); });
+  const allDone=taskList.length>0&&taskList.every(t=>tool==="chk"?t.chkDone:t.idxDone); $("toolReport").disabled=!allDone; $("toolReport").title=allDone?"":"모든 작업을 분석한 뒤 누를 수 있습니다"; $("toolReport").textContent=allDone?"결과 보고 — 최종 멀티태스크 점수":`결과 보고 (${doneN}/${taskList.length} 작업 분석 완료 — 모두 끝나야 활성화)`;
+  if(!allDone){ $("multiResult").hidden=true; }
+  const rm=$("rMulti"); if(mode==="multi"&&taskList.length){ rm.hidden=false; $("rMultiText").textContent=!tool?"모든 작업이 허용 — 종료":allDone?`모든 작업 분석 완료(${taskList.length}/${taskList.length}). ${tool==="chk"?"OCRA Checklist":"OCRA Index"} 구역의 ‘결과 보고’를 누르면 최종 점수가 나옵니다.`:`진행 ${doneN}/${taskList.length} 작업 분석 완료 — 최종 점수는 모든 작업을 ${tool==="chk"?"OCRA Checklist":"OCRA Index"}로 분석한 뒤 나옵니다. 오른쪽 위 숫자는 지금 보는 작업 하나의 결과입니다.`; } else rm.hidden=true;
+  /* TEST-ONLY */ dbg("dbg4",taskList.map(t=>`${t.name}: ${t.min}분, `+Object.keys(t.res).map(s=>`${SIDE_NAME[s]} mini ${t.res[s].mini?f1(t.res[s].mini.score):"—"} chk ${t.res[s].chk==null?"—":f1(t.res[s].chk)} idx ${t.res[s].idx?`ATA ${f1(t.res[s].idx.ata)} k ${f2(t.res[s].idx.k)}`:"—"}`).join(" / "))); /* /TEST-ONLY */
+}
+function multiReport(){ const org=readOrg(); const {tool}=dayTool(); const out=[]; let main=null; const sides=["L","R"].filter(s=>taskList.some(t=>t.res[s]));
+  const per={}; for(const s of sides){ if(tool==="chk"){ const r=OC.multiChk(taskList.map(t=>({name:t.name,min:t.min,partial:t.res[s]?.chk})),org); if(r) per[s]=r; } else { const r=OC.multiIdx(taskList.map(t=>({name:t.name,min:t.min,ata:t.res[s]?.idx?.ata,k:t.res[s]?.idx?.k})),org); if(r) per[s]=r; } }
+  if(!Object.keys(per).length){ $("multiResult").hidden=false; $("multiResult").innerHTML="모든 작업의 결과가 갖춰지지 않았습니다."; return; }
+  const slow=Number($("rotSlow").value)===1; const ks=orderSides(Object.keys(per));
+  for(const s of ks){ const r=per[s]; if(tool==="chk"){ const v=slow?r.complex:r.fast; out.push(`[${SIDE_NAME[s]}] OCRA Checklist 하루 전체 ${slow?"복합식(90분 초과 교대)":"시간가중(90분 이내 교대)"}: ${f1(v)}점 — ${czone(v).name}${slow?` (기준 작업 ‘${r.t1}’, K ${f2(r.K)}, Δ ${f1(r.delta)}; 시간가중이면 ${f1(r.fast)})`:` (총 ${r.total}분 → 지속시간 승수 ${r.duT}; 복합식이면 ${f1(r.complex)})`}`); }
+    else { const v=slow?r.complex:r.fast; out.push(`[${SIDE_NAME[s]}] OCRA Index 하루 전체 ${slow?"복합식(90분 초과 교대)":"시간가중(90분 이내 교대)"}: ${f1(v)} — ${izone(v).name}${slow?` (기준 작업 ‘${r.t1}’, K ${f2(r.K)}, Δ ${f2(r.delta)}; 시간가중이면 ${f1(r.fast)})`:` (ATA ${Math.round(r.ATA).toLocaleString("ko-KR")} ÷ RTA ${Math.round(r.RTA).toLocaleString("ko-KR")}; 회복 ${f2(r.rc)}, 총 ${r.total}분 → 지속시간 ${f2(r.dcT)}; 복합식이면 ${f1(r.complex)})`}`); out.push(`  작업별 단독 지수: `+r.own.map(o=>`${o.name} ${f1(o.own)}`).join(", ")); } }
+  let best=null; for(const s of ks){ const v=slow?per[s].complex:per[s].fast; if(best==null||v>best.v) best={s,v}; }
+  const z=tool==="chk"?czone(best.v):izone(best.v); const tag=ks.length>1?` [${SIDE_NAME[best.s]}]`:"";
+  main=tool==="chk"?{v:best.v,z,act:best.v<=7.5?"추가 조사 불필요 — 기록·주기적 재평가":best.v<=11?"추가 조사 권고 — OCRA Index 활용":"개선 필요 — OCRA Index 활용",title:"하루 전체 OCRA Checklist 분석 결과(멀티태스크)",pos:eqIndex(best.v)}:{v:best.v,z,act:best.v<=2.2?"허용 — 기록·주기적 재평가":best.v<=3.5?"경계 — 개선 권고":"개선 필요 — 가장 높은 작업부터 개선",title:"하루 전체 OCRA Index 분석 결과(멀티태스크)",pos:best.v};
+  const mr=$("multiResult"); mr.hidden=false; mr.innerHTML="<b>최종 멀티태스크 결과</b><br>"+out.join("<br>")+(ks.length>1?`<br>최종값(두 손 중 높은 쪽): ${f1(best.v)}${tag}`:"");
+  showMain(main.title,f1(main.v),`위험 등급: ${main.z.name}${tag}`,main.z.color,main.pos,main.act); $("rMultiText").textContent=`최종 멀티태스크 결과: ${f1(main.v)}${tag} — ${main.z.name}`; }
+function refreshSnapShow(A){ const c=currentSnapshot(A); $("taskNameShow").value=c.name; $("taskSnapShow").value=orderSides(Object.keys(c.res)).map(s=>{const r=c.res[s]; return `${SIDE_NAME[s]}: ${r.mini?"Mini "+f1(r.mini.score):"Mini —"} · ${r.chk!=null?"Checklist 고유 "+f1(r.chk):"Checklist —"} · ${r.idx?"Index ATA "+f1(r.idx.ata)+", 허용/분 "+f2(r.idx.k):"Index —"}`;}).join(" | "); }
+
+function showModal(title,text,focusId){ const d=$("modal"); $("modalTitle").textContent=title; $("modalText").textContent=text; $("msg").textContent=text; if(d.showModal&&!d.open) d.showModal(); else if(!d.showModal) alert(text); const after=()=>{ if(focusId&&$(focusId)){ $(focusId).focus(); $(focusId).scrollIntoView&&$(focusId).scrollIntoView({behavior:"smooth",block:"center"}); } }; d.onclose=after; }
+$("modalOk").addEventListener("click",()=>$("modal").close());
+$("mbarGo").addEventListener("click",()=>{ const a=document.querySelector("aside.result"); if(a&&a.scrollIntoView) a.scrollIntoView({behavior:"smooth",block:"start"}); });
+/* ===== 이벤트 ===== */
+$("taskAdd").addEventListener("click",()=>{ const c=currentSnapshot(); if(c.min==null||c.min<=0){ showModal("하루에 하는 시간을 넣어 주세요","‘이 작업을 하루에 하는 시간(분)’ 칸이 비어 있습니다. 하루 중 이 작업만 하는 시간을 분으로 적은 뒤 다시 ‘목록에 넣기’를 눌러 주세요. 예: 오전 2시간 + 오후 2시간 = 240.","taskMin"); return; } if(!c.mini){ showModal("아직 점수가 없습니다","OCRA Mini-Checklist 점수가 나와야 목록에 넣을 수 있습니다. ‘총 근무시간’과 ‘손의 빠르기’(또는 기술동작 수)를 먼저 넣어 주세요.","shiftH"); return; }
+  const i=taskList.findIndex(t=>t.name===c.name); if(i>=0) taskList[i]=c; else taskList.push(c); recalc(); $("msg").textContent=`‘${c.name}’을(를) 목록에 ${i>=0?"갱신":"추가"}했습니다.`; if($("st4").scrollIntoView) $("st4").scrollIntoView({behavior:"smooth",block:"start"}); });
+$("dayTool").addEventListener("input",recalc); $("rotSlow").addEventListener("input",()=>{ if(!$("multiResult").hidden) multiReport(); }); $("toolReport").addEventListener("click",multiReport);
+$("toolSave").addEventListener("click",()=>{ const c=currentSnapshot(); const i=taskList.findIndex(t=>t.name===c.name); if(i<0){ showModal("목록에 없는 작업입니다","이 작업 이름이 작업 목록에 없습니다. 먼저 간이 선별(Mini) 구역에서 ‘이 작업을 목록에 넣기’를 눌러 주세요.","jobName"); return; } c.min=taskList[i].min; taskList[i]=c; recalc(); $("msg").textContent=`‘${c.name}’ 저장했습니다.`; if($("toolList").scrollIntoView) $("toolList").scrollIntoView({behavior:"smooth",block:"start"}); });
+$("modeSingle").addEventListener("click",()=>setMode("single")); $("modeMulti").addEventListener("click",()=>setMode("multi"));
+$("taskNew").addEventListener("click",()=>{ clearTaskInputs(); openC=false; openI=false; setStage(1); $("msg").textContent="작업별 입력을 비웠습니다(근무·식사·휴식은 그대로). 다음 작업을 입력하세요."; });
+$("learnToggle").addEventListener("click",()=>{ document.body.classList.toggle("showlearn"); $("learnToggle").textContent=document.body.classList.contains("showlearn")?"질문마다 쉬운 설명 숨기기":"질문마다 쉬운 설명 보이기"; });
+document.querySelectorAll("main input, main select").forEach(el=>el.addEventListener("input",recalc));
+$("closeIdx").addEventListener("click",()=>{openI=false; setStage(openC?2:1);});
+document.querySelectorAll(".tip").forEach(t=>{ t.setAttribute("aria-label",t.dataset.tip); t.setAttribute("tabindex","0"); const place=()=>{const r=t.getBoundingClientRect(); t.classList.toggle("flip",r.left+320>window.innerWidth); t.classList.toggle("below",r.top<170);}; t.addEventListener("mouseenter",place); t.addEventListener("focus",place); t.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();place();const on=t.classList.contains("on");document.querySelectorAll(".tip.on").forEach(x=>x.classList.remove("on"));if(!on)t.classList.add("on");}); });
+document.addEventListener("click",e=>{if(!e.target.closest(".tip"))document.querySelectorAll(".tip.on").forEach(x=>x.classList.remove("on"));});
+function clearAll(){ document.querySelectorAll("main input[type=number], main input[type=text]:not([readonly])").forEach(i=>{i.value="";i.classList.remove("est");}); document.querySelectorAll("main select").forEach(s=>s.selectedIndex=0); document.querySelectorAll("#afChecks input").forEach(c=>c.checked=false); document.querySelectorAll("main input[type=checkbox]").forEach(c=>c.checked=false); $("shSlight").checked=true; $("evalScope").value="R"; sideStore.L=null; sideStore.R=null; prefilledSide.L=false; prefilledSide.R=false; curSide="R"; paintSide(); taskList=[]; }
+$("resetBtn").addEventListener("click",()=>{clearAll();setStage(1);$("msg").textContent="입력을 지웠습니다.";});
+/* 예시 1: Ergonomiesite 아이스크림 포장(오른손) — Checklist 32, Index 11.2 */
+$("loadEx").addEventListener("click",()=>{ if(mode==="multi") clearTaskInputs(); else clearAll(); $("jobName").value="아이스크림 포장(사이트 사례)"; $("evalScope").value="R"; curSide="R"; paintSide(); $("shiftH").value=9; $("mealN").value=1; $("mealLen").value=60; $("mealIn").value="0"; $("breakN").value=2; $("breakLen").value=10; $("nonRepMin").value=20;
+  $("cycleSec").value=37; $("same").value="2"; $("taN").value=40; $("taSec").value=37; $("bHand").value="5"; $("bSh").value="1"; $("bWr").value="3"; $("bEl").value="3"; $("modBand").value="0"; $("peakPct").value=0; $("pauses").value="0";
+  document.querySelector('#afChecks input[value="cold"]').checked=true; $("afd-cold").value="3"; $("pace").value="2"; $("borg").value=0.63;
+  const P={hdPalm:60,hdPower:19,elFlex:48,wrRad:41,sh80:15}; Object.entries(P).forEach(([k,v])=>{$("p-"+k).value=v;}); prefilledSide.R=true; $("estOK").checked=true;
+  setStage(1); $("msg").textContent="아이스크림 포장(Ergonomiesite 사례) — OCRA Checklist 32, OCRA Index 11.2가 나오는지 확인하세요."; });
+$("loadEx44").addEventListener("click",()=>{ if(mode==="multi") clearTaskInputs(); else clearAll(); $("jobName").value="와이어링 하네스 테이핑(사례 4-4)"; $("shiftH").value=8; $("mealN").value=1; $("mealLen").value=60; $("breakN").value=1; $("breakLen").value=10; $("nonRepMin").value=30;
+  $("cycleSec").value=8; $("same").value="2"; $("taN").value=5.33; $("taSec").value=8; $("bEl").value="2"; $("modBand").value="5"; $("peakPct").value=0; $("pace").value="0"; setStage(1); $("msg").textContent="테이핑 사례 — OCRA Mini-Checklist·OCRA Checklist 점수와 OCRA Index를 비교해 보세요."; });
+$("copyBtn").addEventListener("click",async()=>{ const A=lastOut; const keys=orderSides(Object.keys(A.sides||{})); const L=[`OCRA 단계별 평가 — ${$("jobName").value||"(작업명 없음)"} / 평가 범위: ${keys.map(s=>SIDE_NAME[s]).join("·")}`];
+  for(const s of keys){ const {r1,r2,r3}=A.sides[s]; const parts=[]; if(r1&&r1.ok) parts.push(`Mini ${f1(r1.score)}점 (범위 ${f1(r1.min)}~${f1(r1.max)}, ${czone(r1.score).name})`); if(stage>=2&&r2&&r2.ok) parts.push(`Checklist ${f1(r2.score)}점 (${czone(r2.score).name})`); if(stage>=3&&r3&&r3.ok) parts.push(`Index EPM ${f1(r3.idxE)} (${izone(r3.idxE).name}) / ISO ${f1(r3.idxI)}`); L.push(`${SIDE_NAME[s]}: ${parts.join(" · ")||"—"}`); }
+  if(keys.length>1){ const b=A.best3||A.best2||A.best1; if(b) L.push(`최종(두 손 중 높은 쪽): ${SIDE_NAME[b.s]}`); }
+  try{await navigator.clipboard.writeText(L.join("\n"));$("msg").textContent="결과를 복사했습니다.";}catch(e){$("msg").textContent=L.join("\n");} });
+/* ===== 저장 ===== */
+function save(){ try{ const d={}; document.querySelectorAll("main input:not([readonly]), main select").forEach(e=>{ if(e.id) d[e.id]=e.type==="checkbox"?e.checked:e.value; }); d._stage=stage; d._list=taskList; d._mode=mode; d._side=curSide; d._store=sideStore; d._pre=prefilledSide; localStorage.setItem("ocra-staged-v2",JSON.stringify(d)); }catch(e){} }
+function restoreSaved(){ let d=null; try{ d=JSON.parse(localStorage.getItem("ocra-staged-v2")||"null"); }catch(e){} if(!d){ $("msg").textContent="저장된 입력이 없습니다."; return; } try{ clearAll(); Object.keys(d).forEach(k=>{ const el=$(k); if(el&&!k.startsWith("_")){ if(el.type==="checkbox") el.checked=!!d[k]; else el.value=d[k]; } }); taskList=Array.isArray(d._list)?d._list:[]; curSide=d._side||"R"; sideStore.L=d._store?.L||null; sideStore.R=d._store?.R||null; Object.assign(prefilledSide,d._pre||{}); paintSide(); setMode(d._mode==="multi"?"multi":"single"); if(d._stage>=2) openC=true; if(d._stage>=3) openI=true; setStage(d._stage||1); $("msg").textContent="이전 입력을 불러왔습니다."; }catch(e){ setStage(1); } }
+$("loadSaved").addEventListener("click",restoreSaved);
+(function(){ try{ if(!localStorage.getItem("ocra-staged-v2")) $("loadSaved").hidden=true; }catch(e){ $("loadSaved").hidden=true; } $("shSlight").checked=true; paintSide(); setStage(1); })();
+</script>
+</body>
+</html>
