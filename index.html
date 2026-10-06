@@ -42,7 +42,7 @@
   .help{color:var(--ink-2);font-size:13.5px;margin:0 0 12px}
   .row{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px 16px}
   .groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px 32px;align-items:start} fieldset.group.three{grid-template-columns:1fr 1fr 1.6fr}
-  fieldset.group{border:1px solid var(--rule);border-radius:6px;margin:0;padding:8px 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px} fieldset.group legend{font-size:13px;font-weight:700;color:var(--blue-3);padding:0 4px} fieldset.group.three{grid-template-columns:1fr 1fr 1fr}
+  fieldset.group{border:1px solid var(--rule);border-radius:6px;margin:0;padding:8px 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px} fieldset.group legend{font-size:13px;font-weight:700;color:var(--blue-3);padding:0 4px} fieldset.group.three{grid-template-columns:1fr 1fr 1.6fr}
   label.f{display:flex;flex-direction:column;gap:5px;font-size:13.5px;font-weight:500} label.f .lt{display:flex;align-items:center;gap:6px;white-space:nowrap}
   input[type=number],input[type=text],select{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--rule-2);border-radius:6px;background:var(--sheet);color:var(--ink);width:100%}
   input[readonly]{background:var(--blue-2);color:var(--blue-3);font-weight:700}
@@ -78,7 +78,7 @@
   .msg{font-size:12.5px;color:var(--ink-3);margin-top:8px;min-height:1.2em;white-space:pre-wrap}
   table.tasks{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:8px} table.tasks th,table.tasks td{border:1px solid var(--rule);padding:6px;vertical-align:middle} table.tasks th{background:var(--blue-2);font-weight:700;font-size:13px;white-space:nowrap} table.tasks input,table.tasks select{font-size:14px;padding:6px 8px;min-width:84px}
   .seg{display:flex;flex-wrap:wrap;gap:6px} .seg button{font:inherit;font-size:13.5px;padding:7px 12px;border:1px solid var(--rule-2);background:var(--sheet);color:var(--ink);border-radius:6px;cursor:pointer} .seg button[aria-pressed="true"]{background:var(--acc,var(--blue));border-color:var(--acc,var(--blue));color:#fff;font-weight:700}
-  #modeSingle,#modeMulti{background:#FFF1E3;border-color:#E0A36A;color:#7A3F00;font-weight:700} #modeSingle[aria-pressed="true"],#modeMulti[aria-pressed="true"]{background:#1F3A6E;border-color:#1F3A6E;color:#fff} body:not(.multi) #st4{display:none} body.multi #multiCtl{display:block} #multiCtl{display:none}
+  #modeSingle,#modeMulti{background:#E8EEF7;border-color:#B7C5DC;color:#1F3A6E;font-weight:700} #modeSingle[aria-pressed="true"],#modeMulti[aria-pressed="true"]{background:#E0801A;border-color:#E0801A;color:#fff} body:not(.multi) #st4{display:none} body.multi #multiCtl{display:block} #multiCtl{display:none}
   .taskbanner{background:#0F6E6E;color:#fff;font-weight:900;font-size:18px;padding:12px 16px;border-radius:8px;margin:10px 0 8px;letter-spacing:-.01em} .taskbanner small{display:block;font-size:13px;font-weight:500;opacity:.95;margin-top:2px}
   .learn{font-size:13px;color:var(--ink-2);background:var(--blue-2);border-left:3px solid var(--blue);padding:6px 10px;margin:6px 0 10px;border-radius:0 6px 6px 0} body:not(.showlearn) .learn{display:none}
   .intro{background:var(--sheet);border:1px solid var(--rule);border-left:6px solid var(--z1);padding:16px 20px}
@@ -161,12 +161,39 @@
   #st2 fieldset.group:not(.one),#st3 fieldset.group:not(.one){grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
   #jointArea{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:12px 16px;align-items:start} #jointArea .jointbox{margin-top:0}
   #jointArea .jgrid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
-  @media (min-width:900px){ #st2 .groups{grid-template-columns:minmax(0,2fr) minmax(0,1fr)} #st3 .groups{grid-template-columns:minmax(0,2fr) minmax(0,3fr)} }
+  @media (min-width:900px){ #st2 .groups{grid-template-columns:minmax(0,2fr) minmax(0,1fr)} #st3 .groups{grid-template-columns:1fr} }
   @media (max-width:560px){ #jointArea{grid-template-columns:1fr} #st2 fieldset.group,#st3 fieldset.group{grid-template-columns:1fr} }
   /* 단계 열기 버튼: 각 단계 배지 색과 같게(추가 조사 주황, 정밀 분석 보라) */
-  .btn[data-go="2"],.btn.go2{background:#B5620E;border-color:#B5620E;color:#fff;font-weight:700}
-  .btn[data-go="3"],.btn.go3{background:#5B2C8F;border-color:#5B2C8F;color:#fff;font-weight:700}
-  .btn[data-go="2"]:hover,.btn.go2:hover{background:#9A530B} .btn[data-go="3"]:hover,.btn.go3:hover{background:#4A2375}
+  .btn[data-go="2"],.btn.go2,main .btn.primary[data-go="2"]{background:#B5620E;border-color:#B5620E;color:#fff;font-weight:700}
+  .btn[data-go="3"],.btn.go3,main .btn.primary[data-go="3"]{background:#5B2C8F;border-color:#5B2C8F;color:#fff;font-weight:700}
+  main .btn[data-go="2"]:hover,main .btn.go2:hover{background:#9A530B;border-color:#9A530B} main .btn[data-go="3"]:hover,main .btn.go3:hover{background:#4A2375;border-color:#4A2375}
+  /* ===== 양손 평가: 공통 / 손별 구별 ===== */
+  .hands .cap{display:none} body:not(.lr)[data-scope="R"] .hands .hL{display:none} body:not(.lr)[data-scope="L"] .hands .hR{display:none}
+  .hands .hc{display:flex;flex-direction:column;gap:3px;min-width:0}
+  body.lr .hands{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  body.lr .hands .cap{display:block;font-size:11.5px;font-weight:800;color:#fff;background:#5F6B75;border-radius:999px;padding:1px 9px;align-self:flex-start}
+  body.lr .hands .hc{border:1px solid var(--rule-2);border-radius:6px;padding:4px 6px 6px;background:var(--sheet)}
+  body.lr .hands input[type=checkbox]{align-self:flex-start}
+  .iconrow .card label.f.sub .hands,.card.pair label.f.sub .hands{flex:0 0 auto}
+  body.lr .iconrow .card label.f.sub,body.lr .card.pair label.f.sub{flex-direction:column;align-items:stretch}
+  .htag,.comchip{display:none}
+  body.lr .htag{display:inline-block;margin-left:10px;font-size:12px;font-weight:800;border-radius:999px;padding:2px 10px;vertical-align:middle;color:#fff}
+  body.lr .htag.com{background:#8C96A0} body.lr .htag.hand{background:#5F6B75} body.lr .htag.mix{background:transparent;color:var(--ink-2);border:1px solid var(--rule-2)}
+  body.lr .comchip{display:inline-block;margin-left:6px;font-size:11px;font-weight:800;color:#fff;background:#8C96A0;border-radius:999px;padding:1px 8px}
+  .hchip{display:inline-block;font-size:11.5px;color:#fff;border-radius:999px;padding:1px 8px} .hchip.com{background:#8C96A0} .hchip.lr{background:#5F6B75}
+  body.lr #st1 fieldset.group:has(#shiftH),body.lr fieldset.group.three{background:var(--sheet)}
+  @media (max-width:560px){ body.lr .hands{gap:6px} body.lr .hands .hc{padding:3px 4px 5px} body.lr .hands select,body.lr .hands input[type=number],body.lr .hands input[type=text]{font-size:15px;padding:8px 6px} }
+  @media (max-width:560px){ #modeSingle{flex:0 1 40%} #modeMulti{flex:1 1 55%} }
+
+  /* 단계 열기 버튼 색(구역 id 규칙보다 우선하도록 id 포함 선택자 사용) */
+  .btn[data-go="2"],.btn.go2,#st1 .btn[data-go="2"],#st2 .btn[data-go="2"],#st3 .btn[data-go="2"],#st4 .btn[data-go="2"],#st1 .btn.primary[data-go="2"],#st2 .btn.primary[data-go="2"],#st3 .btn.primary[data-go="2"],#st4 .btn.primary[data-go="2"],#st1 .btn.go2,#st2 .btn.go2,#st3 .btn.go2,#st4 .btn.go2{background:#B5620E;border-color:#B5620E;color:#fff;font-weight:700}
+  .btn[data-go="3"],.btn.go3,#st1 .btn[data-go="3"],#st2 .btn[data-go="3"],#st3 .btn[data-go="3"],#st4 .btn[data-go="3"],#st1 .btn.primary[data-go="3"],#st2 .btn.primary[data-go="3"],#st3 .btn.primary[data-go="3"],#st4 .btn.primary[data-go="3"],#st1 .btn.go3,#st2 .btn.go3,#st3 .btn.go3,#st4 .btn.go3{background:#5B2C8F;border-color:#5B2C8F;color:#fff;font-weight:700}
+  .btn[data-go="2"]:hover,.btn.go2:hover,#st1 .btn[data-go="2"]:hover,#st2 .btn[data-go="2"]:hover,#st3 .btn[data-go="2"]:hover,#st4 .btn[data-go="2"]:hover,#st1 .btn.primary[data-go="2"]:hover,#st2 .btn.primary[data-go="2"]:hover,#st3 .btn.primary[data-go="2"]:hover,#st4 .btn.primary[data-go="2"]:hover,#st1 .btn.go2:hover,#st2 .btn.go2:hover,#st3 .btn.go2:hover,#st4 .btn.go2:hover{background:#9A530B;border-color:#9A530B}
+  .btn[data-go="3"]:hover,.btn.go3:hover,#st1 .btn[data-go="3"]:hover,#st2 .btn[data-go="3"]:hover,#st3 .btn[data-go="3"]:hover,#st4 .btn[data-go="3"]:hover,#st1 .btn.primary[data-go="3"]:hover,#st2 .btn.primary[data-go="3"]:hover,#st3 .btn.primary[data-go="3"]:hover,#st4 .btn.primary[data-go="3"]:hover,#st1 .btn.go3:hover,#st2 .btn.go3:hover,#st3 .btn.go3:hover,#st4 .btn.go3:hover{background:#4A2375;border-color:#4A2375}
+  /* 양손 평가: 모든 입력창 글씨 70% */
+  body.lr main input[type=number],body.lr main input[type=text],body.lr main select{font-size:10.5px;padding:5px 6px}
+  body.lr .jitem input{font-size:10.5px}
+  @media (max-width:560px){ body.lr main input[type=number],body.lr main input[type=text],body.lr main select,body.lr .jitem input,body.lr .hands select,body.lr .hands input[type=number],body.lr .hands input[type=text]{font-size:11.2px;min-height:38px;padding:6px 5px} }
 </style>
 </head>
 <body>
@@ -211,7 +238,7 @@
 <section class="stage" id="st1">
   <div class="stage-head"><span class="no">간이 선별</span><h2>OCRA Mini-Checklist <em>EPM 시트 2025-06-20</em></h2><span class="val" id="v1">—</span></div>
   <div class="body">
-  <div class="seg" role="tablist" style="margin-top:10px"><button type="button" id="modeSingle" aria-pressed="true">한 가지 작업만 주로 반복</button><button type="button" id="modeMulti" aria-pressed="false">여러 작업을 번갈아 함(작업 목록으로 평가)</button></div>
+  <div class="seg" role="tablist" style="margin-top:10px"><button type="button" id="modeSingle" aria-pressed="true">한 가지 작업만 반복</button><button type="button" id="modeMulti" aria-pressed="false">여러 작업을 번갈아 수행</button></div>
   <p class="stepguide">입력은 <b>▶ 0 작업 정보 → 1 근무 → 2 반복 → 3 자세 → 4 힘 → 5 조건</b> 순서로 내려가며, 각 칸의 질문은 ▷ 표시로 구분됩니다. 추가 조사(Checklist)는 ▶ 6, 정밀 분석(Index)은 ▶ 7·8을 더 묻습니다.</p>
   <div class="learn" id="modeLearn">한 가지 작업만 반복하면 그 작업을 평가하고 점수에 따라 다음 도구로 갑니다. 여러 작업을 번갈아 하면 작업마다 평가해 하루 시간과 함께 목록에 넣고, 목록의 결과로 하루 평가 도구가 정해집니다.</div>
   <div class="sub-h"><span class="stepno">0</span>작업 정보 — 어떤 작업을, 어느 손으로 평가하나요?</div>
@@ -219,7 +246,7 @@
     <label class="f"><span class="lt">작업 이름</span><input type="text" id="jobName" placeholder="예: 아이스크림 포장"></label>
     <label class="f"><span class="lt">평가 범위 <button type="button" class="tip" data-tip="OCRA는 손(상지)마다 따로 평가합니다(EPM 시트는 RIGHT/LEFT 분리, Occhipinti 1998 3.6절). 양손이면 두 손을 각각 입력하고 최종값은 높은 쪽입니다.">?</button></span><select id="evalScope"><option value="R">오른손만</option><option value="L">왼손만</option><option value="LR">양손(각각 입력)</option></select></label>
   </div>
-  <div class="sidebar" id="sideBar"><span class="sidenow">지금 입력 중: 오른손</span><div class="seg" role="tablist"><button type="button" data-side="L" aria-pressed="false">왼손(화면 왼쪽)</button><button type="button" data-side="R" aria-pressed="true">오른손(화면 오른쪽)</button></div><span class="help">근무·사이클·같은 동작 비율·조건·작업속도는 두 손 공통. 기술동작 수·자세·힘과 Checklist·Index 추가 입력은 손마다 따로 저장됩니다. 결과 패널도 왼쪽 열 = 왼손, 오른쪽 열 = 오른손입니다.</span></div>
+  <div class="sidebar" id="sideBar" hidden><span class="sidenow">양손 평가 입력 방법</span><span class="help"><b class="hchip com">공통</b> 표시가 있는 질문은 한 번만 적습니다. <b class="hchip lr">왼손 | 오른손</b> 두 칸이 나란히 있는 질문은 손마다 따로 적습니다. 결과는 두 손을 따로 계산하고, 높은 쪽을 최종값으로 씁니다.</span></div>
   <div class="actions"><button class="btn" type="button" id="loadEx">예시 (아이스크림 포장)</button><button class="btn" type="button" id="loadEx44">예시 (테이핑, 사례 4-4)</button><button class="btn" type="button" id="resetBtn">모두 지우기</button><button class="btn" type="button" id="loadSaved">이전 입력 불러오기</button></div>
 
   <div class="sub-h"><span class="stepno">1</span>근무 — 하루 근무는 어떻게 되나요? <button type="button" class="tip" data-tip="세 단계 모두가 같은 값을 씁니다. 한 번만 넣으면 됩니다.">?</button></div>
@@ -383,7 +410,7 @@
   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><span class="zone" id="zoneOut" style="background:var(--ink-3);margin:0">입력을 기다리는 중</span><span class="zone" id="actChip" style="margin:0;background:transparent;color:var(--blue-3);border:2px solid var(--blue)"></span></div>
   <div class="band" aria-hidden="true"><i style="background:var(--z1)"></i><i style="background:var(--z2)"></i><i style="background:var(--z3)"></i><i style="background:var(--z4)"></i><i style="background:var(--z5)"></i><i style="background:var(--z6)"></i><div class="marker" id="marker" style="left:0;display:none"></div></div>
   <div class="band-ticks" aria-hidden="true"><span>0</span><span>1.5</span><span>2.2</span><span>3.5</span><span>4.5</span><span>9.0+</span></div>
-    <p class="formula" style="margin-top:4px">색 띠는 OCRA Index 척도입니다. OCRA Mini-Checklist·OCRA Checklist 점수는 공식 등가표의 구간 대응(≤5↔1.5, 7.5↔2.2, 11↔3.5, 14↔4.5, 22.5↔9)을 선형 보간한 <b>등가 위치(시각화용)</b>로 표시하며 공식 환산값이 아닙니다. 양손 평가 시 왼쪽 열 = 왼손, 오른쪽 열 = 오른손, 큰 숫자는 두 손 중 높은 쪽입니다. 위험 등급 이름(최적·허용·불확실·경도·중등도·고도)은 세 도구가 같은 체계를 씁니다.</p>
+    <p class="formula" style="margin-top:4px">색 띠는 OCRA Index 척도입니다. OCRA Mini-Checklist·OCRA Checklist 점수는 공식 등가표의 구간 대응(≤5↔1.5, 7.5↔2.2, 11↔3.5, 14↔4.5, 22.5↔9)을 선형 보간한 <b>등가 위치(시각화용)</b>로 표시하며 공식 환산값이 아닙니다. 양손 평가 시 표는 왼손·오른손 열로 나뉘고, 큰 숫자는 두 손 중 높은 쪽입니다. 위험 등급 이름(최적·허용·불확실·경도·중등도·고도)은 세 도구가 같은 체계를 씁니다.</p>
   <div class="sub" id="rMulti" hidden style="border:2px solid #0F6E6E;border-radius:8px;padding:8px 10px;margin-top:12px"><div class="st" style="color:#0F6E6E">멀티태스크(하루 전체)</div><div id="rMultiText" style="font-size:13px"></div></div>
   <div class="sub" id="r1"><div class="st" style="color:#1F3A6E">OCRA Mini-Checklist 분석 결과</div><div class="si" id="r1v">—</div><div class="kv" id="r1kv"></div></div>
   <div class="sub" id="r2" hidden><div class="st" style="color:#B5620E">OCRA Checklist 분석 결과</div><div class="si" id="r2v">—</div><div class="kv" id="r2kv"></div></div>
@@ -498,20 +525,20 @@ function addChk(shared){ const c=shared.checked||[]; let phys=0; if(c.includes("
   const physScore=c.includes("vib")?4:(phys>2?3:phys); const org={0:0,1:1,1.5:1.5,2:2}[shared.pace]??0; return {physScore,org,add:physScore+org}; }   // Checklist 2020 R88, O86
 /* ---------- OCRA Mini-Checklist ---------- */
 function mini(org,shared,side){
-  const sc=shift(org); const fr=freqMini(side); const st=ster(shared.cyc,shared.sameLv);
+  const sc=shift(org); const fr=freqMini(side); const st=ster(shared.cyc,side.sameLv??shared.sameLv);
   const b=side.bands; const post=Math.max(T.mini.hand[b.hand],T.mini.sh[b.sh],T.mini.wr[b.wr],T.mini.el[b.el]); const posture=post+st;
   const mod=T.mini.mod[side.modBand]; const pk=side.peakPct||0; const intense=pk<1?0:(pk<2?8:(pk<10?16:24)); const force=mod+intense;   // Mini E59/H59/K59
-  const a=addMini(shared);
+  const a=addMini({checked:side.checked??shared.checked,pace:shared.pace});
   const ok=!!(sc&&sc.du!=null&&fr.score!=null); const partial=ok?fr.score+posture+force+a.add:null; const score=ok?partial*sc.rcm*sc.du:null;
   return {ok,sc,fr,st,post,posture,mod,intense,force,physScore:a.physScore,org:a.org,add:a.add,partial,score,min:ok?-0.31+0.93*score:null,max:ok?1.8+1.07*score:null};
 }
 /* ---------- OCRA Checklist(EPM 자동계산판 2020) ---------- */
 function chk(org,shared,side){
-  const sc=shift(org); const fr=freqChk(side); const stat=T.stat[side.staticBand||0]; const freq=fr.score==null?null:Math.max(fr.score,stat); const st=ster(shared.cyc,shared.sameLv);
+  const sc=shift(org); const fr=freqChk(side); const stat=T.stat[side.staticBand||0]; const freq=fr.score==null?null:Math.max(fr.score,stat); const st=ster(shared.cyc,side.sameLv??shared.sameLv);
   const b=side.bands; let shs=b.sh===0?(side.shSlight?T.chkShSlight:0):T.chk.sh[b.sh]; if(side.overhead) shs*=2;   // 머리 위 ×2: 핸드북 5.3(ISO Checklist)
   const post=Math.max(shs,T.chk.el[b.el],T.chk.wr[b.wr],T.chk.hand[b.hand]); const posture=post+st;
   const mod=T.chk.mod[side.modBand]; const pk=side.peakPct||0; const intBand=pk<=0?0:(pk<1?1:(pk<5?2:(pk<10?3:4))); const intense=T.chk.intense[intBand]; const mx=T.chk.max[side.maxBand||0]; const force=mod+intense+mx;
-  const a=addChk(shared);
+  const a=addChk({checked:side.checked??shared.checked,pace:shared.pace});
   const ok=!!(sc&&sc.du!=null&&freq!=null); const partial=ok?freq+posture+force+a.add:null; const score=ok?partial*sc.rcm*sc.du:null;
   return {ok,sc,fr,stat,freq,st,shs,post,posture,mod,intense,mx,force,physScore:a.physScore,org:a.org,add:a.add,partial,score};
 }
@@ -533,10 +560,10 @@ function idx(org,shared,side,opts){ opts=opts||{};
   if(a!=null&&stSec!=null&&stSec>0&&side.taSec>0){ const imag=stSec/0.6*0.75; ata=Math.max(side.taN,imag)*60/side.taSec; }   // EPM: 정적 유지 cts×0.75 = 초×1.25 (단위 확인 필요)
   const borg=side.borg; const pk=(side.peakPct||0)/100; const ffEpm=borg==null?null:Math.min(fomEpm(borg),look(T.peakEpm,pk,T.peakLast)); const ffIso=borg==null?null:(pk>=0.10?0.01:fomIso(borg));
   const P=postureIdx(side.post||{});
-  const c=shared.idxChecked||shared.checked||[]; const durs=shared.afDurs||{}; let as=0; for(const k of c){ const d=durs[k]||shared.afDur||0; as+=(k==="vib"?[0,8,12,16]:[0,4,8,12])[d]; }
+  const c=side.idxChecked||side.checked||shared.idxChecked||shared.checked||[]; const durs=side.afDurs||shared.afDurs||{}; let as=0; for(const k of c){ const d=durs[k]||shared.afDur||0; as+=(k==="vib"?[0,8,12,16]:[0,4,8,12])[d]; }
   as+={0:0,1:8,1.5:12,2:12}[shared.pace]??0; const aEpm=look(T.afScore,as,T.afLast);
   const dIso=c.length?Math.max(...c.map(k=>durs[k]||shared.afDur||0)):0; const aIso=(c.length||shared.pace)?[1,.95,.9,.8][(shared.pace&&!c.length)?3:dIso]:1;
-  const rf=Math.min([1,.85,.7][shared.sameLv||0], shared.cyc==null?1:(shared.cyc<8?.7:(shared.cyc<=15?.85:1)));
+  const rf=Math.min([1,.85,.7][(side.sameLv??shared.sameLv)||0], shared.cyc==null?1:(shared.cyc<8?.7:(shared.cyc<=15?.85:1)));
   const dc=opts.dcFixed!=null?opts.dcFixed:(sc?sc.dc:null); const rc=sc?sc.rc:null;
   const ok=!!(sc&&dc!=null&&ata!=null&&ffEpm!=null); let rtaE=null,rtaI=null,idxE=null,idxI=null,k=null;
   if(ok){ k=30*rf*P.pEpm*aEpm*ffEpm; const base=30*rf*rc*dc; rtaE=base*P.pEpm*aEpm*ffEpm; rtaI=base*P.pIso*aIso*ffIso; idxE=rtaE>0?ata/rtaE:Infinity; idxI=rtaI>0?ata/rtaI:Infinity; }
@@ -595,24 +622,34 @@ const SHORT_OPT={"아니요 (무급, 보통의 경우)":"아니요(보통)","예
   const sg=document.querySelector(".stepguide"); if(sg) sg.textContent="▶ 0 작업 정보 → 1 근무 → 2 반복 → 3 자세 → 4 힘 → 5 조건 순서로 입력하세요.";
 })();
 /* ===== 좌·우 ===== */
-const SIDE_IDS=["taN","taSec","speed","fastUncount","bHand","bSh","bWr","bEl","shSlight","overhead","modBand","peakPct","pauses","staticBand","maxBand","borg","staticSec","estOK"].concat(JOINTS.flatMap(J=>J.items.map(it=>"p-"+it.id)));
-let curSide="R"; const sideStore={L:null,R:null}; const prefilledSide={L:false,R:false};
+const SIDE_IDS=["same","taN","taSec","speed","fastUncount","bHand","bSh","bWr","bEl","shSlight","overhead","modBand","peakPct","pauses","staticBand","maxBand","borg","staticSec","estOK"].concat(AF_KEYS.map(k=>"af-"+k)).concat(JOINTS.flatMap(J=>J.items.map(it=>"p-"+it.id)));
+const el=(id,s)=>s==="L"?$(id+"__L"):$(id);
+let curSide="R"; const prefilledSide={L:false,R:false};
+/* 양손 평가: 손별 입력은 같은 자리에 '왼손 | 오른손' 두 칸. 원래 칸 = 오른손, 복제 칸(id__L) = 왼손 */
+(function setupHands(){ for(const id of SIDE_IDS.concat(["ataShow"])){ const e=$(id); if(!e) continue; const box=document.createElement("div"); box.className="hands"; e.parentNode.insertBefore(box,e);
+    const c=e.cloneNode(true); c.id=id+"__L"; if(e.tagName==="SELECT") c.value=e.value; if(e.type==="checkbox") c.checked=e.checked;
+    const hL=document.createElement("div"); hL.className="hc hL"; hL.innerHTML='<span class="cap">왼손</span>'; hL.appendChild(c);
+    const hR=document.createElement("div"); hR.className="hc hR"; hR.innerHTML='<span class="cap">오른손</span>'; hR.appendChild(e);
+    box.appendChild(hL); box.appendChild(hR); }
+  document.querySelectorAll('#jointArea input[id$="__L"]').forEach(c=>c.addEventListener("input",()=>c.classList.remove("est")));
+  const TYPE={0:"com",1:"com",2:"mix",3:"hand",4:"hand",5:"mix",6:"hand",7:"hand",8:"mix"}, TXT={com:"공통 — 한 번만",hand:"왼손·오른손 따로",mix:"공통 + 손별"};
+  document.querySelectorAll(".sub-h").forEach(h=>{ const n=h.querySelector(".stepno"); if(!n) return; const t=TYPE[n.textContent.trim()]; if(!t) return; const sp=document.createElement("span"); sp.className="htag "+t; sp.textContent=TXT[t]; h.appendChild(sp); });
+  ["cycleSec","pace","recWorkMin","shortPeriods","inCycle"].forEach(id=>{ const lab=$(id)&&$(id).closest("label.f"); const lt=lab&&lab.querySelector(".lt"); if(lt){ const c=document.createElement("span"); c.className="comchip"; c.textContent="공통"; lt.insertBefore(c,lt.querySelector(".tip")); } });
+})();
 function defaultSide(){ const o={}; SIDE_IDS.forEach(id=>{ const e=$(id); o[id]=e.type==="checkbox"?(id==="shSlight"):(e.tagName==="SELECT"?e.options[0].value:""); }); o._est=[]; return o; }
-function readSideDOM(){ const o={}; SIDE_IDS.forEach(id=>{ const e=$(id); o[id]=e.type==="checkbox"?e.checked:e.value; }); o._est=SIDE_IDS.filter(id=>$(id).classList.contains("est")); return o; }
-function writeSideDOM(o){ SIDE_IDS.forEach(id=>{ const e=$(id); if(e.type==="checkbox") e.checked=!!o[id]; else e.value=o[id]??""; e.classList.toggle("est",(o._est||[]).includes(id)); }); }
-function sideInputs(s){ const raw=s===curSide?readSideDOM():(sideStore[s]||defaultSide()); return toSide(raw); }
+function readSideDOM(s){ s=s||"R"; const o={}; SIDE_IDS.forEach(id=>{ const e=el(id,s); o[id]=e.type==="checkbox"?e.checked:e.value; }); o._est=SIDE_IDS.filter(id=>el(id,s).classList.contains("est")); return o; }
+function writeSideDOM(o,s){ s=s||"R"; SIDE_IDS.forEach(id=>{ const e=el(id,s); if(!(id in o)) return; if(e.type==="checkbox") e.checked=!!o[id]; else e.value=o[id]??""; e.classList.toggle("est",(o._est||[]).includes(id)); }); }
+function sideInputs(s){ return toSide(readSideDOM(s)); }
 function toSide(raw){ const n=v=>v===""||v==null?null:Number(v); const post={}; JOINTS.forEach(J=>J.items.forEach(it=>post[it.id]=n(raw["p-"+it.id])||0));
-  return {taN:n(raw.taN),taSec:n(raw.taSec)??n($("cycleSec").value),speed:raw.speed,fastUncount:!!raw.fastUncount,bands:{hand:Number(raw.bHand)||0,sh:Number(raw.bSh)||0,wr:Number(raw.bWr)||0,el:Number(raw.bEl)||0},shSlight:!!raw.shSlight,overhead:raw.overhead==="1",modBand:Number(raw.modBand)||0,peakPct:n(raw.peakPct)||0,pauses:raw.pauses==="1",staticBand:Number(raw.staticBand)||0,maxBand:Number(raw.maxBand)||0,borg:n(raw.borg),staticSec:n(raw.staticSec),post,estPending:(raw._est||[]).length>0&&!raw.estOK}; }
-function switchSide(s){ if(s===curSide) return; sideStore[curSide]=readSideDOM(); curSide=s; writeSideDOM(sideStore[s]||defaultSide()); if(openI&&!prefilledSide[s]) prefill3(); paintSide(); recalc(); }
-function paintSide(){ $("sideBar").classList.toggle("single",scopeSides().length===1); document.querySelectorAll("[data-side]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.side===curSide)); document.querySelectorAll(".sidenow").forEach(e=>e.textContent=`지금 입력 중: ${SIDE_NAME[curSide]}`); document.body.dataset.side=curSide; }
+  const lv={}; AF_KEYS.forEach(k=>lv[k]=Number(raw["af-"+k])||0); const checked=AF_KEYS.filter(k=>lv[k]>=AF_MIN[k]); const afDurs={}; AF_KEYS.forEach(k=>{ if(lv[k]>0) afDurs[k]=lv[k]; }); const idxChecked=AF_KEYS.filter(k=>lv[k]>0);
+  return {sameLv:Number(raw.same)||0,checked,afDurs,idxChecked,taN:n(raw.taN),taSec:n(raw.taSec)??n($("cycleSec").value),speed:raw.speed,fastUncount:!!raw.fastUncount,bands:{hand:Number(raw.bHand)||0,sh:Number(raw.bSh)||0,wr:Number(raw.bWr)||0,el:Number(raw.bEl)||0},shSlight:!!raw.shSlight,overhead:raw.overhead==="1",modBand:Number(raw.modBand)||0,peakPct:n(raw.peakPct)||0,pauses:raw.pauses==="1",staticBand:Number(raw.staticBand)||0,maxBand:Number(raw.maxBand)||0,borg:n(raw.borg),staticSec:n(raw.staticSec),post,estPending:(raw._est||[]).length>0&&!raw.estOK}; }
 function scopeSides(){ const v=$("evalScope").value; return v==="LR"?["L","R"]:[v]; }
-document.querySelectorAll("[data-side]").forEach(b=>b.addEventListener("click",()=>switchSide(b.dataset.side)));
-$("evalScope").addEventListener("input",()=>{ const ss=scopeSides(); if(!ss.includes(curSide)) switchSide(ss[0]); paintSide(); recalc(); });
+function paintSide(){ const ss=scopeSides(); curSide=ss.includes("R")?"R":"L"; document.body.classList.toggle("lr",ss.length===2); const vp=document.querySelector('meta[name="viewport"]'); if(vp) vp.setAttribute("content","width=device-width, initial-scale=1, viewport-fit=cover"+(ss.length===2?", maximum-scale=1":"")); document.body.dataset.scope=ss.length===2?"LR":ss[0]; $("sideBar").hidden=ss.length!==2; }
+$("evalScope").addEventListener("input",()=>{ paintSide(); if(openI) prefillAll(); recalc(); });
 
 /* ===== 공통 입력 읽기 ===== */
 function readOrg(){ return {shiftH:num("shiftH"),nonRep:num("nonRepMin")||0,mealN:num("mealN")||0,mealLen:num("mealLen")||0,mealIn:$("mealIn").value==="1",breakN:num("breakN")||0,breakLen:num("breakLen")||0,recWorkMin:num("recWorkMin")||0,shortPeriods:$("shortPeriods").value.split(",").map(v=>Number(v.trim())).filter(v=>!isNaN(v)&&v>0),inCycle:$("inCycle").checked}; }
-function readShared(){ const lv=afLevels(); const checked=AF_KEYS.filter(k=>lv[k]>=AF_MIN[k]); const afDurs={}; AF_KEYS.forEach(k=>{ if(lv[k]>0) afDurs[k]=lv[k]; }); const idxChecked=AF_KEYS.filter(k=>lv[k]>0);
-  return {cyc:num("cycleSec"),sameLv:Number($("same").value),pace:Number($("pace").value),checked,afDurs,idxChecked}; }
+function readShared(){ return {cyc:num("cycleSec"),pace:Number($("pace").value)}; }
 function calcAll(){ const org=readOrg(), shared=readShared(); const out={org,shared,sides:{}};
   for(const s of scopeSides()){ const side=sideInputs(s); const r1=OC.mini(org,shared,side); const r2=openC?OC.chk(org,shared,side):null; const r3=openI?(side.estPending?{ok:false,pending:true}:OC.idx(org,shared,side)):null; out.sides[s]={side,r1,r2,r3}; }
   const pick=(key,val)=>{ let best=null; for(const s of Object.keys(out.sides)){ const r=out.sides[s][key]; if(r&&r.ok&&(best==null||val(r)>val(best.r))) best={s,r}; } return best; };
@@ -622,11 +659,12 @@ function calcAll(){ const org=readOrg(), shared=readShared(); const out={org,sha
 let stage=1, lastOut={}; let openC=false, openI=false;
 function setStage(n){ if(n===1){openC=false;openI=false;} if(n===2){openC=true;} if(n===3){openI=true;} stage=openI?3:(openC?2:1);
   $("st2").classList.toggle("locked",!openC); $("st3").classList.toggle("locked",!openI); $("r2").hidden=!openC; $("r3").hidden=!openI;
-  if(openI){ for(const s of scopeSides()){ if(s===curSide&&!prefilledSide[s]) prefill3(); } } recalc();
+  if(openI) prefillAll(); recalc();
   const tgt=n===3?"st3":n===2?"st2":"st1"; if($(tgt).scrollIntoView) $(tgt).scrollIntoView({behavior:"smooth",block:"start"}); }
-function prefill3(){ prefilledSide[curSide]=true; const b={hand:Number($("bHand").value),sh:Number($("bSh").value),wr:Number($("bWr").value),el:Number($("bEl").value)}; const mid=[0,17,35,48,65,90];   // 밴드 → 대표 비율(%) 추정값
-  const set=(id,v)=>{ const e=$("p-"+id); if(e.value===""){ e.value=v; e.classList.add("est"); } };
-  set("hdPinch",mid[b.hand]); set("wrFlex",mid[b.wr]); set("elFlex",mid[b.el]); set("sh80",b.sh?Math.min(50,[0,10,20,30,40,50][b.sh]):0); $("estOK").checked=false; }
+function prefillAll(){ for(const s of scopeSides()){ if(!prefilledSide[s]) prefill3(s); } }
+function prefill3(s){ s=s||curSide; prefilledSide[s]=true; const b={hand:Number(el("bHand",s).value),sh:Number(el("bSh",s).value),wr:Number(el("bWr",s).value),el:Number(el("bEl",s).value)}; const mid=[0,17,35,48,65,90];
+  const set=(id,v)=>{ const e=el("p-"+id,s); if(e.value===""){ e.value=v; e.classList.add("est"); } };
+  set("hdPinch",mid[b.hand]); set("wrFlex",mid[b.wr]); set("elFlex",mid[b.el]); set("sh80",b.sh?Math.min(50,[0,10,20,30,40,50][b.sh]):0); el("estOK",s).checked=false; }
 function borgEstimate(side){ return Math.min(5,Math.round(([0.5,0.8,1.3,1.8,2.2,3][side.modBand]+(side.peakPct>=10?1.5:side.peakPct>=1?0.5:0))*10)/10); }
 function kvTable(id,rows,sides){ const el=$(id); const cols=sides; el.innerHTML=`<table class="kv2"><thead><tr><th></th>${cols.map(s=>`<th>${SIDE_NAME[s]}</th>`).join("")}</tr></thead><tbody>${rows.map(([k,...v])=>`<tr><td>${k}</td>${v.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table>`; }
 function showMain(title,val,zoneName,color,idxPos,act){ $("rTitle").textContent=title; $("idxOut").textContent=val; if($("mbarVal")){ $("mbarTitle").textContent=title.replace(" 분석 결과","").replace("(점수)","").replace("(EPM)",""); $("mbarVal").textContent=val; $("mbarZone").textContent=zoneName.replace("위험 등급: ",""); $("mbarZone").style.background=color?`var(${color})`:"var(--ink-3)"; } const z=$("zoneOut"); z.textContent=zoneName; z.style.background=color?`var(${color})`:"var(--ink-3)"; const mk=$("marker"); if(idxPos==null){mk.style.display="none";} else {mk.style.display="block"; mk.style.left=`${bandPos(idxPos)}%`;} const ac=$("actChip"); ac.textContent=act||""; ac.style.display=act?"inline-block":"none"; }
@@ -637,7 +675,7 @@ function renderNext(id,btns){ $(id).innerHTML=btns.map(b=>`<div class="advice" s
 
 function recalc(){
   const A=calcAll(); lastOut=A; const keys=orderSides(Object.keys(A.sides)); const cur=A.sides[curSide]||A.sides[keys[0]]; const S=cur.side;
-  $("ataShow").value=OC.apm(S)==null?"—":`${f1(OC.apm(S))} 회/분`;
+  for(const s of ["L","R"]){ const sd=(A.sides[s]||{}).side||sideInputs(s); const a=OC.apm(sd); el("ataShow",s).value=a==null?"—":`${f1(a)} 회/분`; }
   const sideTag=s=>keys.length>1?` [${SIDE_NAME[s]}]`:"";
   /* --- Mini --- */
   const b1=A.best1; $("v1").textContent=b1?`${f1(b1.r.score)}점${sideTag(b1.s)}`:"—"; $("afLive").textContent="— "+(cur.r1.add!=null?`조건 점수 ${cur.r1.add}점(물리 ${cur.r1.physScore} + 속도 ${cur.r1.org})`:"");
@@ -667,9 +705,9 @@ function recalc(){
     /* TEST-ONLY */ dbg("dbg2",keys.flatMap(s=>{const r=A.sides[s].r2; return r.sc?[`[${SIDE_NAME[s]}] 빈도 ${r.fr.note} 동적 ${r.fr.score} vs 정적 ${r.stat} → ${r.freq}`,`  자세 어깨 ${r.shs}${A.sides[s].side.overhead?"(머리 위 ×2)":""} 팔꿈치 ${T.chk.el[A.sides[s].side.bands.el]} 손목 ${T.chk.wr[A.sides[s].side.bands.wr]} 손 ${T.chk.hand[A.sides[s].side.bands.hand]} → ${r.post} + 정형성 ${r.st}; 힘 보통 ${r.mod} + 큰 힘 ${r.intense} + 거의 최대 ${r.mx}; 부가 물리 ${r.physScore} + 조직 ${r.org}`,r.ok?`  (${r.freq}+${r.posture}+${r.force}+${r.add}) = ${r.partial} × ${r.sc.rcm} × ${r.sc.du} = ${f1(r.score)}`:""]:[];})); /* /TEST-ONLY */
   }
   /* --- Index --- */
-  if(openI){ const b3=A.best3; $("idxNeed").hidden=OC.apm(S)!=null; $("borgHint").textContent=`추정값(참고) ${f1(borgEstimate(S))} — 보통 힘 비율·센 힘 비율로 만든 어림값이며 계산에는 쓰지 않습니다. 동작별 Borg를 시간으로 가중 평균해 직접 넣으세요.`;
-    $("estNote").hidden=!(cur.r3&&cur.r3.pending); $("v3").textContent=b3?`EPM ${f1(b3.r.idxE)} · ISO ${f1(b3.r.idxI)}${sideTag(b3.s)}`:"—";
-    if(cur.r3&&cur.r3.joints) cur.r3.joints.forEach(j=>$("jv-"+j.key).textContent=`${j.score}점 → EPM ${f2(j.epm)} / ISO ${f2(j.iso)}`); else JOINTS.forEach(J=>$("jv-"+J.key).textContent="—");
+  if(openI){ const b3=A.best3; $("idxNeed").hidden=keys.every(s=>OC.apm(A.sides[s].side)!=null); $("borgHint").textContent=`추정값(참고) ${keys.map(s=>(keys.length>1?SIDE_NAME[s]+" ":"")+f1(borgEstimate(A.sides[s].side))).join(" · ")} — 보통 힘 비율·센 힘 비율로 만든 어림값이며 계산에는 쓰지 않습니다. 동작별 Borg를 시간으로 가중 평균해 직접 넣으세요.`;
+    $("estNote").hidden=!keys.some(s=>A.sides[s].r3&&A.sides[s].r3.pending); $("v3").textContent=b3?`EPM ${f1(b3.r.idxE)} · ISO ${f1(b3.r.idxI)}${sideTag(b3.s)}`:"—";
+    JOINTS.forEach((J,ji)=>{ const parts=keys.map(s=>{ const r=A.sides[s].r3; const j=r&&r.joints?r.joints[ji]:null; return j?`${keys.length>1?SIDE_NAME[s]+" ":""}${j.score}점 → EPM ${f2(j.epm)} / ISO ${f2(j.iso)}`:null; }).filter(Boolean); $("jv-"+J.key).textContent=parts.length?parts.join(" · "):"—"; });
     if(b3){ const r3=b3.r, z=izone(r3.idxE), zi=izone(r3.idxI); $("r3v").textContent=`${f1(r3.idxE)} (ISO ${f1(r3.idxI)})${sideTag(b3.s)}`;
       const g=(s,fn)=>{const r=A.sides[s].r3; return r&&r.ok?fn(r):"—";};
       kvTable("r3kv",[["Index(EPM/ISO)",...keys.map(s=>g(s,r=>`${f1(r.idxE)} / ${f1(r.idxI)}`))],["ATA",...keys.map(s=>g(s,r=>f1(r.ata)+"/분"))],["Ff",...keys.map(s=>g(s,r=>`${f2(r.ffEpm)} / ${f2(r.ffIso)}`))],["Pf",...keys.map(s=>g(s,r=>`${f2(r.pEpm)} / ${f2(r.pIso)}`))],["Rf",...keys.map(s=>g(s,r=>f2(r.rf)))],["Af",...keys.map(s=>g(s,r=>`${f2(r.aEpm)} / ${f2(r.aIso)}`))],["Rc",...keys.map(s=>g(s,r=>f2(r.rc)))],["Dc",...keys.map(s=>g(s,r=>f2(r.dc)))],["RTA",...keys.map(s=>g(s,r=>`${f2(r.rtaE)} / ${f2(r.rtaI)}`))],["예측 유병률 PA",...keys.map(s=>g(s,r=>r.pa?`${f1(r.pa[0])}~${f1(r.pa[2])}% (평균 ${f1(r.pa[1])}%)`:"≤2.2: 4~5%"))]],keys);
@@ -686,15 +724,15 @@ function recalc(){
 /* ===== 작업 목록(멀티태스크) ===== */
 let taskList=[]; let mode="single";
 function setMode(m){ mode=m; document.body.classList.toggle("multi",m==="multi"); $("modeSingle").setAttribute("aria-pressed",m==="single"); $("modeMulti").setAttribute("aria-pressed",m==="multi"); $("modeLearn").textContent=m==="multi"?"여러 작업 모드: 작업마다 OCRA Mini-Checklist로 평가하고 하루 시간과 함께 ‘추가’하세요. 작업 목록에서 하루 평가 도구가 정해지면 각 작업을 ‘분석하기’로 열어 그 도구까지 분석합니다.":"한 가지 작업 모드: 이 작업을 평가하고 점수에 따라 OCRA Checklist 또는 OCRA Index로 갑니다."; recalc(); }
-const SHARED_IDS=["cycleSec","same","pace"];
-function sharedSnapshot(){ const o={}; SHARED_IDS.forEach(id=>o[id]=$(id).value); o._af=afLevels(); o.recWorkMin=$("recWorkMin").value; o.shortPeriods=$("shortPeriods").value; o.inCycle=$("inCycle").checked; return o; }
-function applyShared(o){ SHARED_IDS.forEach(id=>{ if(id in o) $(id).value=o[id]; }); AF_KEYS.forEach(k=>{ $("af-"+k).value=String((o._af||{})[k]||0); }); $("recWorkMin").value=o.recWorkMin??""; $("shortPeriods").value=o.shortPeriods??""; $("inCycle").checked=!!o.inCycle; }
-function clearTaskInputs(){ const d=defaultSide(); writeSideDOM(d); sideStore.L=null; sideStore.R=null; prefilledSide.L=false; prefilledSide.R=false; SHARED_IDS.forEach(id=>{ const e=$(id); if(e.tagName==="SELECT") e.selectedIndex=0; else e.value=""; }); AF_KEYS.forEach(k=>$("af-"+k).value="0"); $("recWorkMin").value=""; $("shortPeriods").value=""; $("inCycle").checked=false; $("jobName").value=""; $("taskMin").value=""; }
+const SHARED_IDS=["cycleSec","pace"];
+function sharedSnapshot(){ const o={}; SHARED_IDS.forEach(id=>o[id]=$(id).value); o.recWorkMin=$("recWorkMin").value; o.shortPeriods=$("shortPeriods").value; o.inCycle=$("inCycle").checked; return o; }
+function applyShared(o){ SHARED_IDS.forEach(id=>{ if(id in o) $(id).value=o[id]; }); $("recWorkMin").value=o.recWorkMin??""; $("shortPeriods").value=o.shortPeriods??""; $("inCycle").checked=!!o.inCycle; }
+function clearTaskInputs(){ const d=defaultSide(); writeSideDOM(d,"L"); writeSideDOM(d,"R"); prefilledSide.L=false; prefilledSide.R=false; SHARED_IDS.forEach(id=>{ const e=$(id); if(e.tagName==="SELECT") e.selectedIndex=0; else e.value=""; }); $("recWorkMin").value=""; $("shortPeriods").value=""; $("inCycle").checked=false; $("jobName").value=""; $("taskMin").value=""; }
 function currentSnapshot(A){ A=A||calcAll(); const res={}; for(const s of Object.keys(A.sides)){ const {r1,r2,r3}=A.sides[s]; res[s]={mini:r1.ok?{score:r1.score,min:r1.min,max:r1.max}:null,chk:(r2&&r2.ok)?r2.partial:null,idx:(r3&&r3.ok)?{ata:r3.ata,k:r3.k}:null}; }
-  const inputs={L:curSide==="L"?readSideDOM():sideStore.L,R:curSide==="R"?readSideDOM():sideStore.R,shared:sharedSnapshot(),scope:$("evalScope").value};
+  const inputs={L:readSideDOM("L"),R:readSideDOM("R"),shared:sharedSnapshot(),scope:$("evalScope").value};
   const worst=k=>{ let w=null; for(const s of Object.keys(res)){ const v=res[s][k]; if(v==null) continue; const val=k==="mini"?v.min:k==="chk"?v:v.ata/v.k; if(w==null||val>w.val) w={s,val,v}; } return w; };
   return {name:$("jobName").value||`작업 ${taskList.length+1}`,min:num("taskMin"),res,inputs,mini:worst("mini")?.v||null,chkDone:Object.values(res).some(r=>r.chk!=null)&&Object.values(res).every(r=>r.chk!=null),idxDone:Object.values(res).some(r=>r.idx)&&Object.values(res).every(r=>r.idx)}; }
-function applyTask(t){ applyShared(t.inputs.shared||{}); $("evalScope").value=t.inputs.scope||"R"; sideStore.L=t.inputs.L||null; sideStore.R=t.inputs.R||null; const ss=scopeSides(); curSide=ss.includes(curSide)?curSide:ss[0]; writeSideDOM(sideStore[curSide]||defaultSide()); prefilledSide.L=!!(t.inputs.L&&t.inputs.L["p-hdPinch"]!==""); prefilledSide.R=!!(t.inputs.R&&t.inputs.R["p-hdPinch"]!==""); paintSide(); $("jobName").value=t.name; $("taskMin").value=t.min??""; }
+function applyTask(t){ applyShared(t.inputs.shared||{}); $("evalScope").value=t.inputs.scope||"R"; writeSideDOM(Object.assign(defaultSide(),t.inputs.L||{}),"L"); writeSideDOM(Object.assign(defaultSide(),t.inputs.R||{}),"R"); prefilledSide.L=!!(t.inputs.L&&t.inputs.L["p-hdPinch"]!==""); prefilledSide.R=!!(t.inputs.R&&t.inputs.R["p-hdPinch"]!==""); paintSide(); $("jobName").value=t.name; $("taskMin").value=t.min??""; }
 function dayDecision(){ const M=taskList.filter(t=>t.mini); if(!M.length) return {tool:null,text:"목록에 OCRA Mini-Checklist 결과가 있는 작업이 없습니다."};
   const worst=M.reduce((a,t)=>t.mini.min>a.mini.min?t:a); const anyHigh=M.some(t=>t.mini.min>11), allOK=M.every(t=>t.mini.max<=7.5);
   if(anyHigh) return {tool:"idx",text:`‘${worst.name}’의 Mini 예상 범위 최솟값 ${f1(worst.mini.min)} > 11 → 개선 필요가 확정. 모든 작업을 OCRA Index까지 분석해 하루 지수를 냅니다(Checklist 생략 가능).`};
@@ -762,10 +800,10 @@ document.querySelectorAll("main input, main select").forEach(el=>el.addEventList
 $("closeIdx").addEventListener("click",()=>{openI=false; setStage(openC?2:1);});
 document.querySelectorAll(".tip").forEach(t=>{ t.setAttribute("aria-label",t.dataset.tip); t.setAttribute("tabindex","0"); const place=()=>{const r=t.getBoundingClientRect(); t.classList.toggle("flip",r.left+320>window.innerWidth); t.classList.toggle("below",r.top<170);}; t.addEventListener("mouseenter",place); t.addEventListener("focus",place); t.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();place();const on=t.classList.contains("on");document.querySelectorAll(".tip.on").forEach(x=>x.classList.remove("on"));if(!on)t.classList.add("on");}); });
 document.addEventListener("click",e=>{if(!e.target.closest(".tip"))document.querySelectorAll(".tip.on").forEach(x=>x.classList.remove("on"));});
-function clearAll(){ document.querySelectorAll("main input[type=number], main input[type=text]:not([readonly])").forEach(i=>{i.value="";i.classList.remove("est");}); document.querySelectorAll("main select").forEach(s=>s.selectedIndex=0); document.querySelectorAll("main input[type=checkbox]").forEach(c=>c.checked=false); $("shSlight").checked=true; $("evalScope").value="R"; sideStore.L=null; sideStore.R=null; prefilledSide.L=false; prefilledSide.R=false; curSide="R"; paintSide(); taskList=[]; }
+function clearAll(){ document.querySelectorAll("main input[type=number], main input[type=text]:not([readonly])").forEach(i=>{i.value="";i.classList.remove("est");}); document.querySelectorAll("main select").forEach(s=>s.selectedIndex=0); document.querySelectorAll("main input[type=checkbox]").forEach(c=>c.checked=false); $("shSlight").checked=true; $("shSlight__L").checked=true; $("evalScope").value="R"; prefilledSide.L=false; prefilledSide.R=false; paintSide(); taskList=[]; }
 $("resetBtn").addEventListener("click",()=>{clearAll();setStage(1);$("msg").textContent="입력을 지웠습니다.";});
 /* 예시 1: Ergonomiesite 아이스크림 포장(오른손) — Checklist 32, Index 11.2 */
-$("loadEx").addEventListener("click",()=>{ if(mode==="multi") clearTaskInputs(); else clearAll(); $("jobName").value="아이스크림 포장(사이트 사례)"; $("evalScope").value="R"; curSide="R"; paintSide(); $("shiftH").value=9; $("mealN").value=1; $("mealLen").value=60; $("mealIn").value="0"; $("breakN").value=2; $("breakLen").value=10; $("nonRepMin").value=20;
+$("loadEx").addEventListener("click",()=>{ if(mode==="multi") clearTaskInputs(); else clearAll(); $("jobName").value="아이스크림 포장(사이트 사례)"; $("evalScope").value="R"; paintSide(); $("shiftH").value=9; $("mealN").value=1; $("mealLen").value=60; $("mealIn").value="0"; $("breakN").value=2; $("breakLen").value=10; $("nonRepMin").value=20;
   $("cycleSec").value=37; $("same").value="2"; $("taN").value=40; $("taSec").value=37; $("bHand").value="5"; $("bSh").value="1"; $("bWr").value="3"; $("bEl").value="3"; $("modBand").value="0"; $("peakPct").value=0; $("pauses").value="0";
   $("af-cold").value="3"; $("pace").value="2"; $("borg").value=0.63;
   const P={hdPalm:60,hdPower:19,elFlex:48,wrRad:41,sh80:15}; Object.entries(P).forEach(([k,v])=>{$("p-"+k).value=v;}); prefilledSide.R=true; $("estOK").checked=true;
@@ -777,10 +815,10 @@ $("copyBtn").addEventListener("click",async()=>{ const A=lastOut; const keys=ord
   if(keys.length>1){ const b=A.best3||A.best2||A.best1; if(b) L.push(`최종(두 손 중 높은 쪽): ${SIDE_NAME[b.s]}`); }
   try{await navigator.clipboard.writeText(L.join("\n"));$("msg").textContent="결과를 복사했습니다.";}catch(e){$("msg").textContent=L.join("\n");} });
 /* ===== 저장 ===== */
-function save(){ try{ const d={}; document.querySelectorAll("main input:not([readonly]), main select").forEach(e=>{ if(e.id) d[e.id]=e.type==="checkbox"?e.checked:e.value; }); d._stage=stage; d._list=taskList; d._mode=mode; d._side=curSide; d._store=sideStore; d._pre=prefilledSide; localStorage.setItem("ocra-staged-v2",JSON.stringify(d)); }catch(e){} }
-function restoreSaved(){ let d=null; try{ d=JSON.parse(localStorage.getItem("ocra-staged-v2")||"null"); }catch(e){} if(!d){ $("msg").textContent="저장된 입력이 없습니다."; return; } try{ clearAll(); Object.keys(d).forEach(k=>{ const el=$(k); if(el&&!k.startsWith("_")){ if(el.type==="checkbox") el.checked=!!d[k]; else el.value=d[k]; } }); taskList=Array.isArray(d._list)?d._list:[]; curSide=d._side||"R"; sideStore.L=d._store?.L||null; sideStore.R=d._store?.R||null; Object.assign(prefilledSide,d._pre||{}); paintSide(); setMode(d._mode==="multi"?"multi":"single"); if(d._stage>=2) openC=true; if(d._stage>=3) openI=true; setStage(d._stage||1); $("msg").textContent="이전 입력을 불러왔습니다."; }catch(e){ setStage(1); } }
+function save(){ try{ const d={}; document.querySelectorAll("main input:not([readonly]), main select").forEach(e=>{ if(e.id) d[e.id]=e.type==="checkbox"?e.checked:e.value; }); d._stage=stage; d._list=taskList; d._mode=mode; d._pre=prefilledSide; localStorage.setItem("ocra-staged-v2",JSON.stringify(d)); }catch(e){} }
+function restoreSaved(){ let d=null; try{ d=JSON.parse(localStorage.getItem("ocra-staged-v2")||"null"); }catch(e){} if(!d){ $("msg").textContent="저장된 입력이 없습니다."; return; } try{ clearAll(); Object.keys(d).forEach(k=>{ const el=$(k); if(el&&!k.startsWith("_")){ if(el.type==="checkbox") el.checked=!!d[k]; else el.value=d[k]; } }); taskList=Array.isArray(d._list)?d._list:[]; Object.assign(prefilledSide,d._pre||{}); paintSide(); setMode(d._mode==="multi"?"multi":"single"); if(d._stage>=2) openC=true; if(d._stage>=3) openI=true; setStage(d._stage||1); $("msg").textContent="이전 입력을 불러왔습니다."; }catch(e){ setStage(1); } }
 $("loadSaved").addEventListener("click",restoreSaved);
-(function(){ try{ if(!localStorage.getItem("ocra-staged-v2")) $("loadSaved").hidden=true; }catch(e){ $("loadSaved").hidden=true; } $("shSlight").checked=true; paintSide(); setStage(1); })();
+(function(){ try{ if(!localStorage.getItem("ocra-staged-v2")) $("loadSaved").hidden=true; }catch(e){ $("loadSaved").hidden=true; } $("shSlight").checked=true; $("shSlight__L").checked=true; paintSide(); setStage(1); })();
 </script>
 </body>
 </html>
