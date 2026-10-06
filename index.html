@@ -19,9 +19,9 @@
   html{scroll-padding-top:env(safe-area-inset-top,0px)} *,*::before,*::after{box-sizing:inherit}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;word-break:keep-all}
   header.top{border-bottom:2px solid var(--ink);padding:22px 24px 16px;background:var(--sheet)}
-  .top-inner{max-width:1440px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+  .top-inner{max-width:1760px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
   h1{margin:0;font-size:26px;font-weight:900;letter-spacing:-.02em;line-height:1.2} h1 small{display:block;font-size:13px;font-weight:500;color:var(--ink-2);margin-top:4px}
-  main{max-width:1440px;margin:0 auto;padding:22px 24px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:24px;align-items:start}
+  main{max-width:1760px;margin:0 auto;padding:22px 24px;display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:22px;align-items:start}
   @media (max-width:980px){main{grid-template-columns:1fr}}
   .steps{display:flex;flex-direction:column;gap:14px}
   section.stage{background:var(--sheet);border:1px solid var(--rule);border-left:6px solid var(--blue);padding:16px 20px 18px}
@@ -41,7 +41,7 @@
   .sub-h{font-size:15px;font-weight:700;margin:16px 0 6px;display:flex;align-items:center;gap:8px}
   .help{color:var(--ink-2);font-size:13.5px;margin:0 0 12px}
   .row{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px 16px}
-  .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px 16px;align-items:start}
+  .groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px 32px;align-items:start} fieldset.group.three{grid-template-columns:1fr 1fr 1.6fr}
   fieldset.group{border:1px solid var(--rule);border-radius:6px;margin:0;padding:8px 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:10px} fieldset.group legend{font-size:13px;font-weight:700;color:var(--blue-3);padding:0 4px} fieldset.group.three{grid-template-columns:1fr 1fr 1fr}
   label.f{display:flex;flex-direction:column;gap:5px;font-size:13.5px;font-weight:500} label.f .lt{display:flex;align-items:center;gap:6px;white-space:nowrap}
   input[type=number],input[type=text],select{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--rule-2);border-radius:6px;background:var(--sheet);color:var(--ink);width:100%}
@@ -61,8 +61,8 @@
   .tip:hover::after,.tip:hover::before,.tip:focus-visible::after,.tip:focus-visible::before,.tip.on::after,.tip.on::before{opacity:1}
   .tip.flip::after{left:auto;right:0} .tip.flip::before{left:auto;right:5px} .tip.below::after{bottom:auto;top:calc(100% + 8px)} .tip.below::before{bottom:auto;top:calc(100% + 2px);border-top-color:transparent;border-bottom-color:var(--tip-bg)}
   /* TEST-ONLY */
-  .dbg{margin-top:12px;border:2px dashed #E0801A;background:rgba(224,128,26,.08);border-radius:6px;padding:8px 12px;font-size:12.5px;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.6;color:var(--ink);white-space:pre-wrap} .dbg::before{content:"계산 과정(테스트용)";display:block;font-family:"Noto Sans KR",sans-serif;font-weight:700;color:#B5620E;font-size:12px;margin-bottom:2px} body.nodbg .dbg{display:none}
-  #dbgToggle{font:inherit;font-size:12.5px;padding:6px 10px;border:2px dashed #E0801A;background:transparent;color:#B5620E;border-radius:6px;cursor:pointer;font-weight:700}
+  .dbg{margin-top:12px;border:2px dashed var(--rule-2);background:rgba(126,140,150,.08);border-radius:6px;padding:8px 12px;font-size:12.5px;font-family:ui-monospace,Menlo,Consolas,monospace;line-height:1.6;color:var(--ink);white-space:pre-wrap} .dbg::before{content:"계산 과정(테스트용)";display:block;font-family:"Noto Sans KR",sans-serif;font-weight:700;color:var(--ink-3);font-size:12px;margin-bottom:2px} body.nodbg .dbg{display:none}
+  #dbgToggle{font:inherit;font-size:12.5px;padding:6px 10px;border:2px dashed var(--rule-2);background:transparent;color:var(--ink-3);border-radius:6px;cursor:pointer;font-weight:700} #dbgToggle:hover{color:var(--ink-2);border-color:var(--ink-3)}
   /* /TEST-ONLY */
   aside.result{position:sticky;top:calc(12px + env(safe-area-inset-top,0px));background:var(--sheet);border:1px solid var(--rule);padding:18px}
   .r-title{font-size:13px;font-weight:700;color:var(--ink-2);margin:0 0 6px} .index{font-size:50px;font-weight:900;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
@@ -78,8 +78,8 @@
   .msg{font-size:12.5px;color:var(--ink-3);margin-top:8px;min-height:1.2em;white-space:pre-wrap}
   table.tasks{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:8px} table.tasks th,table.tasks td{border:1px solid var(--rule);padding:6px;vertical-align:middle} table.tasks th{background:var(--blue-2);font-weight:700;font-size:13px;white-space:nowrap} table.tasks input,table.tasks select{font-size:14px;padding:6px 8px;min-width:84px}
   .seg{display:flex;flex-wrap:wrap;gap:6px} .seg button{font:inherit;font-size:13.5px;padding:7px 12px;border:1px solid var(--rule-2);background:var(--sheet);color:var(--ink);border-radius:6px;cursor:pointer} .seg button[aria-pressed="true"]{background:var(--acc,var(--blue));border-color:var(--acc,var(--blue));color:#fff;font-weight:700}
-  #modeSingle,#modeMulti{background:#FFF1E3;border-color:#E0A36A;color:#7A3F00;font-weight:700} #modeSingle[aria-pressed="true"],#modeMulti[aria-pressed="true"]{background:#E0801A;border-color:#E0801A;color:#fff} body:not(.multi) #st4{display:none} body.multi #multiCtl{display:block} #multiCtl{display:none}
-  .taskbanner{background:#E0801A;color:#fff;font-weight:900;font-size:18px;padding:12px 16px;border-radius:8px;margin:10px 0 8px;letter-spacing:-.01em} .taskbanner small{display:block;font-size:13px;font-weight:500;opacity:.95;margin-top:2px}
+  #modeSingle,#modeMulti{background:#FFF1E3;border-color:#E0A36A;color:#7A3F00;font-weight:700} #modeSingle[aria-pressed="true"],#modeMulti[aria-pressed="true"]{background:#1F3A6E;border-color:#1F3A6E;color:#fff} body:not(.multi) #st4{display:none} body.multi #multiCtl{display:block} #multiCtl{display:none}
+  .taskbanner{background:#0F6E6E;color:#fff;font-weight:900;font-size:18px;padding:12px 16px;border-radius:8px;margin:10px 0 8px;letter-spacing:-.01em} .taskbanner small{display:block;font-size:13px;font-weight:500;opacity:.95;margin-top:2px}
   .learn{font-size:13px;color:var(--ink-2);background:var(--blue-2);border-left:3px solid var(--blue);padding:6px 10px;margin:6px 0 10px;border-radius:0 6px 6px 0} body:not(.showlearn) .learn{display:none}
   .intro{background:var(--sheet);border:1px solid var(--rule);border-left:6px solid var(--z1);padding:16px 20px}
   .intro h2{margin:0 0 8px;font-size:18px} .intro ol{margin:6px 0 0 18px;padding:0;font-size:14px} .intro li{margin:4px 0}
@@ -88,7 +88,7 @@
   .iconrow label.f{flex-direction:column;align-items:stretch;gap:6px;border:1px solid var(--rule);border-radius:8px;padding:8px} .iconrow label.f .lt{white-space:normal}
   .iconrow select{width:100%}
   .gloss{background:var(--sheet);border:1px solid var(--rule);padding:16px 20px} .gloss h2{font-size:17px;margin:0 0 8px} .gloss dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:13.5px;margin:0} .gloss dt{font-weight:700;color:var(--blue-3)} .gloss dd{margin:0;color:var(--ink-2)}
-  footer{max-width:1440px;margin:0 auto;padding:10px 24px 40px;color:var(--ink-3);font-size:12.5px;line-height:1.7} footer ul{padding-left:18px;margin:6px 0}
+  footer{max-width:1760px;margin:0 auto;padding:10px 24px 40px;color:var(--ink-3);font-size:12.5px;line-height:1.7} footer ul{padding-left:18px;margin:6px 0}
   @media (prefers-reduced-motion:reduce){.marker{transition:none}.tip::after{transition:none}}
   @media print{aside.result{position:static}.actions,.msg,details,#dbgToggle{display:none}body{background:#fff}section.stage.locked{display:none}}
   .sidebar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:10px 0 4px;padding:8px 10px;border:2px solid var(--blue);border-radius:8px;background:var(--blue-2)}
@@ -116,7 +116,7 @@
     header.top{padding:14px 14px 10px} h1{font-size:20px} h1 small{font-size:12px}
     main{padding:12px 12px 90px;gap:14px} section.stage{padding:12px 12px 14px;border-left-width:5px}
     .stage-head{gap:8px} .stage-head h2{font-size:16.5px;line-height:1.3} .stage-head h2 em{display:block;font-size:12px} .stage-head .val{margin-left:0;width:100%;font-size:15px}
-    .row,.groups,.jgrid,.iconrow{grid-template-columns:1fr !important;gap:12px} fieldset.group{grid-template-columns:1fr;gap:10px;padding:8px 10px 12px}
+    .row,.groups,.jgrid,.iconrow{grid-template-columns:1fr !important;gap:12px} fieldset.group,fieldset.group.three{grid-template-columns:1fr;gap:10px;padding:8px 10px 12px}
     #st1 .row,#st1 .groups,#st1 .checks,#st2 .row,#st3 .row,#st3 #jointArea,#st1 .sidebar{margin-left:2px;padding-left:10px}
     label.f{font-size:15px;gap:6px;padding:4px 0} label.f .lt{line-height:1.45}
     input[type=number],input[type=text],select{font-size:16px;min-height:46px;padding:10px 12px}
@@ -140,6 +140,33 @@
     .mbar b{font-size:24px;font-variant-numeric:tabular-nums;color:var(--ink)} .mbar .z{color:#fff;border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700;background:var(--ink-3);white-space:nowrap}
     .mbar button{font:inherit;font-size:13px;padding:8px 10px;border-radius:6px;border:1px solid var(--rule-2);background:var(--sheet);color:var(--ink);min-height:40px}
   }
+  /* 같은 항목 묶음 */
+  .iconrow .card{display:flex;flex-direction:column;gap:8px;border:1px solid var(--rule);border-radius:8px;padding:8px;background:var(--sheet)}
+  .iconrow .card label.f.main{border:0;padding:0}
+  .iconrow .card label.f.sub{border:0;border-top:1px dashed var(--rule-2);border-radius:0;padding:8px 0 0 10px;font-size:13px}
+  .iconrow .card label.f.sub{flex-direction:row;align-items:center;justify-content:space-between;gap:10px} .iconrow .card label.f.sub .lt{flex:1 1 auto} .iconrow .card label.f.sub input[type=checkbox]{flex:0 0 auto;margin:0}
+  label.f.sub .lt::before{content:"└ ";color:var(--acc,var(--blue))}
+  fieldset.group.cnt{grid-template-columns:1fr 1fr}
+  fieldset.group label.f input[type=checkbox]{margin-top:4px}
+  fieldset.group.one{grid-template-columns:1fr}
+  #st2 .groups,#st3 .groups{border-left:3px solid var(--rule-2);margin-left:6px;padding-left:12px}
+  #st3 fieldset.group{background:var(--sheet)}
+  @media (max-width:560px){ fieldset.group.cnt,fieldset.group.one{grid-template-columns:1fr} #st2 .groups,#st3 .groups{margin-left:2px;padding-left:10px} }
+  .card.pair{display:flex;flex-direction:column;gap:8px;border:1px solid var(--rule);border-radius:8px;padding:8px;background:var(--sheet)}
+  .card.pair label.f.main{border:0;padding:0}
+  .card.pair label.f.sub{border-top:1px dashed var(--rule-2);padding:8px 0 0 10px;font-size:13px;flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .card.pair label.f.sub .lt{flex:1 1 auto} .card.pair label.f.sub input[type=checkbox]{flex:0 0 auto;margin:0}
+  /* 넓힌 폭에 맞춘 조정: 추가 조사(▶6)·정밀 분석(▶7·8) */
+  label.f .lt{white-space:normal;line-height:1.4}
+  #st2 fieldset.group:not(.one),#st3 fieldset.group:not(.one){grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  #jointArea{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:12px 16px;align-items:start} #jointArea .jointbox{margin-top:0}
+  #jointArea .jgrid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+  @media (min-width:900px){ #st2 .groups{grid-template-columns:minmax(0,2fr) minmax(0,1fr)} #st3 .groups{grid-template-columns:minmax(0,2fr) minmax(0,3fr)} }
+  @media (max-width:560px){ #jointArea{grid-template-columns:1fr} #st2 fieldset.group,#st3 fieldset.group{grid-template-columns:1fr} }
+  /* 단계 열기 버튼: 각 단계 배지 색과 같게(추가 조사 주황, 정밀 분석 보라) */
+  .btn[data-go="2"],.btn.go2{background:#B5620E;border-color:#B5620E;color:#fff;font-weight:700}
+  .btn[data-go="3"],.btn.go3{background:#5B2C8F;border-color:#5B2C8F;color:#fff;font-weight:700}
+  .btn[data-go="2"]:hover,.btn.go2:hover{background:#9A530B} .btn[data-go="3"]:hover,.btn.go3:hover{background:#4A2375}
 </style>
 </head>
 <body>
@@ -196,7 +223,7 @@
   <div class="actions"><button class="btn" type="button" id="loadEx">예시 (아이스크림 포장)</button><button class="btn" type="button" id="loadEx44">예시 (테이핑, 사례 4-4)</button><button class="btn" type="button" id="resetBtn">모두 지우기</button><button class="btn" type="button" id="loadSaved">이전 입력 불러오기</button></div>
 
   <div class="sub-h"><span class="stepno">1</span>근무 — 하루 근무는 어떻게 되나요? <button type="button" class="tip" data-tip="세 단계 모두가 같은 값을 씁니다. 한 번만 넣으면 됩니다.">?</button></div>
-  <div class="learn">예: 아침 8시 출근, 저녁 5시 퇴근, 점심 1시간(무급), 오전·오후 10분 휴식 → 총 9시간, 식사 1회 60분 미포함, 휴식 2회 10분. 손을 거의 안 쓰는 일(청소, 자재 가져오기)이 하루 20분이면 ‘반복작업 아닌 일 20’.</div>
+  <div class="learn">예: 아침 8시 출근, 저녁 5시 퇴근, 점심 1시간(무급), 오전·오후 10분 휴식 → 총 9시간, 식사 1회 60분·근무시간 밖, 휴식 2회 10분. 손을 거의 안 쓰는 일(청소, 자재 가져오기)이 하루 20분이면 ‘반복작업 아닌 일 20’.</div>
   <div class="groups">
     <fieldset class="group"><legend>근무</legend>
       <label class="f"><span class="lt">총 근무시간(시간) <button type="button" class="tip" data-tip="출근부터 퇴근까지, 식사시간을 포함한 시간. 예: 8시간 일하고 점심 1시간이면 9">?</button></span><input type="number" id="shiftH" min="0" step="0.5" placeholder="예: 9"></label>
@@ -205,7 +232,7 @@
     <fieldset class="group three"><legend>식사</legend>
       <label class="f"><span class="lt">횟수</span><input type="number" id="mealN" min="0" step="1" placeholder="1"></label>
       <label class="f"><span class="lt">1회(분) <button type="button" class="tip" data-tip="30분 이상인 식사만 식사로 봅니다(원저·Ergo/IBV). 30분 미만이면 휴식 1회로 취급합니다.">?</button></span><input type="number" id="mealLen" min="0" step="5" placeholder="60"></label>
-      <label class="f"><span class="lt">유급 포함? <button type="button" class="tip" data-tip="식사시간이 근무시간 안에 들어 있으면(유급) ‘포함’, 무급으로 근무 밖이면 ‘미포함’(한국의 일반적 경우). Mini-Checklist의 교대 길이 계산에 쓰입니다.">?</button></span><select id="mealIn"><option value="0">미포함</option><option value="1">포함</option></select></label>
+      <label class="f"><span class="lt">근무시간 안에 포함? <button type="button" class="tip" data-tip="보통 한국 직장처럼 점심이 무급이고 근무시간 밖이면 ‘아니요’. 교대제 공장처럼 8시간 근무 안에 식사시간이 들어 있고 급여가 나오면 ‘예’. EPM 시트는 이에 따라 교대 길이와 순 반복작업 시간을 다르게 셉니다.">?</button></span><select id="mealIn"><option value="0">아니요 (무급, 보통의 경우)</option><option value="1">예 (유급)</option></select></label>
     </fieldset>
     <fieldset class="group"><legend>휴식(식사 제외)</legend>
       <label class="f"><span class="lt">횟수 <button type="button" class="tip" data-tip="회사가 정한 공식 휴식뿐 아니라 작업자가 임의로 쉬는 비공식 휴식도 포함합니다.">?</button></span><input type="number" id="breakN" min="0" step="1" placeholder="2"></label>
@@ -221,16 +248,14 @@
     <label class="f"><span class="lt">손의 빠르기 <button type="button" class="tip" data-tip="Mini-Checklist의 정성 판단. 2초에 한 번도 안 움직이면 ‘느림’(1점), 1초에 한 번 이상이라 세기 어려우면 ‘매우 빠름’(9점), 그 사이나 물건을 오래 쥐고 있으면 ‘중간’(5점). 아래에 실제로 센 동작 수를 넣으면 그 값이 우선합니다.">?</button></span><select id="speed"><option value="">— 고르세요 —</option><option value="1">느림(2초에 1회 미만)</option><option value="5">중간, 또는 물건을 오래 쥐고 있음</option><option value="9">매우 빠름(1초에 1회 이상, 셀 수 없음)</option></select></label>
     <label class="f"><span class="lt">기술동작 수(회, 선택) <button type="button" class="tip" data-tip="영상에서 이 손의 조작(집기·놓기·돌리기·밀기…)을 하나씩 센 수(힘이 센 동작만이 아니라 모든 기술동작). 넣으면 세 도구 모두 이 값을 씁니다. 4사이클마다 1회면 0.25처럼 소수도 됩니다.">?</button></span><input type="number" id="taN" min="0" step="0.01" placeholder="예: 40"></label>
     <label class="f"><span class="lt">센 구간의 시간(초) <button type="button" class="tip" data-tip="동작을 센 구간의 길이(한 사이클이면 사이클 길이). 비우면 사이클 길이를 씁니다.">?</button></span><input type="number" id="taSec" min="1" step="0.1" placeholder="예: 37"></label>
-    <label class="f"><span class="lt">1분당 동작 수(자동)</span><input type="text" id="ataShow" readonly value="—"></label>
-    <label class="f"><span class="lt">너무 빨라 셀 수 없음 <button type="button" class="tip" data-tip="70회/분을 넘어 셀 수 없으면 체크. EPM Checklist 시트와 같이 72회/분을 대입합니다(중단 가능 9점, 불가 10점; Mini 9점).">?</button></span><input type="checkbox" id="fastUncount"></label>
+    <div class="f card pair"><label class="f main"><span class="lt">1분당 동작 수(자동)</span><input type="text" id="ataShow" readonly value="—"></label><label class="f sub"><span class="lt">너무 빨라 셀 수 없음 <button type="button" class="tip" data-tip="70회/분을 넘어 셀 수 없으면 체크. EPM Checklist 시트와 같이 72회/분을 대입합니다(중단 가능 9점, 불가 10점; Mini 9점).">?</button></span><input type="checkbox" id="fastUncount"></label></div>
   </div>
 
   <div class="sub-h"><span class="stepno">3</span>자세 — 불편한 자세가 한 바퀴 작업 중 얼마나 오래 나오나요? <button type="button" class="tip" data-tip="관절마다 가장 심한 자세 하나를 기준으로 시간 비율을 고릅니다. OCRA Index에서 세부 항목으로 나눌 수 있습니다.">?</button></div>
   <div class="learn">그림의 자세가 한 바퀴 작업(사이클) 중 몇 분의 몇이나 나오는지 고릅니다. 예: 아이스크림을 손바닥으로 감싸 집는 시간이 사이클의 60% → 손은 ‘약 2/3’.</div>
   <div class="row iconrow">
     <label class="f"><svg class="ico"><use href="#ic-pinch"/></svg><span class="lt">손: 손가락 끝·손바닥·갈고리로 쥐기 <button type="button" class="tip" data-tip="핀치(엄지와 검지로 집기), 손바닥으로 누르듯 쥐기, 손가락을 걸어 들기. 손 전체로 감싸 쥐는 파워 그립은 제외">?</button></span><select id="bHand" class="b5"></select></label>
-    <label class="f"><svg class="ico"><use href="#ic-shoulder_front"/></svg><span class="lt">어깨: 팔을 어깨 높이 이상 또는 극단으로 <button type="button" class="tip" data-tip="팔을 앞·옆으로 어깨 높이 이상 들기, 옆으로 45° 넘게 벌리기, 몸 뒤로 보내기">?</button></span><select id="bSh" class="b5"></select></label>
-    <label class="f"><span class="lt">어깨: 팔을 받치지 않고 조금 든 채로 일하는 시간이 절반을 넘나요? <button type="button" class="tip" data-tip="OCRA Checklist의 어깨 1점 항목입니다(있다/없다만 묻습니다). 바로 위 ‘어깨’ 비율을 ‘없음’으로 골랐을 때만 1점이 더해지고, 다른 단계를 고르면 무시됩니다. EPM 시트는 표시가 없으면 기본 1점을 두므로 처음에 체크되어 있습니다. 팔을 책상이나 팔걸이에 받치고 일하면 체크를 풀어 주세요.">?</button></span><input type="checkbox" id="shSlight" checked></label>
+    <div class="f card"><label class="f main"><svg class="ico"><use href="#ic-shoulder_front"/></svg><span class="lt">어깨: 팔을 어깨 높이 이상 또는 극단으로 <button type="button" class="tip" data-tip="팔을 앞·옆으로 어깨 높이 이상 들기, 옆으로 45° 넘게 벌리기, 몸 뒤로 보내기">?</button></span><select id="bSh" class="b5"></select></label><label class="f sub"><span class="lt">팔을 받치지 않고 조금 든 채 일하는 시간이 절반을 넘나요? <button type="button" class="tip" data-tip="OCRA Checklist의 어깨 1점 항목입니다(있다/없다만 묻습니다). 바로 위 ‘어깨’ 비율을 ‘없음’으로 골랐을 때만 1점이 더해지고, 다른 단계를 고르면 무시됩니다. EPM 시트는 표시가 없으면 기본 1점을 두므로 처음에 체크되어 있습니다. 팔을 책상이나 팔걸이에 받치고 일하면 체크를 풀어 주세요.">?</button></span><input type="checkbox" id="shSlight" checked></label></div>
     <label class="f"><svg class="ico"><use href="#ic-overhead"/></svg><span class="lt">손이 머리보다 높이 올라감? <button type="button" class="tip" data-tip="OCRA Checklist에서 어깨 점수를 2배로 합니다.">?</button></span><select id="overhead"><option value="0">아니요</option><option value="1">예</option></select></label>
     <label class="f"><svg class="ico"><use href="#ic-wrist_flexext"/></svg><span class="lt">손목: 크게 꺾기 <button type="button" class="tip" data-tip="손목을 위·아래로 45° 넘게 꺾거나 엄지·새끼손가락 쪽으로 15~20° 넘게 꺾기">?</button></span><select id="bWr" class="b5"></select></label>
     <label class="f"><svg class="ico"><use href="#ic-elbow_flex"/></svg><span class="lt">팔꿈치: 비틀거나 크게 굽혔다 펴기 <button type="button" class="tip" data-tip="손바닥을 위·아래로 60° 넘게 돌리기(드라이버 돌리듯), 팔꿈치를 60° 넘게 급히 굽혔다 펴기">?</button></span><select id="bEl" class="b5"></select></label>
@@ -293,10 +318,14 @@
   <div id="taskBannerC" class="taskbanner" hidden></div>
   <p class="help" style="margin-top:10px">OCRA Mini-Checklist의 공통 입력을 다시 쓰고, 아래 질문 세 가지만 더 묻습니다. 자세·힘 표는 EPM 자동계산판 2020 값으로 바뀝니다(1/3 미만 1점 등). 어깨 1점 항목은 간이 선별의 ③ 자세 칸에 있습니다.</p>
   <div class="sub-h"><span class="stepno">6</span>추가 질문 — 중단·버티기·최대 힘</div>
-  <div class="row">
-    <label class="f"><span class="lt">사이클 중 짧은 중단이 가능한가요? <button type="button" class="tip" data-tip="손을 잠깐 멈출 여유가 있으면 빈도 점수가 낮아집니다(개정 Checklist의 ‘중단 가능/불가’ 구분). 센 동작 수가 없을 때는 간이 선별의 손 빠르기를 씁니다.">?</button></span><select id="pauses"><option value="1">예, 가끔 멈출 수 있음</option><option value="0">아니요, 멈출 수 없음(라인 속도)</option></select></label>
-    <label class="f"><span class="lt">5초 이상 물건을 쥐고 버티는 동작 <button type="button" class="tip" data-tip="정적 동작 점수: 5초 이상 유지가 사이클의 51~80%면 2.5, 80% 초과면 4.5. 동적 점수와 큰 값을 씁니다.">?</button></span><select id="staticBand"><option value="0">거의 없음</option><option value="1">사이클의 51~80%</option><option value="2">80% 넘게</option></select></label>
-    <label class="f"><span class="lt">거의 최대 힘(Borg 8 이상)이 드는 시간 <button type="button" class="tip" data-tip="10분마다 2초 6점, 시간의 1% 12점, 5% 24점, 10% 이상 32점. 간이 선별의 센 힘(5 이상) 비율은 ‘큰 힘(5~7)’ 점수(4/8/16/24)로 쓰입니다.">?</button></span><select id="maxBand"><option value="0">없음</option><option value="1">10분마다 2초</option><option value="2">시간의 1%</option><option value="3">시간의 5%</option><option value="4">10% 이상</option></select></label>
+  <div class="groups">
+    <fieldset class="group"><legend>빠르기 보완</legend>
+      <label class="f"><span class="lt">사이클 중 짧은 중단이 가능한가요? <button type="button" class="tip" data-tip="손을 잠깐 멈출 여유가 있으면 빈도 점수가 낮아집니다(개정 Checklist의 ‘중단 가능/불가’ 구분). 센 동작 수가 없을 때는 간이 선별의 손 빠르기를 씁니다.">?</button></span><select id="pauses"><option value="1">예, 가끔 멈출 수 있음</option><option value="0">아니요, 멈출 수 없음(라인 속도)</option></select></label>
+      <label class="f"><span class="lt">5초 이상 물건을 쥐고 버티는 동작 <button type="button" class="tip" data-tip="정적 동작 점수: 5초 이상 유지가 사이클의 51~80%면 2.5, 80% 초과면 4.5. 동적 점수와 큰 값을 씁니다.">?</button></span><select id="staticBand"><option value="0">거의 없음</option><option value="1">사이클의 51~80%</option><option value="2">80% 넘게</option></select></label>
+    </fieldset>
+    <fieldset class="group one"><legend>힘 보완</legend>
+      <label class="f"><span class="lt">거의 최대 힘(Borg 8 이상)이 드는 시간 <button type="button" class="tip" data-tip="10분마다 2초 6점, 시간의 1% 12점, 5% 24점, 10% 이상 32점. 간이 선별의 센 힘(5 이상) 비율은 ‘큰 힘(5~7)’ 점수(4/8/16/24)로 쓰입니다.">?</button></span><select id="maxBand"><option value="0">없음</option><option value="1">10분마다 2초</option><option value="2">시간의 1%</option><option value="3">시간의 5%</option><option value="4">10% 이상</option></select></label>
+    </fieldset>
   </div>
   <div class="note">회복·지속시간 승수는 Mini와 같은 EPM 표. 빈도는 EPM 2020 시트의 두 표(중단 가능: 상한 9점 / 중단 불가: 37.5회/분부터 +1점, 상한 10점)를 그대로 씁니다. 어깨 0/2/6/8/12/24(표시 없음 + 약간 든 자세 1점, 머리 위 ×2), 손·손목·팔꿈치 0/1/2/3.5/4/8, 보통 힘 0/1/2/4/6/8. 부가요인은 Mini와 같은 시트 규칙(진동 4, 그 밖 2점 항목 합 상한 3; 속도 1/1.5/2).</div>
   <div class="advice" id="adv2"><b>OCRA Checklist 분석 결과</b>—</div>
@@ -319,13 +348,17 @@
   <div class="note" id="estNote" hidden><b>노란색 칸은 간이 선별 값으로 만든 추정값입니다.</b> 영상이나 현장 관찰로 각 항목의 비율을 확인·수정한 뒤 체크하세요. 체크 전에는 Index를 계산하지 않습니다.</div>
   <label class="checks" style="margin:8px 0 0"><span style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;font-size:14px"><input type="checkbox" id="estOK" style="width:18px;height:18px;accent-color:var(--blue)"> 추정값을 확인·수정했습니다(이 손)</span></label>
   <div class="sub-h"><span class="stepno">8</span>힘과 쉼 — 평균 힘든 정도와 그 밖의 선택 입력</div>
-  <div class="row">
-    <label class="f"><span class="lt">평균 힘든 정도(Borg 0.5~5) <button type="button" class="tip" data-tip="동작별 Borg를 시간으로 가중 평균한 값(EPM Index 시트 J열, Occhipinti 1998 3.2절). 자동으로 채우지 않으며 아래 추정값은 참고용입니다. EPM 함수(구간선형): 0.5→1.00, 1→0.85, 2→0.65, 3→0.45, 4→0.20, 5→0.01. 센 힘(Borg≥5) 비율이 10% 이상이면 0.01, 1~9%는 phases 시트 표(0.55~0.1)와 작은 값.">?</button></span><input type="number" id="borg" min="0.5" max="5" step="0.01"><span class="help" id="borgHint" style="font-size:12px;margin:4px 0 0"></span></label>
-    <label class="f"><span class="lt">5초 이상 쥐고 버티는 시간(초, 선택) <button type="button" class="tip" data-tip="EPM 시트: 5초(8 cts) 이상 유지한 시간(cts, 1/100분) × 0.75를 가상 기술동작 수로 보고 실제 동작 수와 큰 값을 씁니다. 이 칸은 초로 받아 cts로 바꿉니다(초 × 1.25). 단위 해석은 확인 필요.">?</button></span><input type="number" id="staticSec" min="0" step="0.1" placeholder="보통 비움"></label>
-    <label class="f"><span class="lt">휴식으로 볼 수 있는 일(분) <button type="button" class="tip" data-tip="눈으로만 검사하기, 기계 대기처럼 손을 완전히 쉬게 하는 비반복 작업">?</button></span><input type="number" id="recWorkMin" min="0" step="5" placeholder="0"></label>
-    <label class="f"><span class="lt">출근·식사 후 첫 작업 구간(분, 선택) <button type="button" class="tip" data-tip="첫 휴식까지 1시간보다 짧게 일하는 구간 길이. 20분 미만 쉰 것으로, 20~40분 0.5시간, 40~80분 1시간(Ergo/IBV). 둘이면 쉼표로.">?</button></span><input type="text" id="shortPeriods" placeholder="예: 30, 50"></label>
+  <div class="groups">
+    <fieldset class="group"><legend>힘</legend>
+      <label class="f"><span class="lt">평균 힘든 정도(Borg 0.5~5) <button type="button" class="tip" data-tip="동작별 Borg를 시간으로 가중 평균한 값(EPM Index 시트 J열, Occhipinti 1998 3.2절). 자동으로 채우지 않으며 아래 추정값은 참고용입니다. EPM 함수(구간선형): 0.5→1.00, 1→0.85, 2→0.65, 3→0.45, 4→0.20, 5→0.01. 센 힘(Borg≥5) 비율이 10% 이상이면 0.01, 1~9%는 phases 시트 표(0.55~0.1)와 작은 값.">?</button></span><input type="number" id="borg" min="0.5" max="5" step="0.01"><span class="help" id="borgHint" style="font-size:12px;margin:4px 0 0"></span></label>
+      <label class="f"><span class="lt">5초 이상 쥐고 버티는 시간(초, 선택) <button type="button" class="tip" data-tip="EPM 시트: 5초(8 cts) 이상 유지한 시간(cts, 1/100분) × 0.75를 가상 기술동작 수로 보고 실제 동작 수와 큰 값을 씁니다. 이 칸은 초로 받아 cts로 바꿉니다(초 × 1.25). 단위 해석은 확인 필요.">?</button></span><input type="number" id="staticSec" min="0" step="0.1" placeholder="보통 비움"></label>
+    </fieldset>
+    <fieldset class="group"><legend>쉼(선택)</legend>
+      <label class="f"><span class="lt">휴식으로 볼 수 있는 일(분) <button type="button" class="tip" data-tip="눈으로만 검사하기, 기계 대기처럼 손을 완전히 쉬게 하는 비반복 작업">?</button></span><input type="number" id="recWorkMin" min="0" step="5" placeholder="0"></label>
+      <label class="f"><span class="lt">출근·식사 후 첫 작업 구간(분, 선택) <button type="button" class="tip" data-tip="첫 휴식까지 1시간보다 짧게 일하는 구간 길이. 20분 미만 쉰 것으로, 20~40분 0.5시간, 40~80분 1시간(Ergo/IBV). 둘이면 쉼표로.">?</button></span><input type="text" id="shortPeriods" placeholder="예: 30, 50"></label>
+      <label class="f"><span class="lt">사이클 안에서 손이 제대로 쉬나요? <button type="button" class="tip" data-tip="매 사이클 손이 10초 이상 연속으로 쉬고, 일하는 시간이 쉬는 시간의 5~6.5배 이하이면 체크(예: 기계가 30초 동작하는 동안 손을 놓고 기다림). 해당하면 회복 계수 1.00.">?</button></span><input type="checkbox" id="inCycle"></label>
+    </fieldset>
   </div>
-  <label class="checks" style="margin:10px 0 0"><span style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--rule);border-radius:6px;font-size:14px"><input type="checkbox" id="inCycle" style="width:18px;height:18px;accent-color:var(--blue)"> 매 사이클 손이 10초 이상 연속으로 쉬고, 일하는 시간이 쉬는 시간의 5~6.5배 이하 <button type="button" class="tip" data-tip="예: 기계가 30초 동작하는 동안 손을 놓고 기다림. 해당하면 회복 계수 1.00">?</button></span></label>
   <div class="note">EPM 시트 기준(힘 구간선형 함수, 관절별 가중 점수, 부가요인 점수 합산 → 1/0.95/0.9/0.85/0.8, 회복 0.5시간 단위). ISO 11228-3(2007) Annex C 간이표 값(힘 보간, 자세 1/0.7/0.6/0.5, 부가 1/0.95/0.9/0.8)은 참고용으로 결과 패널에 함께 표시합니다. 예측 유병률 PA = 2.16·2.39·2.62 × Index(Index ≥ 2.25일 때; Occhipinti & Colombini 2007, EPM 멀티태스크 시트).</div>
   <div id="afStore" hidden>
   <div id="toolList" class="advice" style="background:var(--sheet);margin:10px 0 14px"><b id="toolListTitle">작업 목록 — 각 작업을 이 도구로 분석하세요</b>
@@ -360,7 +393,7 @@
 </aside>
 </main>
 
-<section class="gloss" id="gloss" style="max-width:1440px;margin:0 auto 20px;padding:16px 24px"><details><summary style="font-size:17px;font-weight:700">쉬운 용어 풀이 (눌러서 펼치기)</summary>
+<section class="gloss" id="gloss" style="max-width:1760px;margin:0 auto 20px;padding:16px 24px"><details><summary style="font-size:17px;font-weight:700">쉬운 용어 풀이 (눌러서 펼치기)</summary>
   <dl style="margin-top:8px">
     <dt>사이클(한 바퀴 작업)</dt><dd>제품 하나를 끝내고 다음 제품을 시작할 때까지. 사이클이 없고 같은 동작만 이어지면 ‘센 구간’으로 대신합니다.</dd>
     <dt>동작(기술동작)</dt><dd>집기, 놓기, 돌리기, 밀기, 당기기, 바꿔 쥐기처럼 손이 하는 조작 하나. 그냥 손을 펴서 떨어뜨리기, 걷기, 눈으로 보기는 동작이 아닙니다.</dd>
@@ -375,7 +408,7 @@
 </section>
 <div class="mbar" id="mbar"><div class="t"><span id="mbarTitle">결과</span></div><b id="mbarVal">—</b><span class="z" id="mbarZone">입력 중</span><button type="button" id="mbarGo">결과 보기</button></div>
 <dialog class="modal" id="modal"><b id="modalTitle">안내</b><div id="modalText"></div><div class="actions"><button class="btn primary" type="button" id="modalOk">확인</button></div></dialog>
-<footer><b>출처</b><ul>
+<footer><details><summary style="font-size:17px;font-weight:700;color:var(--ink)">출처 (눌러서 펼치기)</summary><ul>
 <li>OCRA Mini-Checklist: EPM International Ergonomics School(Colombini D, Cerbai M, Occhipinti E, Placci M). ERGOepmEN_MINIcheckOCRAmonotaskBIL 시트(2025-06-20 배포). 빈도·자세·힘·부가요인·회복·지속시간 표와 수식을 그대로 옮김.</li>
 <li>OCRA Checklist: EPM ERGOepmENChecklistOCRAauto(2020-10-19, 개정 OCRA Checklist 2013 기반). 빈도 2열 표(중단 가능/불가), 자세·힘 5단계 표(1/3 미만 1점), 어깨 기본 1점, 부가요인 합산 규칙. 머리 위 ×2는 ISO/핸드북 Checklist 규칙. 고정밀판(2020-10-10)의 % 보간표는 쓰지 않음(밴드 입력이므로).</li>
 <li>OCRA Index: EPM ERGOepmIndexOCRA classic(2017-09-01)·phases(2017-11-07). 힘 구간선형 함수, 피크 힘 표(phases), 관절별 가중 점수와 저빈도 합산(classic N40:AC43), 부가요인 합산, 회복 0.5시간 표, 지속시간 표. 좌·우 분리는 시트 구조와 Occhipinti E. Ergonomics 1998;41(9):1290-1311 3.6절. 원안(1998) 대비 현행과 다른 점: 지속시간 계수 추가, 어깨를 계수 최솟값에 포함, 부가요인 0.85 단계, 위험 구간 6단계(1.5/2.2/3.5/4.5/9), 예측 유병률 2.39×Index(Occhipinti & Colombini, Ergonomics 2007). 1998 원안은 역사적 기준으로만 참고.</li>
@@ -384,7 +417,7 @@
 <li>검산 사례: Ergonomiesite 아이스크림 포장(Checklist 32, Index 11.2, 2시간 순환 13), EN 1005-5 멀티태스크 2.62, Occhipinti 1998 부록 B(좌 5.6 / 우 1.50, Dc = 1). ISO 11228-3:2026 원문은 대조하지 못했고 EPM 엑셀을 기준으로 함.</li>
 <li>자세 그림: EPM 시트의 그림(Daniela Colombini 저작권)을 복제하지 않고, ISO 11228-3·EPM이 정한 각도 기준(어깨 80°·45–80°, 손목 45°·15–20°, 팔꿈치 60°)만 같은 원작 픽토그램.</li>
 <li>단계 전환 기준: 저자들의 권고(Mini는 빠른 평가, Checklist는 선별·관리, Index는 재설계)와 Mini 시트의 예상 범위식(−0.31 + 0.93x ~ 1.8 + 1.07x)을 조합한 <b>이 도구의 권고 흐름</b>(OCRA 공식 규칙이 아님). 예상 범위 최댓값 ≤ 7.5 → 종료, 범위가 7.5 또는 11을 걸침 → Checklist로 확정, 범위 최솟값 > 11 → Index로 직행. Checklist 7.6–11 → Index 권고, > 11 → Index 필요.</li>
-</ul></footer>
+</ul></details></footer>
 
 <script>
 /* ===== OCRA-CORE-BEGIN ===== */
@@ -551,6 +584,16 @@ document.querySelectorAll("select.b5").forEach(s=>B5.forEach(([v,t])=>{const o=d
 const AF_KEYS=["vib","strike","impact","cold","glove","precision","compress","other"]; const AF_MIN={vib:1,strike:2,impact:1,cold:2,glove:2,precision:2,compress:1,other:2};
 function afLevels(){ const o={}; AF_KEYS.forEach(k=>o[k]=Number($("af-"+k).value)||0); return o; }
 
+/* ===== 스마트폰: 짧은 질문 문구 ===== */
+const SHORT_LT={"총 근무시간(시간)":"총 근무시간(시간)","반복작업 아닌 일(분)":"손 안 쓰는 일(분)","근무시간 안에 포함?":"근무시간 안에 포함?","한 사이클 길이(초)":"사이클 길이(초)","같은 동작이 되풀이되는 비율":"같은 동작 비율","손의 빠르기":"손 빠르기","기술동작 수(회, 선택)":"동작 수(회)","센 구간의 시간(초)":"센 시간(초)","1분당 동작 수(자동)":"분당 동작 수(자동)","너무 빨라 셀 수 없음":"너무 빨라 못 셈","손: 손가락 끝·손바닥·갈고리로 쥐기":"손: 집기·손바닥·갈고리 쥐기","어깨: 팔을 어깨 높이 이상 또는 극단으로":"어깨: 팔을 어깨 위로","팔을 받치지 않고 조금 든 채 일하는 시간이 절반을 넘나요?":"팔을 조금 든 채 절반 넘게?","손이 머리보다 높이 올라감?":"손이 머리 위로?","사이클 안에서 손이 제대로 쉬나요?":"사이클 안에서 손이 쉬나?","손목: 크게 꺾기":"손목: 크게 꺾기","팔꿈치: 비틀거나 크게 굽혔다 펴기":"팔꿈치: 비틀기·크게 굽히기","보통 힘(3~4점)이 드는 시간":"보통 힘(3~4점) 시간","센 힘(5점 이상)이 드는 시간 비율(%)":"센 힘(5점 이상) 비율(%)","반동·충격(망치질처럼 되튀는 동작)":"반동·충격(망치질)","손을 도구처럼 써서 두드림(시간당 10회 이상)":"손으로 두드림","추위 0 °C 미만에서 일함":"추위(0 °C 미만)","맞지 않는 장갑을 낌":"맞지 않는 장갑","2~3 mm 정밀작업":"정밀작업(2~3 mm)","손이 눌려 자국·굳은살이 생김":"손 눌림(자국·굳은살)","그 밖(소음, 미끄러운 물건 등)":"그 밖(소음 등)","작업속도는 누가 정하나요?":"작업속도","이 작업을 하루에 하는 시간(분)":"하루에 하는 시간(분)","이 작업의 지금까지 결과":"지금까지 결과","사이클 중 짧은 중단이 가능한가요?":"잠깐 멈출 수 있나?","5초 이상 물건을 쥐고 버티는 동작":"5초 이상 쥐고 버팀","거의 최대 힘(Borg 8 이상)이 드는 시간":"거의 최대 힘(8 이상) 시간","평균 힘든 정도(Borg 0.5~5)":"평균 힘든 정도(Borg)","5초 이상 쥐고 버티는 시간(초, 선택)":"5초 이상 버틴 시간(초)","휴식으로 볼 수 있는 일(분)":"쉬는 셈인 일(분)","출근·식사 후 첫 작업 구간(분, 선택)":"첫 작업 구간(분)"};
+const SHORT_H={"작업 정보 — 어떤 작업을, 어느 손으로 평가하나요?":"작업 정보","근무 — 하루 근무는 어떻게 되나요?":"근무","반복 — 작업은 어떻게 반복되나요?":"반복","자세 — 불편한 자세가 한 바퀴 작업 중 얼마나 오래 나오나요?":"자세","힘 — 힘이 드나요?":"힘","조건 — 일을 더 힘들게 하는 조건":"조건","추가 질문 — 중단·버티기·최대 힘":"추가 질문","세부 자세 — 관절별 항목이 한 바퀴 작업 중 몇 %나 나오나요?":"세부 자세(%)","힘과 쉼 — 평균 힘든 정도와 그 밖의 선택 입력":"힘과 쉼"};
+const SHORT_OPT={"아니요 (무급, 보통의 경우)":"아니요(보통)","예 (유급)":"예(유급)","기계·라인이 정하지만 버퍼로 조절 가능":"기계가 정함, 조절 가능","라인이 느리게 움직이며 기계가 정함":"느린 라인, 기계가 정함","기계·라인이 완전히 정함":"기계가 완전히 정함","작업자가 자유롭게":"작업자가 정함","예, 가끔 멈출 수 있음":"예","아니요, 멈출 수 없음(라인 속도)":"아니요","양손(각각 입력)":"양손"};
+(function(){ if(!window.matchMedia||!window.matchMedia("(max-width:560px)").matches) return;
+  document.querySelectorAll("label.f .lt").forEach(e=>{ const tn=[...e.childNodes].find(n=>n.nodeType===3&&n.textContent.trim()); if(!tn) return; const k=tn.textContent.trim(); if(SHORT_LT[k]) tn.textContent=SHORT_LT[k]+" "; });
+  document.querySelectorAll(".sub-h").forEach(e=>{ const tn=[...e.childNodes].find(n=>n.nodeType===3&&n.textContent.trim()); if(!tn) return; const k=tn.textContent.trim(); if(SHORT_H[k]) tn.textContent=SHORT_H[k]; });
+  document.querySelectorAll("main option").forEach(o=>{ const k=o.textContent.trim(); if(SHORT_OPT[k]) o.textContent=SHORT_OPT[k]; });
+  const sg=document.querySelector(".stepguide"); if(sg) sg.textContent="▶ 0 작업 정보 → 1 근무 → 2 반복 → 3 자세 → 4 힘 → 5 조건 순서로 입력하세요.";
+})();
 /* ===== 좌·우 ===== */
 const SIDE_IDS=["taN","taSec","speed","fastUncount","bHand","bSh","bWr","bEl","shSlight","overhead","modBand","peakPct","pauses","staticBand","maxBand","borg","staticSec","estOK"].concat(JOINTS.flatMap(J=>J.items.map(it=>"p-"+it.id)));
 let curSide="R"; const sideStore={L:null,R:null}; const prefilledSide={L:false,R:false};
@@ -670,7 +713,7 @@ function renderTaskList(A){
   const netI=sc?sc.netIdx:null;
   $("taskTime").textContent=taskList.length?`목록의 시간 합 ${total}분 / 근무 조건의 순 반복작업 시간 ${netI!=null?netI:"—"}분${netI!=null&&total!==netI?`  ⚠ 시간 배분을 다시 확인하세요(차이 ${total-netI}분). EPM 시트는 합이 같아야 계산을 인정합니다.`:(netI!=null?"  ✓ 일치":"")}`:"목록이 비어 있습니다.";
   let html="<b>하루 평가 도구</b>"+(sel==="auto"?dec.text:(tool==="chk"?"직접 선택: 모든 작업을 OCRA Checklist까지 분석":"직접 선택: 모든 작업을 OCRA Index까지 분석"));
-  if(tool) html+=`<div class="actions" style="margin-top:8px"><button class="btn primary" type="button" id="goTool">${tool==="chk"?"OCRA Checklist 열기 — 작업 목록과 함께":"OCRA Index 열기 — 작업 목록과 함께"}</button></div>`;
+  if(tool) html+=`<div class="actions" style="margin-top:8px"><button class="btn ${tool==="chk"?"go2":"go3"}" type="button" id="goTool">${tool==="chk"?"OCRA Checklist 열기 — 작업 목록과 함께":"OCRA Index 열기 — 작업 목록과 함께"}</button></div>`;
   $("adv4").innerHTML=html; const gt=$("goTool"); if(gt) gt.addEventListener("click",()=>setStage(tool==="chk"?2:3));
   $("v4").textContent=tool?(tool==="chk"?"→ OCRA Checklist":"→ OCRA Index"):(taskList.length?"허용·종료":"—");
   const curName=$("jobName").value; const curT=taskList.find(t=>t.name===curName);
