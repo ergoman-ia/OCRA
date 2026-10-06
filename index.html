@@ -204,6 +204,9 @@
   /* 양손: 손 이름표 글씨 60%(11.5px → 6.9px) */
   body.lr .hands .cap{font-size:6.9px;padding:1px 6px;line-height:1.5}
   body.lr .hands .hc .cap{flex:0 0 34px}
+  /* hidden 속성은 다른 display 규칙보다 항상 우선 */
+  [hidden]{display:none !important}
+  @media (max-width:560px){ #sideBar{display:none !important} .lronly{display:none !important} }
 </style>
 </head>
 <body>
@@ -420,7 +423,7 @@
   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><span class="zone" id="zoneOut" style="background:var(--ink-3);margin:0">입력을 기다리는 중</span><span class="zone" id="actChip" style="margin:0;background:transparent;color:var(--blue-3);border:2px solid var(--blue)"></span></div>
   <div class="band" aria-hidden="true"><i style="background:var(--z1)"></i><i style="background:var(--z2)"></i><i style="background:var(--z3)"></i><i style="background:var(--z4)"></i><i style="background:var(--z5)"></i><i style="background:var(--z6)"></i><div class="marker" id="marker" style="left:0;display:none"></div></div>
   <div class="band-ticks" aria-hidden="true"><span>0</span><span>1.5</span><span>2.2</span><span>3.5</span><span>4.5</span><span>9.0+</span></div>
-    <p class="formula" style="margin-top:4px">색 띠는 OCRA Index 척도입니다. OCRA Mini-Checklist·OCRA Checklist 점수는 공식 등가표의 구간 대응(≤5↔1.5, 7.5↔2.2, 11↔3.5, 14↔4.5, 22.5↔9)을 선형 보간한 <b>등가 위치(시각화용)</b>로 표시하며 공식 환산값이 아닙니다. 양손 평가 시 표는 왼손·오른손 열로 나뉘고, 큰 숫자는 두 손 중 높은 쪽입니다. 위험 등급 이름(최적·허용·불확실·경도·중등도·고도)은 세 도구가 같은 체계를 씁니다.</p>
+    <p class="formula" style="margin-top:4px">색 띠는 OCRA Index 척도입니다. OCRA Mini-Checklist·OCRA Checklist 점수는 공식 등가표의 구간 대응(≤5↔1.5, 7.5↔2.2, 11↔3.5, 14↔4.5, 22.5↔9)을 선형 보간한 <b>등가 위치(시각화용)</b>로 표시하며 공식 환산값이 아닙니다. <span class="lronly">양손 평가 시 표는 왼손·오른손 열로 나뉘고, 큰 숫자는 두 손 중 높은 쪽입니다.</span> 위험 등급 이름(최적·허용·불확실·경도·중등도·고도)은 세 도구가 같은 체계를 씁니다.</p>
   <div class="sub" id="rMulti" hidden style="border:2px solid #0F6E6E;border-radius:8px;padding:8px 10px;margin-top:12px"><div class="st" style="color:#0F6E6E">멀티태스크(하루 전체)</div><div id="rMultiText" style="font-size:13px"></div></div>
   <div class="sub" id="r1"><div class="st" style="color:#1F3A6E">OCRA Mini-Checklist 분석 결과</div><div class="si" id="r1v">—</div><div class="kv" id="r1kv"></div></div>
   <div class="sub" id="r2" hidden><div class="st" style="color:#B5620E">OCRA Checklist 분석 결과</div><div class="si" id="r2v">—</div><div class="kv" id="r2kv"></div></div>
