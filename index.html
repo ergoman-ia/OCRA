@@ -118,7 +118,7 @@
   </div>
   <div class="card">
     <h2>저장된 평가 <span class="help" id="recCount" style="font-weight:500"></span></h2>
-    <p class="lsnote">이 목록은 이 기기의 이 브라우저에만 저장됩니다. 브라우저를 바꾸거나 방문 기록·쿠키·사이트 데이터를 지우면 사라질 수 있습니다.</p>
+    <p class="lsnote" id="lsNote" hidden>이 목록은 이 기기의 이 브라우저에만 저장됩니다. 브라우저를 바꾸거나 방문 기록·쿠키·사이트 데이터를 지우면 사라질 수 있습니다.</p>
     <div class="actions" id="selBar" style="margin:0 0 8px" hidden><button type="button" class="btn small" id="selToggle">선택해서 삭제</button><button type="button" class="btn small danger" id="selDel" hidden disabled>선택한 0건 삭제</button><button type="button" class="btn small" id="selAll" hidden>모두 선택</button></div>
     <div id="recList"></div>
     <p class="help" id="recEmpty">아직 저장된 평가가 없습니다.</p><div class="okbox" id="pairBox" hidden></div>
@@ -533,7 +533,7 @@ const NEXT_MAP={"OCRA Checklist로 등급 확정":"추가 정밀평가 필요","
 function nextOf(rec){ if(rec.kind!=="multi"){ const st=recState(rec); const nx=st.ok?OCM.nextStep(st.A.rng):null; if(nx) return nx.label; } return NEXT_MAP[rec.result.next]||rec.result.next; }
 function paintSel(){ $("selToggle").textContent=selMode?"선택 취소":"선택해서 삭제"; $("selDel").hidden=!selMode; $("selAll").hidden=!selMode; $("selDel").disabled=!selSet.size; $("selDel").textContent=`선택한 ${selSet.size}건 삭제`; }
 function renderHome(){ const list=recs(); const el=$("recList"); el.innerHTML=""; $("recEmpty").hidden=list.length>0; $("recCount").textContent=list.length?`(${list.length}건)`:""; $("pairBox").hidden=true; const dr=store.get(KEY_DRAFT,null); $("resumeBtn").hidden=!(dr&&dr.d&&(dr.d.jobName||dr.d.shiftH));
-  $("selBar").hidden=!list.length; if(!list.length){ selMode=false; selSet.clear(); } [...selSet].forEach(id=>{ if(!list.some(r=>r.id===id)) selSet.delete(id); }); paintSel();
+  $("selBar").hidden=!list.length; $("lsNote").hidden=!list.length; if(!list.length){ selMode=false; selSet.clear(); } [...selSet].forEach(id=>{ if(!list.some(r=>r.id===id)) selSet.delete(id); }); paintSel();
   const groups=[["단일 작업 평가",list.filter(r=>r.kind!=="multi")],["여러 작업 평가",list.filter(r=>r.kind==="multi")]];
   groups.forEach(([title,arr])=>{ if(!arr.length) return; const hd=document.createElement("h3"); hd.className="mh"; hd.textContent=`▶ ${title} (${arr.length}건)`; el.appendChild(hd);
     arr.forEach(rec=>{ const z=OCM.czone(rec.result.score); const m=rec.kind==="multi"; const st=m?null:recState(rec); const b=document.createElement(selMode?"label":"button"); if(!selMode) b.type="button"; b.className="rec"+(m?" multi":"")+(selSet.has(rec.id)?" sel":"");
