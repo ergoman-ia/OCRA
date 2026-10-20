@@ -65,6 +65,8 @@
   .bkrow{border-top:1px dashed var(--rule-2);margin-top:14px;padding-top:10px} .bkrow b{font-size:14px;color:var(--ink-2)} .bkrow .btn{flex:1 1 30%}
   .recw{display:flex;gap:6px;align-items:stretch;margin-bottom:8px} .recw .rec{margin:0;flex:1 1 auto;min-width:0} .recdel{flex:0 0 auto;min-width:56px;border:1.5px solid #C62828;color:#C62828;background:var(--sheet);border-radius:12px;font-weight:700;font-size:14px;padding:0 8px} .btn.primary.danger,#dlgOk.danger{background:#C62828;border-color:#C62828;color:#fff}
   select.seg2[hidden]{display:none !important} .seg2box{margin:0} .seg2box button{min-height:48px}
+  /* 누를 수 없는 버튼·칸은 흐리게(눌리지 않는 이유를 눈으로 알 수 있게) */
+  button:disabled,.btn:disabled,.bar button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.35);box-shadow:none}
   /* 선택 버튼(칩) */
   .chips{display:flex;flex-wrap:wrap;gap:8px} .chips button{flex:1 1 auto;min-height:46px;padding:8px 12px;border:1.5px solid var(--rule-2);border-radius:10px;background:var(--sheet);color:var(--ink);font-size:15px;font-weight:600;text-align:center}
   .chips button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
