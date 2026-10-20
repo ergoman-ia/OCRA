@@ -48,6 +48,8 @@
   /* 키보드가 열렸을 때(입력 칸에 초점): 알림을 숨기고, 아래쪽 여백을 늘려 마지막 칸도 키보드 위로 올라오게 함 */
   input,textarea,select{scroll-margin-top:96px;scroll-margin-bottom:24px}
   body.kb #toast{display:none !important} body.kb main{padding-bottom:60vh} body.kb dialog[open]{margin:12px auto auto}
+  .lsnote{color:#C62828;font-size:12.5px;font-weight:600;margin:-2px 0 10px;line-height:1.45} @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsnote{color:#FF8A80}}
+  .rec .rck{width:24px;height:24px;flex:none;accent-color:#C62828} .rec.sel{border-color:#C62828;background:rgba(198,40,40,.06)}
   /* 선택 버튼(칩) */
   .chips{display:flex;flex-wrap:wrap;gap:8px} .chips button{flex:1 1 auto;min-height:46px;padding:8px 12px;border:1.5px solid var(--rule-2);border-radius:10px;background:var(--sheet);color:var(--ink);font-size:15px;font-weight:600;text-align:center}
   .chips button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
@@ -116,6 +118,8 @@
   </div>
   <div class="card">
     <h2>저장된 평가 <span class="help" id="recCount" style="font-weight:500"></span></h2>
+    <p class="lsnote">이 목록은 이 기기의 이 브라우저에만 저장됩니다. 브라우저를 바꾸거나 방문 기록·쿠키·사이트 데이터를 지우면 사라질 수 있습니다.</p>
+    <div class="actions" id="selBar" style="margin:0 0 8px" hidden><button type="button" class="btn small" id="selToggle">선택해서 삭제</button><button type="button" class="btn small danger" id="selDel" hidden disabled>선택한 0건 삭제</button><button type="button" class="btn small" id="selAll" hidden>모두 선택</button></div>
     <div id="recList"></div>
     <p class="help" id="recEmpty">아직 저장된 평가가 없습니다.</p><div class="okbox" id="pairBox" hidden></div>
   </div>
@@ -132,7 +136,7 @@
   <div class="wizban" id="wizBan" hidden>여러 작업 평가의 작업을 입력하는 중<small>하루 공통 근무 조건은 이 여러 작업 평가의 모든 작업에 같이 씁니다. 바꿔야 하면 1단계의 ‘공통 근무 조건 변경하기’를 누르세요. 마지막에 ‘여러 작업 평가에 넣기’를 누르면 돌아갑니다.</small></div>
   <div class="prog" id="prog"></div>
   <div class="handbar" id="handBar" hidden>
-    <div class="hbt">▶ 평가할 손 <button type="button" class="tip" data-tip="EPM 계산표는 손(팔)마다 따로 평가합니다(오른손·왼손 시트). 두 손이 같은 동작을 같은 비율로 하는 대칭 작업이면 ‘양손’을 골라 한 번만 입력합니다(EPM의 BIL). 그렇지 않으면 오른손과 왼손을 모두 입력해야 작업 목록에 저장할 수 있습니다. 근무 조건·사이클 타임·작업속도는 두 손 공통이라 다시 넣지 않습니다.">?</button></div>
+    <div class="hbt">▶ 평가할 손 <button type="button" class="tip" data-tip="EPM 계산표는 손(팔)마다 따로 평가합니다(오른손·왼손 시트). 두 손이 같은 동작을 같은 비율로 하는 대칭 작업이면 ‘양손’을 골라 한 번만 입력합니다(EPM의 BIL). 그렇지 않으면 오른손과 왼손을 모두 입력해야 목록에 저장할 수 있습니다. 근무 조건·사이클 타임·작업속도는 두 손 공통이라 다시 넣지 않습니다.">?</button></div>
     <div class="chips hchips"><button type="button" data-h="R">오른손<small id="hsR"></small></button><button type="button" data-h="L">왼손<small id="hsL"></small></button><button type="button" data-h="B">양손<small>같은 동작·같은 비율</small></button></div>
     <p class="help" id="handGuide" style="margin:8px 0 0"></p>
   </div>
@@ -295,7 +299,7 @@
 <li>등급(OCRA Checklist 척도와 같음): 5 이하 최적 · 7.5 이하 허용 · 11 이하 불확실 · 14 이하 낮음 · 22.5 이하 중간 · 초과 높음.</li>
 <li>EPM 계산표와 다르게 적용하는 곳: ① 교대 540·600분에서도 휴식·식사 횟수를 뺌 ② 회복 없는 시간 9시간은 승수 3.0 ③ 회복 없는 시간이 음수면 0 ④ 분당 2.5회 미만은 빈도 0점. 해당하면 결과 화면에 표시합니다.</li>
 <li>여러 작업 평가(통합 결과): 작업 교대 간격 90분 이내는 시간 가중 평균(Occhipinti 1998, EN 1005-5), 90분 초과는 복합식(Occhipinti E, Colombini D, Occhipinti M. Med Lav 2008;99(3):234-241, EPM 멀티태스크 계산표 2014). Mini 부분점수(빈도+자세+힘+부가요인)에 첫 작업의 회복 승수와 총 반복시간의 지속시간 승수를 적용합니다.</li>
-<li>다음 단계 권고(이 도구의 규칙, OCRA 공식 규칙은 아님): 예상 범위 최댓값 7.5 이하 → 종료, 범위가 7.5나 11을 걸침 → OCRA Checklist, 최솟값 11 초과 → OCRA Index.</li>
+<li>다음 단계 안내(이 도구의 규칙, OCRA 공식 규칙은 아님): Mini 점수는 그 자체로 Mini의 결과입니다. Mini 계산표의 예상 범위식으로 최댓값이 7.5 이하면 ‘추가 평가 불필요’, 7.5나 11을 걸치면 ‘추가 정밀평가 필요(OCRA Checklist 또는 Index)’, 최솟값이 11을 넘으면 ‘개선 필요 — 추가 정밀평가 필요(OCRA Index 권장)’로 안내합니다.</li>
 <li>자세 그림: EPM 계산표의 그림(Daniela Colombini 저작권)을 복제하지 않고 같은 각도 기준만 따라 새로 그린 그림입니다.</li>
 </ul></details></footer>
 
@@ -357,10 +361,11 @@ function mini(org,shared,side){
   const epm=!ok?null:(fr.apm!=null&&fr.apm<2.5?{err:"F"}:(sc.epmMini.err?{err:"E"}:{score:partial*sc.epmMini.rcm*sc.du,unrec:sc.epmMini.unrec,rcm:sc.epmMini.rcm}));
   return {ok,sc,fr,st,post,posture,mod,intense,force,physScore:a.physScore,org:a.org,add:a.add,partial,score,epm,min:ok?-0.31+0.93*score:null,max:ok?1.8+1.07*score:null};
 }
-/* 다음 단계 권고(이 도구의 규칙): 범위 최댓값 7.5 이하 → 종료, 최솟값 11 초과 → OCRA Index, 그 밖 → OCRA Checklist */
-function nextStep(r){ if(!r||!r.ok) return null; if(r.max<=7.5) return {key:"end",label:"추가 평가 불필요",text:"예상 범위 전체가 ‘허용’ 이하입니다. 기록하고 종료해도 됩니다."};
-  if(r.min>11) return {key:"idx",label:"OCRA Index로 개선 설계",text:"예상 범위 전체가 ‘개선 필요’입니다. OCRA Checklist는 건너뛰고 OCRA Index로 원인을 정량화하고 개선안을 설계하세요."};
-  return {key:"chk",label:"OCRA Checklist로 등급 확정",text:"예상 범위가 등급 경계(7.5 또는 11)를 걸칩니다. OCRA Checklist로 점수를 확정하세요."}; }
+/* 다음 단계 권고(이 도구의 규칙): Mini 점수는 그대로 Mini의 결과이고, 예상 범위(0.93×점수−0.31 ~ 1.07×점수+1.8)로 추가 정밀평가가 필요한지만 알려 줌.
+   범위 최댓값 7.5 이하 → 추가 평가 불필요, 최솟값 11 초과 → 개선 필요(OCRA Index 권장), 그 밖 → 추가 정밀평가 필요(OCRA Checklist 또는 Index) */
+function nextStep(r){ if(!r||!r.ok) return null; if(r.max<=7.5) return {key:"end",label:"추가 평가 불필요",text:"Mini 점수로 예상되는 범위 전체가 ‘허용’ 이하입니다. 이 결과를 기록하고 종료해도 됩니다."};
+  if(r.min>11) return {key:"idx",label:"개선 필요 — 추가 정밀평가 필요",text:"Mini 점수가 높아 개선이 필요한 수준입니다. 원인을 따져 개선안을 정하려면 추가 정밀평가(OCRA Index 권장, 또는 OCRA Checklist)가 필요합니다."};
+  return {key:"chk",label:"추가 정밀평가 필요",text:"Mini 점수만으로는 허용 여부를 가르기 어려운 구간입니다. 추가 정밀평가(OCRA Checklist 또는 OCRA Index)가 필요합니다."}; }
 /* ---------- 여러 작업(멀티태스크) ----------
    tasks: [{name,min,partial(Mini 부분점수 = 빈도+자세+힘+부가)}]. EPM 멀티태스크 계산표·V2 multiChk와 같은 식에 Mini 회복 승수 적용.
    90분 이내 교대: 시간가중(Occhipinti 1998, EN 1005-5). 90분 초과: 복합식(Occhipinti·Colombini·Occhipinti 2008): 결과 = 과업1(자기 지속시간) + Δ×K, K = Σ(과업ᵢmax×FTᵢ)/과업1max */
@@ -434,14 +439,14 @@ function show(v){ if(v!=="wiz"){ if(toMulti&&typeof M!=="undefined"&&M.pending){
 function renderProg(){ const p=$("prog"); p.innerHTML=""; STEPS.forEach((n,i)=>{ const b=document.createElement("button"); b.type="button"; b.className=i<step?"done":i===step?"cur":""; b.innerHTML=`${i}<span> ${n}</span>`; b.title=n; b.addEventListener("click",()=>goStep(i)); p.appendChild(b); }); }
 function goStep(i){ step=Math.max(0,Math.min(6,i)); document.querySelectorAll("#wiz .step").forEach(s=>s.hidden=Number(s.dataset.step)!==step);
   if(step>=2&&step<=5){ const hh=D.H[curKey(D)]; if(!hh.seen.includes(step)) hh.seen.push(step); }
-  renderProg(); paintHandBar(); $("prevBtn").disabled=step===0; $("nextBtn").textContent=step===5?nextLabel5():step===6?(toMulti?"여러 작업 평가에 넣기":"작업 목록에 저장"):"다음"; if(step===6) renderResult(); window.scrollTo({top:0,behavior:"smooth"}); saveDraft(); }
+  renderProg(); paintHandBar(); $("prevBtn").disabled=step===0; $("nextBtn").textContent=step===5?nextLabel5():step===6?saveState().label:"다음"; $("nextBtn").disabled=step===6&&!saveState().ok; if(step===6) renderResult(); window.scrollTo({top:0,behavior:"smooth"}); saveDraft(); }
 const otherHand=h=>h==="R"?"L":"R";
 function nextLabel5(){ if(D.mode==="RL"&&!handDone(D,otherHand(D.cur))) return `${HAND[otherHand(D.cur)]} 입력`; return "결과 보기"; }
 /* ---- 손 막대 ---- */
 function paintHandBar(){ const on=step>=2&&step<=5; $("handBar").hidden=!on; document.querySelectorAll(".hname").forEach(e=>e.textContent=`— ${HAND[curKey(D)]}`);
   document.querySelectorAll(".hchips button").forEach(b=>{ const h=b.dataset.h; b.setAttribute("aria-pressed",String(D.mode==="B"?h==="B":h===D.cur)); });
   ["R","L"].forEach(h=>{ $("hs"+h).textContent=D.mode==="B"?"—":(handDone(D,h)?"입력 완료 ✓":(D.H[h].seen.length?"입력 중":"미입력")); });
-  $("handGuide").innerHTML=D.mode==="B"?"두 손이 같은 동작을 같은 비율로 하므로 <b>한 번만</b> 입력합니다. 결과는 오른손·왼손에 같게 적용됩니다.":`두 손의 동작이 다르면 <b>오른손과 왼손을 모두</b> 입력해야 작업 목록에 저장할 수 있습니다. 지금 입력: <b>${HAND[D.cur]}</b>`; }
+  $("handGuide").innerHTML=D.mode==="B"?"두 손이 같은 동작을 같은 비율로 하므로 <b>한 번만</b> 입력합니다. 결과는 오른손·왼손에 같게 적용됩니다.":`두 손의 동작이 다르면 <b>오른손과 왼손을 모두</b> 입력해야 목록에 저장할 수 있습니다. 지금 입력: <b>${HAND[D.cur]}</b>`; }
 function setHand(h){ writeHand(); if(h==="B"){ D.mode="B"; } else { D.mode="RL"; D.cur=h; } paintAll(); const hh=D.H[curKey(D)]; if(step>=2&&step<=5&&!hh.seen.includes(step)) hh.seen.push(step); onInput(); paintHandBar(); $("nextBtn").textContent=step===5?nextLabel5():"다음"; }
 document.querySelectorAll(".hchips button").forEach(b=>b.addEventListener("click",()=>{ if(b.dataset.h==="B"&&D.mode==="RL"&&(handDone(D,"R")||handDone(D,"L"))){ dialog("양손으로 바꿀까요?","‘양손’은 두 손이 같은 동작을 같은 비율로 할 때만 고릅니다. 오른손·왼손에 넣은 값은 지워지지 않고 남아 있어, 다시 ‘오른손’이나 ‘왼손’을 누르면 되돌아갑니다.",()=>setHand("B")); return; } setHand(b.dataset.h); }));
 /* ---- 입력 칸 ↔ D ---- */
@@ -465,7 +470,7 @@ function onInput(){ readAll(); applySeconds(); const hh=D.H[curKey(D)];
   const fsum=BAND_MID[+hh.modBand||0]+(Number(hh.peak)||0); $("forceWarn").hidden=!(fsum>100); $("forceWarn").textContent=`중간 힘(${BAND_NAME[+hh.modBand||0]}, 약 ${BAND_MID[+hh.modBand||0]}%)과 강한 힘(${hh.peak}% 이상) 시간의 합이 100%를 넘습니다. 두 값을 다시 확인하세요.`;
   const A=calcAll(D); const txt=handsOf(D).map(h=>`${HAND[h]} ${A.res[h].ok?f1(A.res[h].score):"—"}`).join(" · "); const z=A.fin?OCM.czone(A.res[A.fin].score):null;
   $("barV").textContent=A.fin?f1(A.res[A.fin].score)+"점":"—"; $("barZ").textContent=z?z.name:"입력 중"; $("barZ").style.background=z?`var(--${z.color})`:"var(--ink-3)"; $("barT").textContent=(D.jobName?D.jobName+" · ":"")+txt;
-  if(step>=2&&step<=5) paintHandBar(); if(step===5) $("nextBtn").textContent=nextLabel5(); if(step===6) renderResult(); saveDraft(); }
+  if(step>=2&&step<=5) paintHandBar(); if(step===5) $("nextBtn").textContent=nextLabel5(); if(step===6){ renderResult(); const ss=saveState(); $("nextBtn").textContent=ss.label; $("nextBtn").disabled=!ss.ok; } saveDraft(); }
 function saveDraft(){ if(toMulti){ M.pending={d:D,step,idx:mEditIdx}; saveMDraft(); return; } store.set(KEY_DRAFT,{d:D,step,editId}); }
 $("orgFromMulti").addEventListener("click",e=>{ const b=e.target.closest("button"); if(!b) return; if(b.dataset.orge){ wOrgOpen=true; onInput(); $("shiftH").focus(); } if(b.dataset.orgx){ wOrgOpen=false; ORG_F.forEach(k=>D[k]=M.org[k]); paintAll(); onInput(); } });
 /* ---- 결과 ---- */
@@ -485,7 +490,7 @@ function renderResult(){ const A=calcAll(D); const box=$("resBox"); const mc=mis
   const rows=[["빈도",r=>`${r.fr.score}${r.fr.apm!=null?`<br><small>${f1(r.fr.apm)}회/분</small>`:""}`],["자세(+정형성)",r=>`${r.post}+${r.st}`],["힘",r=>r.force],["부가요인",r=>r.add],["합계",r=>r.partial],["× 회복 승수",r=>r.sc.rcm],["× 지속시간 승수",r=>r.sc.du],["점수",r=>`<b>${f1(r.score)}</b>`],["등급",r=>OCM.czone(r.score).name],["예상 범위",r=>`${f1(r.min)}~${f1(r.max)}`]];
   box.innerHTML=`<p class="help" style="margin:0">${esc(D.jobName)||"(작업 이름 없음)"} · ${D.mode==="B"?"양손(대칭)":"오른손·왼손 각각"}</p>
    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px"><span class="resval">${f1(F.score)}<span style="font-size:18px;font-weight:700">점</span></span><span class="zone" style="background:var(--${z.color})">${z.name}</span></div>
-   <p class="help" style="margin:6px 0 0">${D.mode==="B"?"양손":`최종 = 높은 쪽(${HAND[A.fin]})`} · OCRA Checklist 점수의 예상 범위 ${f1(A.rng.min)}~${f1(A.rng.max)}</p>${bandHTML(F.score)}
+   <p class="help" style="margin:6px 0 0">${D.mode==="B"?"양손":`최종 = 높은 쪽(${HAND[A.fin]})`} · Mini 점수로 본 예상 범위(Checklist 척도) ${f1(A.rng.min)}~${f1(A.rng.max)}</p>${bandHTML(F.score)}
    ${A.complete?"":`<div class="note"><b>아직 저장할 수 없습니다.</b> ${miss.map(esc).join(" / ")}</div>`}
    <div class="nextbox"><b>다음 단계: ${nx.label}</b>${nx.text}</div>
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${cell(h,fn)}</td>`).join("")}</tr>`).join("")}</table>
@@ -494,7 +499,11 @@ function renderResult(){ const A=calcAll(D); const box=$("resBox"); const mc=mis
    ${[...new Set(hs.flatMap(h=>A.res[h].ok?diffs(A.res[h]):[]))].map(t=>`<div class="note"><b>EPM 계산표와 다르게 적용한 점</b> ${t}</div>`).join("")}`;
   renderActions(A,miss);
   $("dbg").hidden=!showDbg; $("dbg").textContent=hs.filter(h=>A.res[h].ok).map(h=>{ const r=A.res[h]; return `[${HAND[h]}] 빈도 ${r.fr.note} → ${r.fr.score}; 자세 ${r.post}+정형성 ${r.st}; 힘 ${r.mod}+${r.intense}; 부가 ${r.physScore}+${r.org}; (${r.partial}) × ${r.sc.rcm} × ${r.sc.du} = ${f1(r.score)}`; }).join("\n"); }
-function renderActions(A,miss){ const btns=[]; btns.push(`<button type="button" class="btn primary" id="saveBtn" ${A.complete?"":"disabled"}>${toMulti?"여러 작업 평가에 넣기":(editId?"수정 저장":"작업 목록에 저장")}</button>`);
+/* 저장할 내용이 있을 때만 저장 버튼을 켬: 새 평가는 입력이 끝났을 때, 불러온 평가는 입력이 끝났고 바뀐 내용이 있을 때 */
+const snapOf=d=>JSON.stringify(d,(k,v)=>(k==="seen"||k==="cur")?undefined:v); let baseSnap=null;
+function saveState(A){ A=A||calcAll(D); const label=toMulti?(mEditIdx!=null?"여러 작업 평가에 수정 반영":"여러 작업 평가에 넣기"):(editId?"수정 저장":"목록에 저장"); const editing=toMulti?mEditIdx!=null:!!editId; const dirty=!editing||snapOf(D)!==baseSnap;
+  const ok=A.complete&&dirty; const why=!A.complete?"입력이 끝나야 저장할 수 있습니다":(!dirty?"바뀐 내용이 없습니다":""); return {ok,label,why}; }
+function renderActions(A,miss){ const btns=[]; const ss=saveState(A); btns.push(`<button type="button" class="btn primary" id="saveBtn" ${ss.ok?"":"disabled"} title="${ss.why}">${ss.label}</button>`); if(!ss.ok&&ss.why==="바뀐 내용이 없습니다") btns.push(`<p class="help" style="flex:1 1 100%;margin:0">저장된 내용과 같아 저장할 것이 없습니다.</p>`);
   if(D.mode==="RL") ["R","L"].filter(h=>!handDone(D,h)).forEach(h=>btns.push(`<button type="button" class="btn" data-goh="${h}">${HAND[h]} 입력하기</button>`));
   if(toMulti) btns.push(`<button type="button" class="btn" id="cancelAdd">넣지 않고 돌아가기</button>`);
   if(A.fin) btns.push(`<button type="button" class="btn" id="copyBtn">결과 복사</button><button type="button" class="btn" id="printBtn">인쇄</button>`);
@@ -513,18 +522,27 @@ function saveRecord(){ writeHand(); const A=calcAll(D); if(!D.jobName.trim()){ d
   const hands={}; handsOf(D).forEach(h=>hands[h]=handSummary(A.res[h]));
   const rec={id,kind:"task",savedAt:new Date().toISOString(),inputs:JSON.parse(JSON.stringify(D)),result:{mode:D.mode,hands,fin:A.fin,score:+f1(F.score),min:+f1(A.rng.min),max:+f1(A.rng.max),zone:z.name,next:nx.label,rcm:F.sc.rcm,du:F.sc.du,unrec:F.sc.unrec,net:F.sc.net}};
   const i=list.findIndex(x=>x.id===id); if(i>=0) list[i]=rec; else list.unshift(rec); if(!store.set(KEY_REC,list)){ dialog("저장 실패","브라우저 저장소에 쓸 수 없습니다(저장 공간 부족 또는 비공개 모드).",null); return; }
-  editId=id; store.del(KEY_DRAFT); toast(`‘${D.jobName}’을(를) 작업 목록에 저장했습니다.`); show("home"); }
+  editId=id; store.del(KEY_DRAFT); toast(`‘${D.jobName}’을(를) 목록에 저장했습니다.`); show("home"); }
 /* 저장 기록이 완전한지(새 구조이고 두 손 또는 양손이 계산됨) */
 function recState(rec){ const d=upgrade(rec.inputs); const A=calcAll(d); const legacy=!rec.inputs.H; const ok=handsOf(d).every(h=>A.res[h].ok); return {d,A,ok,legacy}; }
-function openRecord(id){ const rec=recs().find(x=>x.id===id); if(!rec) return; if(rec.kind==="multi"){ openMulti(rec); return; } D=upgrade(rec.inputs); editId=id; paintAll(); show("wiz"); goStep(6); onInput(); }
+function openRecord(id){ const rec=recs().find(x=>x.id===id); if(!rec) return; if(rec.kind==="multi"){ openMulti(rec); return; } D=upgrade(rec.inputs); editId=id; baseSnap=snapOf(D); paintAll(); show("wiz"); goStep(6); onInput(); }
 function newEval(){ D=blank(); editId=null; paintAll(); show("wiz"); goStep(0); onInput(); }
 function recLine(rec){ const r=rec.result; if(rec.kind==="multi") return `여러 작업 통합 결과 · 오른손 ${f1(r.R)} / 왼손 ${f1(r.L)}`; const st=recState(rec); if(!st.ok){ const miss=handsOf(st.d).filter(h=>!st.A.res[h].ok).map(h=>HAND[h]); return `${miss.join("·")} 미입력 — 열어서 입력하면 저장됩니다`; } return st.d.mode==="B"?`양손 ${f1(st.A.res.B.score)}`:`오른손 ${f1(st.A.res.R.score)} / 왼손 ${f1(st.A.res.L.score)}`; }
+let selMode=false; const selSet=new Set();
+const NEXT_MAP={"OCRA Checklist로 등급 확정":"추가 정밀평가 필요","OCRA Index로 개선 설계":"개선 필요 — 추가 정밀평가 필요"};
+function nextOf(rec){ if(rec.kind!=="multi"){ const st=recState(rec); const nx=st.ok?OCM.nextStep(st.A.rng):null; if(nx) return nx.label; } return NEXT_MAP[rec.result.next]||rec.result.next; }
+function paintSel(){ $("selToggle").textContent=selMode?"선택 취소":"선택해서 삭제"; $("selDel").hidden=!selMode; $("selAll").hidden=!selMode; $("selDel").disabled=!selSet.size; $("selDel").textContent=`선택한 ${selSet.size}건 삭제`; }
 function renderHome(){ const list=recs(); const el=$("recList"); el.innerHTML=""; $("recEmpty").hidden=list.length>0; $("recCount").textContent=list.length?`(${list.length}건)`:""; $("pairBox").hidden=true; const dr=store.get(KEY_DRAFT,null); $("resumeBtn").hidden=!(dr&&dr.d&&(dr.d.jobName||dr.d.shiftH));
+  $("selBar").hidden=!list.length; if(!list.length){ selMode=false; selSet.clear(); } [...selSet].forEach(id=>{ if(!list.some(r=>r.id===id)) selSet.delete(id); }); paintSel();
   const groups=[["단일 작업 평가",list.filter(r=>r.kind!=="multi")],["여러 작업 평가",list.filter(r=>r.kind==="multi")]];
   groups.forEach(([title,arr])=>{ if(!arr.length) return; const hd=document.createElement("h3"); hd.className="mh"; hd.textContent=`▶ ${title} (${arr.length}건)`; el.appendChild(hd);
-    arr.forEach(rec=>{ const z=OCM.czone(rec.result.score); const m=rec.kind==="multi"; const st=m?null:recState(rec); const b=document.createElement("button"); b.type="button"; b.className="rec"+(m?" multi":"");
-      b.innerHTML=`<span class="rz" style="background:var(--${z.color})"></span><span class="ri"><b>${esc(rec.inputs.jobName||"(이름 없음)")}${st&&!st.ok?'<span class="badge">한 손 미입력</span>':""}</b><span>${m?`작업 ${(rec.inputs.tasks||[]).length}개 · 오른손 ${f1(rec.result.R)} / 왼손 ${f1(rec.result.L)}`:recLine(rec)}</span><span style="display:block">${fmtDate(rec.savedAt)} · ${esc(rec.result.zone)} · ${esc(rec.result.next)}</span></span><span class="rs">${f1(rec.result.score)}</span>`;
-      b.addEventListener("click",()=>m?openMulti(rec):openRecord(rec.id)); el.appendChild(b); }); }); }
+    arr.forEach(rec=>{ const z=OCM.czone(rec.result.score); const m=rec.kind==="multi"; const st=m?null:recState(rec); const b=document.createElement(selMode?"label":"button"); if(!selMode) b.type="button"; b.className="rec"+(m?" multi":"")+(selSet.has(rec.id)?" sel":"");
+      b.innerHTML=`${selMode?`<input type="checkbox" class="rck" ${selSet.has(rec.id)?"checked":""} aria-label="${esc(rec.inputs.jobName)} 선택">`:""}<span class="rz" style="background:var(--${z.color})"></span><span class="ri"><b>${esc(rec.inputs.jobName||"(이름 없음)")}${st&&!st.ok?'<span class="badge">한 손 미입력</span>':""}</b><span>${m?`작업 ${(rec.inputs.tasks||[]).length}개 · 오른손 ${f1(rec.result.R)} / 왼손 ${f1(rec.result.L)}`:recLine(rec)}</span><span style="display:block">${fmtDate(rec.savedAt)} · ${esc(rec.result.zone)} · ${esc(nextOf(rec))}</span></span><span class="rs">${f1(rec.result.score)}</span>`;
+      if(selMode){ b.querySelector("input").addEventListener("change",e=>{ e.target.checked?selSet.add(rec.id):selSet.delete(rec.id); b.classList.toggle("sel",e.target.checked); paintSel(); }); }
+      else b.addEventListener("click",()=>m?openMulti(rec):openRecord(rec.id)); el.appendChild(b); }); }); }
+$("selToggle").addEventListener("click",()=>{ selMode=!selMode; selSet.clear(); renderHome(); });
+$("selAll").addEventListener("click",()=>{ const all=recs(); if(selSet.size===all.length) selSet.clear(); else all.forEach(r=>selSet.add(r.id)); renderHome(); $("selAll").textContent=selSet.size===all.length?"모두 해제":"모두 선택"; });
+$("selDel").addEventListener("click",()=>{ const n=selSet.size; if(!n) return; const names=recs().filter(r=>selSet.has(r.id)).map(r=>esc(r.inputs.jobName||"(이름 없음)")); dialog(`${n}건 삭제`,`다음 평가를 삭제할까요? 되돌릴 수 없습니다.<br><b>${names.join(", ")}</b><br><span class="help">단일 작업 평가를 지워도, 그 평가에서 가져온 여러 작업 평가 안의 작업은 남습니다.</span>`,()=>{ store.set(KEY_REC,recs().filter(r=>!selSet.has(r.id))); selSet.clear(); selMode=false; renderHome(); toast(`${n}건을 삭제했습니다.`); }); });
 /* ---- 여러 작업 평가(통합 결과) ----
    EPM 멀티태스크 계산표 구조: 하루 근무 조건(DATI ORGANIZZATIVI)은 묶음에 한 번, 작업(TASK A~D)에는 근무 조건이 없음.
    M = {id, rot, name, org, tasks:[{tid, min, d(작업 입력: 이름·사이클·작업속도·손별 입력)}]}. 작업은 이 묶음 안에만 저장됨(단일 작업 목록과 분리). */
@@ -557,7 +575,7 @@ function renderMTasks(){ const el=$("mList"); el.innerHTML=""; $("mEmpty").hidde
     el.appendChild(row); });
   calcMulti(); }
 function needOrg(){ if(num(M.org.shiftH)>0) return true; toast("하루 공통 근무 조건(근무시간 등)을 먼저 넣어 주세요."); $("m_shiftH").focus(); return false; }
-function startMTask(d,idx,keepOrg){ wOrgOpen=false; D=keepOrg?upgrade(JSON.parse(JSON.stringify(d))):withOrg(d); editId=null; mEditIdx=idx; toMulti=true; paintAll(); show("wiz"); }
+function startMTask(d,idx,keepOrg){ wOrgOpen=false; D=keepOrg?upgrade(JSON.parse(JSON.stringify(d))):withOrg(d); baseSnap=snapOf(D); editId=null; mEditIdx=idx; toMulti=true; paintAll(); show("wiz"); }
 function editMTask(i){ startMTask(M.tasks[i].d,i); goStep(6); onInput(); }
 $("mAddNew").addEventListener("click",()=>{ M.name=$("mName").value; const first=!(num(M.org.shiftH)>0); startMTask(blank(),null); goStep(0); onInput(); toast(first?"작업 이름부터 넣으세요. 다음 단계에서 하루 공통 근무 조건을 한 번 넣습니다.":"작업 이름부터 넣으세요. 공통 근무 조건은 앞서 넣은 값을 씁니다."); });
 /* 단일 작업 평가에서 가져오기: 작업 입력(사이클·작업속도·손별 입력)만 복사하고 근무 조건은 이 묶음의 값으로 바꿈 */
@@ -595,7 +613,7 @@ $("mSave").addEventListener("click",()=>{ const c=calcMulti(); if(!c){ toast("�
 function handCell(rec,h){ if(rec.kind==="multi") return f1(rec.result[h]); const st=recState(rec); const k=st.d.mode==="B"?"B":h; return st.A.res[k].ok?f1(st.A.res[k].score)+(k==="B"?"(양손)":""):"미입력"; }
 function renderAdmin(){ const q=($("admSearch").value||"").trim().toLowerCase(); const list=recs().filter(r=>!q||[r.inputs.jobName,r.inputs.company,r.inputs.dept,r.inputs.station].some(v=>(v||"").toLowerCase().includes(q))); const tb=$("admBody"); tb.innerHTML=""; $("admEmpty").hidden=list.length>0;
   list.forEach(rec=>{ const r=rec.result, i=rec.inputs; const z=OCM.czone(r.score); const m=rec.kind==="multi"; const mode=m?"여러 작업":(upgrade(i).mode==="B"?"양손":"각각"); const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${fmtDate(rec.savedAt)}</td><td>${esc(i.company||"")}${i.dept?" / "+esc(i.dept):""}</td><td>${m?"<b>여러 작업</b> ":""}${esc(i.jobName||"")}${i.station?`<br><small>${esc(i.station)}</small>`:""}</td><td>${mode}</td><td class="n">${handCell(rec,"R")}</td><td class="n">${handCell(rec,"L")}</td><td class="n"><b>${f1(r.score)}</b></td><td class="n">${f1(r.min)}~${f1(r.max)}</td><td><span class="zone" style="background:var(--${z.color});font-size:12px;padding:2px 8px">${esc(r.zone)}</span></td><td>${esc(r.next)}</td><td class="n">${r.rcm}×${r.du}</td><td style="white-space:nowrap"><button type="button" class="btn small" data-open="${rec.id}">열기</button> <button type="button" class="btn small danger" data-del="${rec.id}">삭제</button></td>`;
+    tr.innerHTML=`<td>${fmtDate(rec.savedAt)}</td><td>${esc(i.company||"")}${i.dept?" / "+esc(i.dept):""}</td><td>${m?"<b>여러 작업</b> ":""}${esc(i.jobName||"")}${i.station?`<br><small>${esc(i.station)}</small>`:""}</td><td>${mode}</td><td class="n">${handCell(rec,"R")}</td><td class="n">${handCell(rec,"L")}</td><td class="n"><b>${f1(r.score)}</b></td><td class="n">${f1(r.min)}~${f1(r.max)}</td><td><span class="zone" style="background:var(--${z.color});font-size:12px;padding:2px 8px">${esc(r.zone)}</span></td><td>${esc(nextOf(rec))}</td><td class="n">${r.rcm}×${r.du}</td><td style="white-space:nowrap"><button type="button" class="btn small" data-open="${rec.id}">열기</button> <button type="button" class="btn small danger" data-del="${rec.id}">삭제</button></td>`;
     tr.querySelector("[data-open]").addEventListener("click",()=>openRecord(rec.id)); tr.querySelector("[data-del]").addEventListener("click",()=>dialog("삭제","‘"+esc(i.jobName||"")+"’ 평가를 삭제할까요? 되돌릴 수 없습니다.",()=>{ store.set(KEY_REC,recs().filter(x=>x.id!==rec.id)); renderAdmin(); })); tb.appendChild(tr); }); }
 const CSV_C=[["저장일시",r=>fmtDate(r.savedAt)],["종류",r=>r.kind==="multi"?"여러 작업":"작업"],["회사",r=>r.inputs.company],["부서",r=>r.inputs.dept],["라인·작업장",r=>r.inputs.station],["작업",r=>r.inputs.jobName],["손 방식",r=>r.kind==="multi"?"":(upgrade(r.inputs).mode==="B"?"양손(대칭)":"오른손·왼손 각각")],["오른손 점수",r=>handCell(r,"R")],["왼손 점수",r=>handCell(r,"L")],["최종 점수",r=>r.result.score],["범위 최소",r=>r.result.min],["범위 최대",r=>r.result.max],["등급",r=>r.result.zone],["권고",r=>r.result.next],["회복 승수",r=>r.result.rcm],["지속시간 승수",r=>r.result.du],["순 반복작업(분)",r=>r.result.net],
   ["근무시간(h)",r=>r.inputs.shiftH],["비반복(분)",r=>r.inputs.nonRepMin],["식사 횟수",r=>r.inputs.mealN],["식사(분)",r=>r.inputs.mealLen],["식사 포함",r=>r.inputs.mealIn==="1"?"예":(r.inputs.mealIn==="0"?"아니요":"")],["8분 이상 휴식(회)",r=>r.inputs.break8N],["총 휴식(분)",r=>r.inputs.breakTotal],["그 밖 중단(회)",r=>r.inputs.otherBreakN],["사이클(초)",r=>r.inputs.cycleSec],["작업속도",r=>r.inputs.pace],["여러 작업 구성",r=>r.kind==="multi"?(r.inputs.tasks||[]).map(t=>`${t.name} ${t.min}분`).join(" | "):""],["작업 설명",r=>r.inputs.jobDesc]];
@@ -643,7 +661,7 @@ window.addEventListener("popstate",()=>{ if(navSkip){ navSkip=false; return; } n
   if(view==="wiz"){ if(step>0){ goStep(step-1); navSync(); return; } goHomeOrMulti(); navSync(); return; }
   if(view==="multi"||view==="admin"){ show("home"); return; } });
 $("newBtn").addEventListener("click",()=>{ const dr=store.get(KEY_DRAFT,null); if(dr&&dr.d&&(dr.d.jobName||dr.d.shiftH)) dialog("작성 중인 평가가 있습니다","새로 시작하면 작성 중이던 내용은 지워집니다. 새로 시작할까요?",newEval); else newEval(); });
-$("resumeBtn").addEventListener("click",()=>{ const dr=store.get(KEY_DRAFT,null); if(!dr){ toast("작성 중인 평가가 없습니다."); return; } D=upgrade(dr.d||{}); editId=dr.editId||null; paintAll(); show("wiz"); goStep(Math.min(6,dr.step||0)); onInput(); });
+$("resumeBtn").addEventListener("click",()=>{ const dr=store.get(KEY_DRAFT,null); if(!dr){ toast("작성 중인 평가가 없습니다."); return; } D=upgrade(dr.d||{}); editId=dr.editId||null; { const r0=editId&&recs().find(x=>x.id===editId); baseSnap=r0?snapOf(upgrade(r0.inputs)):null; } paintAll(); show("wiz"); goStep(Math.min(6,dr.step||0)); onInput(); });
 /* ---- 스마트폰 키보드: 초점 받은 입력 칸을 머리(고정)와 키보드 사이 보이는 곳으로 올림 ---- */
 const KB_SEL='input[type=text],input[type=number],input[type=password],input:not([type]),textarea';
 function keepVisible(el){ if(document.activeElement!==el) return; const vv=window.visualViewport; const vTop=vv?vv.offsetTop:0, vH=vv?vv.height:window.innerHeight;
