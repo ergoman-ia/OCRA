@@ -26,7 +26,7 @@
   header.top .hb{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:7px 11px;font-size:13.5px;font-weight:700;min-height:38px}
   header.top .hb.adm{background:var(--admin);border-color:var(--admin)} @media (max-width:899px){ header.top .hb.adm{display:none} }
   /* ---- 공통 ---- */
-  main{max-width:760px;margin:0 auto;padding:14px 14px calc(96px + env(safe-area-inset-bottom,0px))}
+  main{max-width:760px;margin:0 auto;padding:14px 14px 4px}
   main.wide{max-width:1200px}
   .card{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:14px;margin-bottom:12px}
   .card h2{margin:0 0 6px;font-size:18px;font-weight:800;color:var(--acc)} .card h2 .no{display:inline-block;min-width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;background:var(--acc);color:#fff;font-size:14px;margin-right:6px}
@@ -51,17 +51,17 @@
   .lsnote{color:#C62828;font-size:12.5px;font-weight:600;margin:-2px 0 10px;line-height:1.45} @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsnote{color:#FF8A80}}
   .rec .rck{width:24px;height:24px;flex:none;accent-color:#C62828} .rec.sel{border-color:#C62828;background:rgba(198,40,40,.06)}
   /* OCRA Checklist(주황)·OCRA Index(보라) */
-  #chkv{--acc:#B5620E;--acc-2:#FBEEDF;--acc-3:#7A3F06} #idxv{--acc:#5B2C8F;--acc-2:#F0E8F8;--acc-3:#3D1C63}
+  #chkv{--acc:#A3560C;--acc-2:#FBEEDF;--acc-3:#7A3F06} #idxv{--acc:#5B2C8F;--acc-2:#F0E8F8;--acc-3:#3D1C63}
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #chkv{--acc:#F0A35E;--acc-2:#3A2A18;--acc-3:#FFD2A6} :root:not([data-theme="light"]) #idxv{--acc:#B79AE0;--acc-2:#2B2140;--acc-3:#E1D2F7}}
-  body[data-view="chk"] header.top{background:#B5620E} body[data-view="idx"] header.top{background:#5B2C8F}
+  body[data-view="chk"] header.top{background:#A3560C} body[data-view="idx"] header.top{background:#5B2C8F}
   .tool .bar{border-top-color:var(--acc)} .tool .prog button.cur{background:var(--acc)} .tool .prog button.done{background:var(--acc-2);color:var(--acc-3)}
   .toolban{background:var(--acc);color:#fff;border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:15px;font-weight:800} .toolban small{display:block;font-weight:500;font-size:12.5px;opacity:.92;margin-top:2px}
   .handbar2{background:var(--sheet);border:2px solid var(--acc);border-radius:12px;padding:10px 12px;margin:0 0 12px} .handbar2 .hbt{font-weight:800;color:var(--acc);margin-bottom:6px}
   .toolbtns{display:flex;flex-direction:column;gap:8px;margin-top:10px} .toolbtns .btn{text-align:left;color:#fff;font-weight:800} .toolbtns .btn small{display:block;font-weight:600;font-size:12px;opacity:.95}
-  .btn.gochk{background:#B5620E;border-color:#B5620E;color:#fff} .btn.goidx{background:#5B2C8F;border-color:#5B2C8F;color:#fff} .toolbtns .btn:not(.rec){opacity:.88} .toolbtns .btn.rec{box-shadow:0 0 0 3px rgba(0,0,0,.12)}
+  .btn.gochk{background:#A3560C;border-color:#A3560C;color:#fff} .btn.goidx{background:#5B2C8F;border-color:#5B2C8F;color:#fff} .toolbtns .btn.pick{box-shadow:0 0 0 3px rgba(0,0,0,.12)}
   input.est,select.est{background:#FFF4C2 !important;border-color:#D9A400 !important} @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) input.est,:root:not([data-theme="light"]) select.est{background:#4A3F12 !important}}
   .jh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px} .jh b{color:var(--acc);font-size:16px} .jit{margin-bottom:8px} .jit .lt{font-size:14px;font-weight:600}
-  .rec .tb{display:inline-block;font-size:11.5px;font-weight:700;color:#fff;border-radius:999px;padding:1px 7px;margin:2px 4px 0 0} .rec .tb.c{background:#B5620E} .rec .tb.i{background:#5B2C8F}
+  .rec .ri span.tb,.rec .tb{display:inline-block;font-size:11.5px;font-weight:700;color:#fff;border-radius:999px;padding:1px 7px;margin:2px 4px 0 0} .rec .ri span.tb.c,.rec .tb.c{background:#A3560C} .rec .ri span.tb.i,.rec .tb.i{background:#5B2C8F}
   .bkrow{border-top:1px dashed var(--rule-2);margin-top:14px;padding-top:10px} .bkrow b{font-size:14px;color:var(--ink-2)} .bkrow .btn{flex:1 1 30%}
   .recw{display:flex;gap:6px;align-items:stretch;margin-bottom:8px} .recw .rec{margin:0;flex:1 1 auto;min-width:0} .recdel{flex:0 0 auto;min-width:56px;border:1.5px solid #C62828;color:#C62828;background:var(--sheet);border-radius:12px;font-weight:700;font-size:14px;padding:0 8px} .btn.primary.danger,#dlgOk.danger{background:#C62828;border-color:#C62828;color:#fff}
   select.seg2[hidden]{display:none !important} .seg2box{margin:0} .seg2box button{min-height:48px}
@@ -105,7 +105,7 @@
   .sheet{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--sheet);color:var(--ink);border-top:3px solid var(--acc);border-radius:16px 16px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 20px rgba(0,0,0,.2);font-size:15px;max-height:65vh;overflow:auto} .sheet b{display:block;margin-bottom:6px} .sheet p{margin:0 0 12px} .sheet .btn{width:100%}
   .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:55}
   dialog{border:2px solid var(--acc);border-radius:12px;padding:16px 18px;max-width:420px;width:92vw;background:var(--sheet);color:var(--ink)} dialog::backdrop{background:rgba(0,0,0,.45)} dialog b{display:block;font-size:17px;margin-bottom:6px}
-  footer{max-width:760px;margin:0 auto;padding:0 14px 110px;color:var(--ink-3);font-size:12.5px;line-height:1.6} footer summary{cursor:pointer;font-weight:700;color:var(--ink-2)} footer ul{padding-left:18px;margin:6px 0}
+  footer{max-width:760px;margin:0 auto;padding:0 14px calc(100px + env(safe-area-inset-bottom,0px));color:var(--ink-3);font-size:12.5px;line-height:1.6} footer summary{cursor:pointer;font-weight:700;color:var(--ink-2)} footer ul{padding-left:18px;margin:6px 0}
   @media print{header.top,.bar,.prog,.actions,footer{display:none !important} main{padding:0} body{background:#fff}}
 </style>
 </head>
@@ -371,7 +371,7 @@
 <li>등급(OCRA Checklist 척도와 같음): 5 이하 최적 · 7.5 이하 허용 · 11 이하 불확실 · 14 이하 낮음 · 22.5 이하 중간 · 초과 높음.</li>
 <li>EPM 계산표와 다르게 적용하는 곳: ① 교대 540·600분에서도 휴식·식사 횟수를 뺌 ② 회복 없는 시간 9시간은 승수 3.0 ③ 회복 없는 시간이 음수면 0 ④ 분당 2.5회 미만은 빈도 0점. 해당하면 결과 화면에 표시합니다.</li>
 <li>여러 작업 평가(통합 결과): 작업 교대 간격 90분 이내는 시간 가중 평균(Occhipinti 1998, EN 1005-5), 90분 초과는 복합식(Occhipinti E, Colombini D, Occhipinti M. Med Lav 2008;99(3):234-241, EPM 멀티태스크 계산표 2014). Mini 부분점수(빈도+자세+힘+부가요인)에 첫 작업의 회복 승수와 총 반복시간의 지속시간 승수를 적용합니다.</li>
-<li>다음 단계 안내(이 도구의 규칙, OCRA 공식 규칙은 아님): Mini 점수는 그 자체로 Mini의 결과입니다. Mini 계산표의 예상 범위식으로 최댓값이 7.5 이하면 ‘추가 평가 불필요’, 7.5나 11을 걸치면 ‘추가 정밀평가 필요(OCRA Checklist 또는 Index)’, 최솟값이 11을 넘으면 ‘개선 필요 — 추가 정밀평가 필요(OCRA Index 권장)’로 안내합니다.</li>
+<li>다음 단계 안내(이 도구의 규칙, OCRA 공식 규칙은 아님): Mini 점수는 그 자체로 Mini의 결과입니다. Mini 계산표의 예상 범위식으로 최댓값이 7.5 이하면 ‘추가 평가 불필요’, 7.5나 11을 걸치면 ‘추가 정밀평가 필요(OCRA Checklist 또는 Index)’, 최솟값이 11을 넘으면 ‘개선 필요 — 추가 정밀평가 필요(OCRA Index 권장)’로 안내합니다. OCRA Checklist 결과가 7.5 이하면 기록하고 주기적으로 재평가, 7.6~11이면 재평가와 가능하면 작업 조건 개선(OCRA Index는 선택), 11을 넘으면 OCRA Index로 개선안을 설계하도록 안내합니다. EPM 계산표에는 다음 단계를 정하는 규칙이 없어, 이 순서는 실무핸드북의 단계 적용 제안을 따랐고 경계 구간의 조치는 OCRA 위험 등급표의 권고 조치(재평가, 가능하면 작업 조건 개선)를 따랐습니다.</li>
 <li>OCRA Checklist(주황): EPM OCRA Checklist 자동 계산표(2020년 10월). 프로젝트 V2 도구의 계산부를 그대로 쓰며, EPM 대조 140건 중 Checklist가 계산되는 129건이 모두 일치합니다. 어깨 자세가 ‘없음’이어도 기본 1점입니다.</li>
 <li>OCRA Index(보라): EPM OCRA Index 계산표(2017년 9월 classic). 강한 힘(Borg 5 이상) 비율이 1% 이상이면 같은 해 11월 단계 분석 계산표의 피크 힘 표로 힘 계수를 낮춥니다. 공개 사례 검산: 아이스크림 포장 11.2(사이트 11.2), Firdaus & Sahroni(E3S Web Conf 2023;426:01080) 작업자 3명.</li>
 <li>작업속도 대응: Mini ‘기계가 정하지만 버퍼로 늦출 수 있음’(1.5점) = Checklist ‘기계가 정하나 조절 가능’(1점) = Index 8점, ‘라인이 움직여 완전히 기계’ = Checklist 2점 = Index 12점.</li>
@@ -667,7 +667,7 @@ function diffs(r){ const d=[]; if(!r.ok||!r.epm) return d; const e=r.epm, sc=r.s
   return d; }
 function toolButtons(A,nx){ if(toMulti) return `<p class="help" style="margin:8px 0 0">여러 작업 평가의 Checklist·Index 연결은 다음 단계에서 지원할 예정입니다.</p>`; if(!A.complete) return `<p class="help" style="margin:8px 0 0">두 손(또는 양손) 입력이 끝나면 OCRA Checklist·Index로 이어서 평가할 수 있습니다.</p>`;
   const cs=toolSummary(D,"chk"), is=toolSummary(D,"idx"); const recC=nx.key==="chk", recI=nx.key==="idx";
-  return `<div class="toolbtns"><button type="button" class="btn gochk${recC?" rec":""}" data-tool="chk">OCRA Checklist로 추가 정밀평가${cs?`<small>완료 ${cs.score}점 · ${cs.zone}</small>`:(recC?"<small>권장</small>":"")}</button><button type="button" class="btn goidx${recI?" rec":""}" data-tool="idx">OCRA Index로 추가 정밀평가${is?`<small>완료 ${is.score} · ${is.zone}</small>`:(recI?"<small>권장</small>":"")}</button></div><p class="help" style="margin:6px 0 0">Mini에서 넣은 값은 다시 묻지 않고 추가 항목만 묻습니다.</p>`; }
+  return `<div class="toolbtns"><button type="button" class="btn gochk${recC?" pick":""}" data-tool="chk">OCRA Checklist로 추가 정밀평가${cs?`<small>완료 ${cs.score}점 · ${cs.zone}</small>`:(recC?"<small>권장</small>":"")}</button><button type="button" class="btn goidx${recI?" pick":""}" data-tool="idx">OCRA Index로 추가 정밀평가${is?`<small>완료 ${is.score} · ${is.zone}</small>`:(recI?"<small>권장</small>":"")}</button></div><p class="help" style="margin:6px 0 0">Mini에서 넣은 값은 다시 묻지 않고 추가 항목만 묻습니다.</p>`; }
 const secTag=(hh,k)=>hh[k]==="sec"?`(${hh["sec_"+k]}초)`:"";
 function postTxt(d,h,r){ const hh=d.H[h], b=sideOf(d,hh).bands; return `손 ${BAND_NAME[b.hand]}${secTag(hh,"bHand")}·어깨 ${BAND_NAME[b.sh]}${secTag(hh,"bSh")}·손목 ${BAND_NAME[b.wr]}${secTag(hh,"bWr")}·팔꿈치 ${BAND_NAME[b.el]}${secTag(hh,"bEl")}`; }
 function renderResult(){ const A=calcAll(D); const box=$("resBox"); const mc=missingCommon(D); const hs=handsOf(D);
@@ -856,7 +856,7 @@ function backToMini(){ show("wiz"); goStep(6); onInput(); }
 function renderC(){ const hs=handsOf(D); const R={}; hs.forEach(h=>R[h]=calcChk(D,h)); const miss=hs.filter(h=>!chkDone(D,h)); const ok=hs.filter(h=>R[h].ok);
   if(!ok.length){ $("cRes").innerHTML=`<p class="missing">아직 계산할 수 없습니다. C1에서 ${miss.map(h=>HAND[h]).join("·")}의 추가 항목을 넣어 주세요.</p>`; $("cAct").innerHTML=""; return; }
   const fin=ok.reduce((a,h)=>R[h].score>R[a].score?h:a,ok[0]); const F=R[fin], z=OC.czone(F.score);
-  const adv=F.score<=7.5?["허용","기록하고 주기적으로 다시 평가합니다."]:F.score<=11?["불확실","원인을 확인하려면 OCRA Index로 추가 분석을 권합니다."]:["개선 필요","OCRA Index로 요인별 원인을 따져 개선안을 정하세요."];
+  const adv=F.score<=7.5?["허용","기록하고 주기적으로 다시 평가합니다."]:F.score<=11?["불확실","다시 평가하고, 가능하면 작업 조건을 개선합니다. 개선안을 수치로 비교하려면 OCRA Index를 쓸 수 있습니다(선택)."]:["개선 필요","OCRA Index로 요인별 원인을 따져 개선안을 정하세요."];
   const rows=[["빈도(동적 / 정적 → 적용)",r=>`${r.fr.score} / ${r.stat} → <b>${r.freq}</b>${r.fr.apm!=null?`<br><small>${esc(r.fr.note)}</small>`:""}`],["자세(+정형성)",r=>`${r.post}+${r.st}`],["힘(중간+강한+최대)",r=>`${r.mod}+${r.intense}+${r.mx}`],["부가요인",r=>r.add],["합계",r=>r.partial],["× 회복 승수",r=>r.rcm],["× 지속시간 승수",r=>r.sc.du],["Checklist 점수",r=>`<b>${f1(r.score)}</b>`],["등급",r=>OC.czone(r.score).name]];
   const mini=calcAll(D);
   $("cRes").innerHTML=`<p class="help" style="margin:0">${esc(D.jobName)} · ${D.mode==="B"?"양손(대칭)":"오른손·왼손 각각"}</p>
@@ -866,7 +866,7 @@ function renderC(){ const hs=handsOf(D); const R={}; hs.forEach(h=>R[h]=calcChk(
    <div class="nextbox"><b>${adv[0]}</b>${adv[1]}</div>
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${R[h].ok?fn(R[h]):"—"}</td>`).join("")}</tr>`).join("")}</table>
    <p class="help" style="margin:6px 0 0">회복: ${esc(F.sc.unrecSrc)} ${F.sc.unrecChk}시간 · 작업속도: ${esc(PACE_NAME[D.pace]||"")}(Checklist ${F.org}점) · 어깨 자세가 ‘없음’이어도 Checklist는 기본 1점</p>`;
-  const ss=saveState(); $("cAct").innerHTML=`<button type="button" class="btn primary" id="cSave" ${ss.ok?"":"disabled"}>${ss.label}</button><button type="button" class="btn goidx" id="cToIdx">OCRA Index로 이어서</button><button type="button" class="btn" id="cBack">Mini 결과로</button>`;
+  const ss=saveState(); $("cAct").innerHTML=`<button type="button" class="btn primary" id="cSave" ${ss.ok?"":"disabled"}>${ss.label}</button><button type="button" class="btn goidx" id="cToIdx">${F&&F.score<=11?"OCRA Index로 이어서(선택)":"OCRA Index로 개선안 설계"}</button><button type="button" class="btn" id="cBack">Mini 결과로</button>`;
   $("cSave").addEventListener("click",saveRecord); $("cToIdx").addEventListener("click",()=>openTool("idx")); $("cBack").addEventListener("click",backToMini); }
 /* ---- Index 화면 ---- */
 (function buildJoints(){ const area=$("iJoints"); OC.JOINTS.forEach(J=>{ const box=document.createElement("div"); box.className="pcard"; box.innerHTML=`<div class="jh"><b>${J.name}</b><span class="help" id="ij_${J.key}"></span></div>`+J.items.map(it=>`<label class="f jit"><span class="lt">${it.label}</span><input type="number" id="ip_${it.id}" data-post="${it.id}" min="0" max="100" step="1" inputmode="decimal" placeholder="% (사이클 비율)"></label>`).join(""); area.appendChild(box); });
