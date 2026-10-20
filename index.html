@@ -64,6 +64,7 @@
   .rec .tb{display:inline-block;font-size:11.5px;font-weight:700;color:#fff;border-radius:999px;padding:1px 7px;margin:2px 4px 0 0} .rec .tb.c{background:#B5620E} .rec .tb.i{background:#5B2C8F}
   .bkrow{border-top:1px dashed var(--rule-2);margin-top:14px;padding-top:10px} .bkrow b{font-size:14px;color:var(--ink-2)} .bkrow .btn{flex:1 1 30%}
   .recw{display:flex;gap:6px;align-items:stretch;margin-bottom:8px} .recw .rec{margin:0;flex:1 1 auto;min-width:0} .recdel{flex:0 0 auto;min-width:56px;border:1.5px solid #C62828;color:#C62828;background:var(--sheet);border-radius:12px;font-weight:700;font-size:14px;padding:0 8px} .btn.primary.danger,#dlgOk.danger{background:#C62828;border-color:#C62828;color:#fff}
+  select.seg2[hidden]{display:none !important} .seg2box{margin:0} .seg2box button{min-height:48px}
   /* 선택 버튼(칩) */
   .chips{display:flex;flex-wrap:wrap;gap:8px} .chips button{flex:1 1 auto;min-height:46px;padding:8px 12px;border:1.5px solid var(--rule-2);border-radius:10px;background:var(--sheet);color:var(--ink);font-size:15px;font-weight:600;text-align:center}
   .chips button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
@@ -157,7 +158,7 @@
   <section class="card step" data-step="0">
     <h2><span class="no">0</span>작업 정보</h2>
     <label class="f"><span class="lt">작업 이름 <span class="u">(필수)</span></span><input type="text" id="jobName" placeholder="예: 아이스크림 포장" autocomplete="off"></label>
-    <label class="f"><span class="lt">반복작업인가요? <button type="button" class="tip" data-tip="정해진 작업 순서(사이클)가 반복되거나, 같은 기술동작이 근무시간의 절반 넘게 반복되면 ‘예’입니다. ‘예’가 곧 위험하다는 뜻은 아닙니다. 한 사이클 안에서 여러 동작(어깨를 쓰는 동작, 손목을 쓰는 동작 등)이 섞여 반복되어도 한 작업입니다. 하루 중 서로 다른 작업을 번갈아 하면 작업마다 따로 평가합니다.">?</button></span><select id="isRep"><option value="1">예</option><option value="0">아니요</option></select></label>
+    <label class="f"><span class="lt">반복작업인가요? <button type="button" class="tip" data-tip="정해진 작업 순서(사이클)가 반복되거나, 같은 기술동작이 근무시간의 절반 넘게 반복되면 ‘예’입니다. ‘예’가 곧 위험하다는 뜻은 아닙니다. 한 사이클 안에서 여러 동작(어깨를 쓰는 동작, 손목을 쓰는 동작 등)이 섞여 반복되어도 한 작업입니다. 하루 중 서로 다른 작업을 번갈아 하면 작업마다 따로 평가합니다.">?</button></span><select id="isRep" class="seg2"><option value="1">예</option><option value="0">아니요</option></select></label>
     <div class="note" id="notRep" hidden><b>반복작업이 아니면 OCRA 평가 대상이 아닙니다.</b> 다른 평가 방법을 쓰세요.</div>
     <div id="rep1">
     <details><summary style="font-weight:700;cursor:pointer;margin-bottom:8px">▶ 작업장 정보(선택)</summary>
@@ -181,7 +182,7 @@
     <label class="f"><span class="lt">식사 횟수 <span class="u">회</span></span><input type="number" id="mealN" min="0" step="1" inputmode="numeric" placeholder="0"></label>
     <div class="sub" id="mealBox" hidden>
       <label class="f"><span class="lt">식사 시간 <span class="u">1회, 분</span> <button type="button" class="tip" data-tip="근무시간에 포함되지 않는(무급) 식사는 30분 이상일 때만 회복으로 셉니다. 이 값은 아래 ‘그 밖의 중단’ 칸에 다시 넣지 않습니다(자동으로 셈).">?</button></span><input type="number" id="mealLen" min="0" step="5" inputmode="numeric" placeholder="60"></label>
-      <label class="f"><span class="lt">식사시간이 근무시간에 포함되나요? <button type="button" class="tip" data-tip="식사시간이 근무시간에 포함(유급)되면 ‘포함’을 고릅니다. 포함된 식사는 횟수와 관계없이 회복 1회로 셉니다.">?</button></span><select id="mealIn"><option value="0">미포함(무급)</option><option value="1">포함(유급)</option></select></label>
+      <label class="f"><span class="lt">식사시간이 근무시간에 포함되나요? <button type="button" class="tip" data-tip="식사시간이 근무시간에 포함(유급)되면 ‘포함’을 고릅니다. 포함된 식사는 횟수와 관계없이 회복 1회로 셉니다.">?</button></span><select id="mealIn" class="seg2"><option value="0">미포함(무급)</option><option value="1">포함(유급)</option></select></label>
     </div>
     <div class="row2">
       <label class="f"><span class="lt">8분 이상 휴식 <span class="u">회</span> <button type="button" class="tip" data-tip="식사시간을 뺀 휴식 가운데 8분 이상 이어지는 휴식의 횟수입니다(공식·비공식 모두). EPM 계산표: ‘점심시간 제외(excluding lunch break)’.">?</button></span><input type="number" id="break8N" min="0" step="1" inputmode="numeric" placeholder="2"></label>
@@ -198,7 +199,7 @@
     <h2><span class="no">2</span>반복(빈도) <span class="help hname" style="font-weight:500"></span></h2>
     <div class="learn">기술동작은 집기·놓기·돌리기·밀기·당기기처럼 손으로 하는 기본 조작입니다. 한 사이클에 여러 동작(어깨 동작 4회, 손목 동작 8회 등)이 섞여 있으면 그 손의 기술동작을 모두 더해서 셉니다. 셀 수 없으면 빠르기만 골라도 계산됩니다.</div>
     <label class="f"><span class="lt">같은 동작이 사이클에서 차지하는 비율 <button type="button" class="tip" data-tip="같은 기술동작이 되풀이되는 비율입니다. 사이클이 짧거나(8초 이하 3점, 9~15초 1.5점) 이 비율이 높으면(51~80% 1.5점, 80% 초과 3점) 정형성 점수가 붙습니다. 둘 중 큰 값을 씁니다.">?</button></span><select id="same"><option value="0">절반 이하</option><option value="1">절반 넘게(51~80%)</option><option value="2">거의 내내(80% 넘게)</option></select></label>
-    <label class="f"><span class="lt">기술동작 수를 셀 수 있나요? <button type="button" class="tip" data-tip="영상을 느리게 재생하거나 현장에서 한 사이클 동안 이 손의 기술동작 수를 셀 수 있으면 ‘예’를 고릅니다. 세는 쪽이 더 정확합니다.">?</button></span><select id="canCount"><option value="">— 고르세요 —</option><option value="1">예 — 사이클당 기술동작 수를 넣음</option><option value="0">아니요 — 빠르기만 고름</option></select></label>
+    <label class="f"><span class="lt">기술동작 수를 셀 수 있나요? <button type="button" class="tip" data-tip="영상을 느리게 재생하거나 현장에서 한 사이클 동안 이 손의 기술동작 수를 셀 수 있으면 ‘예’를 고릅니다. 세는 쪽이 더 정확합니다.">?</button></span><select id="canCount" class="seg2"><option value="">— 고르세요 —</option><option value="1" data-short="예(동작 수 입력)">예 — 사이클당 기술동작 수를 넣음</option><option value="0" data-short="아니요(빠르기만)">아니요 — 빠르기만 고름</option></select></label>
     <div id="taBox" class="sub" hidden>
       <label class="f"><span class="lt">사이클당 기술동작 수 <span class="u">회</span> <button type="button" class="tip" data-tip="한 사이클(사이클이 없으면 관찰 시간) 동안 이 손의 기술동작 수입니다. 힘을 쓰는 동작만이 아니라 모든 기술동작을 셉니다. 4사이클에 한 번 하는 동작은 0.25처럼 소수로 더합니다.">?</button></span><input type="number" id="taN" min="0" step="0.01" inputmode="decimal" placeholder="예: 40"></label>
       <div class="okbox" id="apmShow">분당 기술동작 수: —</div>
@@ -272,14 +273,14 @@
     <div class="note" id="mOrgWarn"></div>
     <div class="row2"><label class="f"><span class="lt">근무시간 <span class="u">시간</span> <button type="button" class="tip" data-tip="출근부터 퇴근까지, 식사시간을 포함한 교대 전체 시간입니다.">?</button></span><input type="number" id="m_shiftH" class="mo" min="0" step="any" inputmode="decimal" placeholder="예: 9"></label><label class="f"><span class="lt">비반복 작업 <span class="u">분/하루</span> <button type="button" class="tip" data-tip="청소, 자재 운반, 회의, 기계 대기 등 손을 반복해서 쓰지 않는 일의 하루 합계입니다.">?</button></span><input type="number" id="m_nonRepMin" class="mo" min="0" step="any" inputmode="decimal" placeholder="예: 20"></label></div>
     <label class="f"><span class="lt">식사 횟수 <span class="u">회</span></span><input type="number" id="m_mealN" class="mo" min="0" step="any" inputmode="decimal" placeholder="0"></label>
-    <div class="sub" id="m_mealBox" hidden><label class="f"><span class="lt">식사 시간 <span class="u">1회, 분</span> <button type="button" class="tip" data-tip="근무시간에 포함되지 않는(무급) 식사는 30분 이상일 때만 회복으로 셉니다.">?</button></span><input type="number" id="m_mealLen" class="mo" min="0" step="any" inputmode="decimal" placeholder="60"></label><label class="f"><span class="lt">식사시간이 근무시간에 포함되나요?</span><select id="m_mealIn" class="mo"><option value="0">미포함(무급)</option><option value="1">포함(유급)</option></select></label></div>
+    <div class="sub" id="m_mealBox" hidden><label class="f"><span class="lt">식사 시간 <span class="u">1회, 분</span> <button type="button" class="tip" data-tip="근무시간에 포함되지 않는(무급) 식사는 30분 이상일 때만 회복으로 셉니다.">?</button></span><input type="number" id="m_mealLen" class="mo" min="0" step="any" inputmode="decimal" placeholder="60"></label><label class="f"><span class="lt">식사시간이 근무시간에 포함되나요?</span><select id="m_mealIn" class="seg2 mo"><option value="0">미포함(무급)</option><option value="1">포함(유급)</option></select></label></div>
     <div class="row2"><label class="f"><span class="lt">8분 이상 휴식 <span class="u">회</span> <button type="button" class="tip" data-tip="식사시간을 뺀 휴식 가운데 8분 이상 이어지는 휴식의 횟수입니다.">?</button></span><input type="number" id="m_break8N" class="mo" min="0" step="any" inputmode="decimal" placeholder="2"></label><label class="f"><span class="lt">총 휴식 시간 <span class="u">분</span> <button type="button" class="tip" data-tip="식사시간을 뺀 모든 휴식의 합계입니다(8분 미만 휴식 포함).">?</button></span><input type="number" id="m_breakTotal" class="mo" min="0" step="any" inputmode="decimal" placeholder="20"></label></div>
     <label class="f"><span class="lt">그 밖의 30분 이상 중단 <span class="u">회</span> <button type="button" class="tip" data-tip="식사가 아닌, 근무시간 밖의 30분 이상 중단(예: 사업장 간 이동)의 횟수입니다. 보통 0입니다.">?</button></span><input type="number" id="m_otherBreakN" class="mo" min="0" step="any" inputmode="decimal" placeholder="0"></label>
     <div class="okbox" id="m_shiftInfo" hidden></div>
     </div>
     <h3 class="mh">▶ 평가 이름과 통합 결과</h3>
     <label class="f"><span class="lt">평가 이름</span><input type="text" id="mName" placeholder="예: 포장 라인 A조"></label>
-    <label class="f"><span class="lt">작업을 바꾸는 간격 <button type="button" class="tip" data-tip="약 1시간마다(90분 이내) 작업을 바꾸면 작업별 점수를 시간 비율로 평균합니다. 한 작업을 90분 넘게 계속하면 평균이 위험을 낮춰 보이게 하므로, 가장 힘든 작업을 기준으로 다른 작업의 부담을 더하는 복합식을 씁니다(Occhipinti·Colombini·Occhipinti 2008, EPM 멀티태스크 계산표).">?</button></span><select id="mRot"><option value="0">90분 이내마다 바꿈(시간 가중)</option><option value="1">90분 넘게 한 작업을 계속함(복합식)</option></select></label>
+    <label class="f"><span class="lt">작업을 바꾸는 간격 <button type="button" class="tip" data-tip="약 1시간마다(90분 이내) 작업을 바꾸면 작업별 점수를 시간 비율로 평균합니다. 한 작업을 90분 넘게 계속하면 평균이 위험을 낮춰 보이게 하므로, 가장 힘든 작업을 기준으로 다른 작업의 부담을 더하는 복합식을 씁니다(Occhipinti·Colombini·Occhipinti 2008, EPM 멀티태스크 계산표).">?</button></span><select id="mRot" class="seg2"><option value="0">90분 이내마다 바꿈(시간 가중)</option><option value="1">90분 넘게 한 작업을 계속함(복합식)</option></select></label>
     <div class="note" id="mWarn" hidden></div>
     <div id="mRes"></div>
     <div class="actions"><button type="button" class="btn primary" id="mSave">여러 작업 통합 결과 저장</button><button type="button" class="btn" id="mBack">목록으로</button></div>
@@ -292,10 +293,10 @@
   <div class="prog" id="cprog"></div>
   <section class="card cstep" data-c="0">
     <h2><span class="no">C1</span>추가 항목 <span class="help hname2" style="font-weight:500"></span></h2>
-    <label class="f"><span class="lt">작업 중 짧은 중단(두 손 공통) <button type="button" class="tip" data-tip="작업자가 속도를 조절해 잠깐씩 멈출 수 있으면 ‘중단 가능’입니다. 중단할 수 없으면 분당 기술동작 수가 같아도 빈도 점수가 더 높습니다(EPM Checklist 계산표의 두 빈도표).">?</button></span><select id="c_pauses"><option value="1">중단 가능</option><option value="0">중단 불가</option></select></label>
+    <label class="f"><span class="lt">작업 중 짧은 중단(두 손 공통) <button type="button" class="tip" data-tip="작업자가 속도를 조절해 잠깐씩 멈출 수 있으면 ‘중단 가능’입니다. 중단할 수 없으면 분당 기술동작 수가 같아도 빈도 점수가 더 높습니다(EPM Checklist 계산표의 두 빈도표).">?</button></span><select id="c_pauses" class="seg2"><option value="1">중단 가능</option><option value="0">중단 불가</option></select></label>
     <div class="handbar2" id="cHandBar"></div>
     <div id="cNeedCount" class="sub" hidden>
-      <div id="cFastBox" hidden><label class="f"><span class="lt">분당 70회를 넘어 셀 수 없나요? <button type="button" class="tip" data-tip="Mini에서 ‘매우 빠름(초당 1회 초과)’을 골랐습니다. Checklist는 분당 70회 초과로 셀 수 없으면 분당 72회로 계산하고, 그렇지 않으면 사이클당 기술동작 수가 필요합니다.">?</button></span><select id="c_fast"><option value="1">예 — 분당 72회로 계산</option><option value="0">아니요 — 동작 수를 셈</option></select></label></div>
+      <div id="cFastBox" hidden><label class="f"><span class="lt">분당 70회를 넘어 셀 수 없나요? <button type="button" class="tip" data-tip="Mini에서 ‘매우 빠름(초당 1회 초과)’을 골랐습니다. Checklist는 분당 70회 초과로 셀 수 없으면 분당 72회로 계산하고, 그렇지 않으면 사이클당 기술동작 수가 필요합니다.">?</button></span><select id="c_fast" class="seg2"><option value="1" data-short="예(72회로 계산)">예 — 분당 72회로 계산</option><option value="0" data-short="아니요(동작 수 셈)">아니요 — 동작 수를 셈</option></select></label></div>
       <div id="cTaBox"><label class="f"><span class="lt">사이클당 기술동작 수 <span class="u">회</span> <button type="button" class="tip" data-tip="Mini에서 빠르기만 골랐기 때문에 Checklist는 실제 기술동작 수가 필요합니다. 한 사이클 동안 이 손의 기술동작을 모두 셉니다.">?</button></span><input type="number" id="c_taN" min="0" step="0.01" inputmode="decimal" placeholder="예: 40"></label><div class="okbox" id="cApm" hidden></div></div>
     </div>
     <label class="f"><span class="lt">정적 동작(물체를 5초 넘게 계속 쥠) 비율 <button type="button" class="tip" data-tip="물체를 5초 넘게 계속 쥐고 있는 시간이 사이클에서 차지하는 비율입니다. 약 2/3면 2.5점, 거의 내내면 4.5점이며 빈도 점수와 비교해 큰 값을 씁니다.">?</button></span><select id="c_static"><option value="0">거의 없음</option><option value="1">약 2/3(51~80%)</option><option value="2">거의 내내(80% 넘게)</option></select></label>
@@ -303,7 +304,7 @@
     <p class="help" id="cNoPeak" hidden>Mini에서 강한 힘(Borg 5 이상)이 ‘없음’이라 Borg 8 이상 비율은 묻지 않습니다.</p>
     <details class="more"><summary>회복 시간을 더 정확하게(선택, 두 손 공통)</summary>
       <label class="f" style="margin-top:8px"><span class="lt">회복 없는 시간 직접 입력 <span class="u">시간</span> <button type="button" class="tip" data-tip="근무 시간표에서 1시간마다 8~10분 휴식이 없는 시간을 0.5시간 단위로 센 값입니다. 넣으면 휴식 횟수 대신 이 값을 씁니다(Checklist·Index에만 적용).">?</button></span><input type="number" id="c_unrec" class="xunrec" min="0" max="9" step="0.5" inputmode="decimal" placeholder="비우면 휴식 횟수로 계산"></label>
-      <label class="f"><span class="lt">사이클 안에 회복이 있나요? <button type="button" class="tip" data-tip="매 사이클 10초 넘게 이어지는 휴지가 있고 작업:휴지 비가 6.5:1 이하이면 ‘예’입니다(예: 기계 가공 30초 동안 대기). ‘예’면 회복 없는 시간을 0으로 봅니다.">?</button></span><select id="c_incycle" class="xincycle"><option value="0">아니요</option><option value="1">예</option></select></label>
+      <label class="f"><span class="lt">사이클 안에 회복이 있나요? <button type="button" class="tip" data-tip="매 사이클 10초 넘게 이어지는 휴지가 있고 작업:휴지 비가 6.5:1 이하이면 ‘예’입니다(예: 기계 가공 30초 동안 대기). ‘예’면 회복 없는 시간을 0으로 봅니다.">?</button></span><select id="c_incycle" class="seg2 xincycle"><option value="0">아니요</option><option value="1">예</option></select></label>
     </details>
   </section>
   <section class="card cstep" data-c="1" hidden>
@@ -349,7 +350,7 @@
     <p class="help" id="iPace"></p>
     <details class="more"><summary>회복 시간을 더 정확하게(선택, 두 손 공통)</summary>
       <label class="f" style="margin-top:8px"><span class="lt">회복 없는 시간 직접 입력 <span class="u">시간</span></span><input type="number" id="i_unrec" class="xunrec" min="0" max="9" step="0.5" inputmode="decimal" placeholder="비우면 휴식 횟수로 계산"></label>
-      <label class="f"><span class="lt">사이클 안에 회복이 있나요?</span><select id="i_incycle" class="xincycle"><option value="0">아니요</option><option value="1">예</option></select></label>
+      <label class="f"><span class="lt">사이클 안에 회복이 있나요?</span><select id="i_incycle" class="seg2 xincycle"><option value="0">아니요</option><option value="1">예</option></select></label>
     </details>
   </section>
   <section class="card istep" data-i="3" hidden>
@@ -677,7 +678,7 @@ function renderResult(){ const A=calcAll(D); const box=$("resBox"); const mc=mis
    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px"><span class="resval">${f1(F.score)}<span style="font-size:18px;font-weight:700">점</span></span><span class="zone" style="background:var(--${z.color})">${z.name}</span></div>
    <p class="help" style="margin:6px 0 0">${D.mode==="B"?"양손":`최종 = 높은 쪽(${HAND[A.fin]})`} · Mini 점수로 본 예상 범위(Checklist 척도) ${f1(A.rng.min)}~${f1(A.rng.max)}</p>${bandHTML(F.score)}
    ${A.complete?"":`<div class="note"><b>아직 저장할 수 없습니다.</b> ${miss.map(esc).join(" / ")}</div>`}
-   <div class="nextbox"><b>다음 단계: ${nx.label}</b>${nx.text}${toolButtons(A,nx)}</div>
+   <div class="nextbox"><b>다음 단계: ${nx.label}</b>${toolButtons(A,nx)}</div>
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${cell(h,fn)}</td>`).join("")}</tr>`).join("")}</table>
    ${hs.map(h=>A.res[h].ok?`<p class="help" style="margin:6px 0 0">${HAND[h]} 자세: ${postTxt(D,h,A.res[h])}</p>`:"").join("")}
    <p class="help" style="margin:6px 0 0">공통: 회복 없는 시간 ${s.unrec}시간 · 순 반복작업 ${s.net}분 · 작업속도 ${F.org}점(부가요인에 포함)</p>
@@ -773,7 +774,7 @@ function calcMulti(){ const box=$("mRes"), warn=$("mWarn"); const org=orgOf(M.or
   const slow=M.rot==="1"; const val=h=>slow?out[h].complex:out[h].fast, rg=h=>slow?out[h].rangeComplex:out[h].rangeFast; const fin=val("R")>=val("L")?"R":"L";
   const v=val(fin), z=OCM.czone(v); const rng={ok:true,min:Math.max(rg("R").min,rg("L").min),max:Math.max(rg("R").max,rg("L").max)}; const nx=OCM.nextStep(rng);
   box.innerHTML=`<h2 style="margin-top:14px">여러 작업 통합 결과</h2><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px"><span class="resval">${f1(v)}<span style="font-size:18px;font-weight:700">점</span></span><span class="zone" style="background:var(--${z.color})">${z.name}</span></div>
-   <p class="help" style="margin:6px 0 0">최종 = 높은 쪽(${HAND[fin]}) · ${slow?"복합식(90분 초과 교대)":"시간 가중(90분 이내 교대)"} · 예상 범위 ${f1(rng.min)}~${f1(rng.max)}</p>${bandHTML(v)}<div class="nextbox"><b>다음 단계: ${nx.label}</b>${nx.text}</div>
+   <p class="help" style="margin:6px 0 0">최종 = 높은 쪽(${HAND[fin]}) · ${slow?"복합식(90분 초과 교대)":"시간 가중(90분 이내 교대)"} · 예상 범위 ${f1(rng.min)}~${f1(rng.max)}</p>${bandHTML(v)}<div class="nextbox"><b>다음 단계: ${nx.label}</b></div>
    <table class="kv"><tr><th></th><th>오른손</th><th>왼손</th></tr><tr><td>통합 점수</td><td class="n">${f1(val("R"))}</td><td class="n">${f1(val("L"))}</td></tr><tr><td>등급</td><td class="n">${OCM.czone(val("R")).name}</td><td class="n">${OCM.czone(val("L")).name}</td></tr><tr><td>다른 식이면</td><td class="n">${f1(slow?out.R.fast:out.R.complex)}</td><td class="n">${f1(slow?out.L.fast:out.L.complex)}</td></tr>
    ${V.map(t=>`<tr><td>${esc(t.name)} ${t.min}분 <small>${t.d.mode==="B"?"(양손)":""}</small></td><td class="n">${f1(out.R.own.find(o=>o.name===t.name)?.own)}</td><td class="n">${f1(out.L.own.find(o=>o.name===t.name)?.own)}</td></tr>`).join("")}
    <tr><td>총 반복시간 ${r0.total}분 → 지속시간 승수 · 회복 승수</td><td class="n" colspan="2">${r0.duT} · ${r0.rcm}</td></tr></table><p class="help" style="margin:4px 0 0">작업 줄의 숫자는 그 작업만 자기 시간 동안 했을 때의 단독 점수입니다.</p>`;
@@ -957,6 +958,12 @@ window.addEventListener("popstate",()=>{ if(navSkip){ navSkip=false; return; } n
   if(view==="multi"){ show("home"); return; } });
 $("newBtn").addEventListener("click",()=>{ const dr=store.get(KEY_DRAFT,null); if(dr&&dr.d&&(dr.d.jobName||dr.d.shiftH)) dialog("작성 중인 평가가 있습니다","새로 시작하면 작성 중이던 내용은 지워집니다. 새로 시작할까요?",newEval); else newEval(); });
 $("resumeBtn").addEventListener("click",()=>{ const dr=store.get(KEY_DRAFT,null); if(!dr){ toast("작성 중인 평가가 없습니다."); return; } D=upgrade(dr.d||{}); editId=dr.editId||null; { const r0=editId&&recs().find(x=>x.id===editId); baseSnap=r0?snapOf(upgrade(r0.inputs)):null; } paintAll(); show("wiz"); goStep(Math.min(6,dr.step||0)); onInput(); if(dr.view==="chk"||dr.view==="idx"){ ciHand=dr.ciHand||firstHand(D); if(dr.view==="chk"){ cStep=dr.cStep||0; show("chk"); paintC(); } else { iStep=dr.iStep||0; show("idx"); paintI(); } } });
+/* ---- 두 가지 중 하나를 고르는 질문: 목록 대신 버튼 두 개(선택된 것만 색) ---- */
+function buildSeg2(){ document.querySelectorAll("select.seg2").forEach(s=>{ if(s._seg) return; const opts=[...s.options].filter(o=>o.value!==""); if(/^아니요/.test(opts[0].textContent)) opts.reverse();
+  const box=document.createElement("div"); box.className="chips seg2box"+(opts.some(o=>(o.dataset.short||o.textContent).length>12)?" col":""); box.innerHTML=opts.map(o=>`<button type="button" data-v="${o.value}">${o.dataset.short||o.textContent}</button>`).join("");
+  box.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{ s.value=b.dataset.v; s.dispatchEvent(new Event("input",{bubbles:true})); s.dispatchEvent(new Event("change",{bubbles:true})); syncSegs(); }));
+  s.after(box); s.hidden=true; s._seg=box; }); syncSegs(); }
+function syncSegs(){ document.querySelectorAll("select.seg2").forEach(s=>{ if(s._seg) s._seg.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===s.value))); }); }
 /* ---- 스마트폰 키보드: 초점 받은 입력 칸을 머리(고정)와 키보드 사이 보이는 곳으로 올림 ---- */
 const KB_SEL='input[type=text],input[type=number],input[type=password],input:not([type]),textarea';
 function keepVisible(el){ if(document.activeElement!==el) return; const vv=window.visualViewport; const vTop=vv?vv.offsetTop:0, vH=vv?vv.height:window.innerHeight;
@@ -968,6 +975,7 @@ document.addEventListener("focusin",e=>{ const el=e.target; if(!(el instanceof E
 document.addEventListener("focusout",e=>{ const el=e.target; if(!(el instanceof Element)||!el.matches(KB_SEL)) return; setTimeout(()=>{ const a=document.activeElement; if(!(a instanceof Element)||!a.matches(KB_SEL)) document.body.classList.remove("kb"); },150); });
 if(window.visualViewport) window.visualViewport.addEventListener("resize",()=>{ const a=document.activeElement; if(a instanceof Element&&a.matches(KB_SEL)) setTimeout(()=>keepVisible(a),30); });
 window.addEventListener("resize",()=>{ const a=document.activeElement; if(a instanceof Element&&a.matches(KB_SEL)) setTimeout(()=>keepVisible(a),30); });
+buildSeg2(); ["paintAll","onInput","paintC","paintI","paintMOrg","renderMulti"].forEach(n=>{ const f=window[n]; if(typeof f==="function") window[n]=function(){ const r=f.apply(this,arguments); syncSegs(); return r; }; });
 buildFields(); paintAll(); renderProg(); show("home");
 </script>
 </body>
