@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#1E6B4A">
 <title>OCRA Mini-Checklist</title>
 <!--
@@ -45,6 +45,9 @@
   .hchips button{flex:1 1 30%;min-height:52px;font-size:15px} .hchips button small{display:block;font-size:11.5px;font-weight:600;line-height:1.3}
   table.kv th{font-size:12.5px;color:var(--ink-2);text-align:right;padding:4px;border-bottom:1px solid var(--rule-2)} table.kv th:first-child{text-align:left} table.kv td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
   .badge{display:inline-block;font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:6px;background:var(--warn-bg);color:var(--warn-ink)}
+  /* 키보드가 열렸을 때(입력 칸에 초점): 알림을 숨기고, 아래쪽 여백을 늘려 마지막 칸도 키보드 위로 올라오게 함 */
+  input,textarea,select{scroll-margin-top:96px;scroll-margin-bottom:24px}
+  body.kb #toast{display:none !important} body.kb main{padding-bottom:60vh} body.kb dialog[open]{margin:12px auto auto}
   /* 선택 버튼(칩) */
   .chips{display:flex;flex-wrap:wrap;gap:8px} .chips button{flex:1 1 auto;min-height:46px;padding:8px 12px;border:1.5px solid var(--rule-2);border-radius:10px;background:var(--sheet);color:var(--ink);font-size:15px;font-weight:600;text-align:center}
   .chips button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#fff}
@@ -620,6 +623,17 @@ $("nextBtn").addEventListener("click",()=>{ if(step===0&&!$("jobName").value.tri
 $("homeBtn").addEventListener("click",()=>{ if(view==="wiz"&&toMulti){ dialog("작업 입력을 그만둘까요?","넣지 않은 입력은 여러 작업 평가에 반영하지 않고 돌아갑니다.",()=>{ show("multi"); }); return; } if(view==="wiz") saveDraft(); show("home"); });
 $("newBtn").addEventListener("click",()=>{ const dr=store.get(KEY_DRAFT,null); if(dr&&dr.d&&(dr.d.jobName||dr.d.shiftH)) dialog("작성 중인 평가가 있습니다","새로 시작하면 작성 중이던 내용은 지워집니다. 새로 시작할까요?",newEval); else newEval(); });
 $("resumeBtn").addEventListener("click",()=>{ const dr=store.get(KEY_DRAFT,null); if(!dr){ toast("작성 중인 평가가 없습니다."); return; } D=upgrade(dr.d||{}); editId=dr.editId||null; paintAll(); show("wiz"); goStep(Math.min(6,dr.step||0)); onInput(); });
+/* ---- 스마트폰 키보드: 초점 받은 입력 칸을 머리(고정)와 키보드 사이 보이는 곳으로 올림 ---- */
+const KB_SEL='input[type=text],input[type=number],input[type=password],input:not([type]),textarea';
+function keepVisible(el){ if(document.activeElement!==el) return; const vv=window.visualViewport; const vTop=vv?vv.offsetTop:0, vH=vv?vv.height:window.innerHeight;
+  const inDlg=el.closest("dialog"); const head=inDlg?0:document.querySelector("header.top").getBoundingClientRect().bottom; const bar=$("bar"); let barTop=Infinity; if(!inDlg&&bar&&!bar.hidden){ const br=bar.getBoundingClientRect(); if(br.top<vTop+vH) barTop=br.top; } const top=Math.max(vTop,head)+8, bot=Math.min(vTop+vH,barTop)-12;
+  const box=(el.closest("label.f")||el).getBoundingClientRect(), r=el.getBoundingClientRect(); const need=box.top<top||r.bottom>bot;
+  if(!need) return; const want=top+Math.max(0,(bot-top)*0.18); const dy=(r.bottom-box.top>bot-top)?(r.bottom-bot):(box.top-want);
+  const sc=inDlg||null; if(sc&&sc.scrollHeight>sc.clientHeight) sc.scrollTop+=dy; else window.scrollBy({top:dy,left:0,behavior:"auto"}); }
+document.addEventListener("focusin",e=>{ const el=e.target; if(!(el instanceof Element)||!el.matches(KB_SEL)) return; document.body.classList.add("kb"); [60,300,600].forEach(t=>setTimeout(()=>keepVisible(el),t)); });
+document.addEventListener("focusout",e=>{ const el=e.target; if(!(el instanceof Element)||!el.matches(KB_SEL)) return; setTimeout(()=>{ const a=document.activeElement; if(!(a instanceof Element)||!a.matches(KB_SEL)) document.body.classList.remove("kb"); },150); });
+if(window.visualViewport) window.visualViewport.addEventListener("resize",()=>{ const a=document.activeElement; if(a instanceof Element&&a.matches(KB_SEL)) setTimeout(()=>keepVisible(a),30); });
+window.addEventListener("resize",()=>{ const a=document.activeElement; if(a instanceof Element&&a.matches(KB_SEL)) setTimeout(()=>keepVisible(a),30); });
 buildFields(); paintAll(); renderProg(); show("home");
 </script>
 </body>
