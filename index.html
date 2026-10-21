@@ -323,6 +323,7 @@
     <h2><span class="no">C2</span>OCRA Checklist 결과</h2>
     <div id="cRes"></div>
     <div class="actions" id="cAct"></div>
+    <div id="cNextSlot"></div>
   </section>
   <div class="bar" id="cbar"><div class="sc"><small id="cbarT">OCRA Checklist</small><b id="cbarV">—</b><span class="z" id="cbarZ">입력 중</span></div><button type="button" id="cPrev">이전</button><button type="button" class="primary" id="cNext">다음</button></div>
 </main>
@@ -371,6 +372,7 @@
     <h2><span class="no">I4</span>OCRA Index 결과</h2>
     <div id="iRes"></div>
     <div class="actions" id="iAct"></div>
+    <div id="iNextSlot"></div>
   </section>
   <div class="bar" id="ibar"><div class="sc"><small id="ibarT">OCRA Index</small><b id="ibarV">—</b><span class="z" id="ibarZ">입력 중</span></div><button type="button" id="iPrev">이전</button><button type="button" class="primary" id="iNext">다음</button></div>
 </main>
@@ -963,7 +965,7 @@ function fxIdx(R,fin){ const hs=tHands(D); let b="";
   if(hs.length>1) b+=fxL(`최종 = 두 손 중 높은 값 = <b>${fI(R[fin].idxE)}</b>`,1);
   return fxBox("idx","계산 수식 보기",b+`<p class="fxs">기준: EPM OCRA Index classic 계산표(2017-09-01), 강한 힘 비율은 단계 분석 계산표(2017-11-07)의 피크 힘 표. 표시값은 반올림했으므로 곱한 결과와 끝자리가 조금 다를 수 있습니다.</p>`); }
 function renderC(){ const hs=tHands(D); const R={}; hs.forEach(h=>R[h]=calcChk(D,h)); const miss=hs.filter(h=>!chkDone(D,h)); const ok=hs.filter(h=>R[h].ok);
-  if(!ok.length){ $("cRes").innerHTML=`<p class="missing">아직 계산할 수 없습니다. C1에서 ${miss.map(h=>HAND[h]).join("·")}의 추가 항목을 넣어 주세요.</p>`; $("cAct").innerHTML=""; return; }
+  if(!ok.length){ $("cRes").innerHTML=`<p class="missing">아직 계산할 수 없습니다. C1에서 ${miss.map(h=>HAND[h]).join("·")}의 추가 항목을 넣어 주세요.</p>`; $("cAct").innerHTML=""; $("cNextSlot").innerHTML=""; return; }
   const fin=ok.reduce((a,h)=>R[h].score>R[a].score?h:a,ok[0]); const F=R[fin], z=OC.czone(F.score);
   const adv=F.score<=7.5?["허용","기록하고 주기적으로 다시 평가합니다."]:F.score<=11?["불확실","다시 평가하고, 가능하면 작업 조건을 개선합니다. 개선안을 수치로 비교하려면 OCRA Index를 쓸 수 있습니다(선택)."]:["개선 필요","OCRA Index로 요인별 원인을 따져 개선안을 정하세요."];
   const rows=[["빈도(동적 / 정적 → 적용)",r=>`${r.fr.score} / ${r.stat} → <b>${r.freq}</b>${r.fr.apm!=null?`<br><small>${esc(r.fr.note)}</small>`:""}`],["자세(+정형성)",r=>`${r.post}+${r.st}`],["힘(중간+강한+최대)",r=>`${r.mod}+${r.intense}+${r.mx}`],["부가요인",r=>r.add],["합계",r=>r.partial],["× 회복 승수",r=>r.rcm],["× 지속시간 승수",r=>r.sc.du],["Checklist 점수",r=>`<b>${f1(r.score)}</b>`],["등급",r=>OC.czone(r.score).name]];
@@ -972,11 +974,10 @@ function renderC(){ const hs=tHands(D); const R={}; hs.forEach(h=>R[h]=calcChk(D
    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px"><span class="resval">${f1(F.score)}<span style="font-size:18px;font-weight:700">점</span></span><span class="zone" style="background:var(--${z.color})">${z.name}</span></div>
    <p class="help" style="margin:6px 0 0">${D.mode==="B"?"양손":`최종 = 높은 쪽(${HAND[fin]})`} · 참고: Mini ${mini.fin?f1(mini.res[mini.fin].score)+"점":"—"}</p>${bandHTML(F.score)}
    ${miss.length?`<div class="note"><b>아직 저장되지 않는 손이 있습니다.</b> ${miss.map(h=>HAND[h]).join("·")}의 C1 추가 항목을 확인하세요.</div>`:""}
-   <div class="nextbox"><b>${adv[0]}</b>${adv[1]}</div>
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${R[h].ok?fn(R[h]):"—"}</td>`).join("")}</tr>`).join("")}</table>
    <p class="help" style="margin:6px 0 0">회복: ${esc(F.sc.unrecSrc)} ${F.sc.unrecChk}시간 · 작업속도: ${esc(PACE_NAME[D.pace]||"")}(Checklist ${F.org}점) · 어깨 자세가 ‘없음’이어도 Checklist는 기본 1점</p>${fxChk(R,fin)}`;
   const ss=saveState(); $("cAct").innerHTML=`<button type="button" class="btn primary" id="cSave" ${ss.ok?"":"disabled"}>${ss.label}</button><button type="button" class="btn goidx" id="cToIdx">${F&&F.score<=11?"OCRA Index로 이어서(선택)":"OCRA Index로 개선안 설계"}</button><button type="button" class="btn" id="cBack">Mini 결과로</button>`;
-  $("cSave").addEventListener("click",saveRecord); $("cToIdx").addEventListener("click",()=>openTool("idx")); $("cBack").addEventListener("click",backToMini); }
+  $("cNextSlot").innerHTML=`<div class="nextbox"><b>${adv[0]}</b>${adv[1]}</div>`; $("cSave").addEventListener("click",saveRecord); $("cToIdx").addEventListener("click",()=>openTool("idx")); $("cBack").addEventListener("click",backToMini); }
 /* ---- Index 화면 ---- */
 (function buildJoints(){ const area=$("iJoints"); OC.JOINTS.forEach(J=>{ const box=document.createElement("div"); box.className="pcard"; box.innerHTML=`<div class="jh"><b>${J.name}</b><span class="help" id="ij_${J.key}"></span></div>`+J.items.map(it=>`<label class="f jit"><span class="lt">${it.label}</span><input type="number" id="ip_${it.id}" data-post="${it.id}" min="0" max="100" step="1" inputmode="decimal" placeholder="% (사이클 비율)"></label>`).join(""); area.appendChild(box); });
   $("iAF").innerHTML=AF_IDX.map(([k,n])=>`<label class="f"><span class="lt">${n}</span><select id="ia_${k}" data-af="${k}">${AF_LV.map(([v,t])=>`<option value="${v}">${t}</option>`).join("")}</select></label>`).join(""); })();
@@ -1077,7 +1078,7 @@ function improveHTML(hs,R,ok,fin){ const order=[fin,...ok.filter(h=>h!==fin)]; i
     return (hs.length>1?`<div class="imphand">${HAND[h]}</div>`:"")+(inner||`<p class="fxs" style="margin:4px 0 0">점수를 낮출 개선 대상이 없습니다.</p>`); }).join("");
   return `<div class="imp"><strong class="imph">개선방안</strong>${body}<p class="fxs" style="margin:6px 0 0">결과를 낮추는 항목만, 효과가 큰 순서로 적었습니다. 대책은 실무핸드북의 위험 저감 대책(ISO 11228-3)에서 가져왔습니다.</p></div>`; }
 function renderI(){ const hs=tHands(D); const R={}; hs.forEach(h=>R[h]=calcIdx(D,h)); const ok=hs.filter(h=>R[h].ok); const miss=hs.filter(h=>!idxDone(D,h));
-  if(!ok.length){ const why=hs.map(h=>{ const x=D.H[h].idx, s=idxSide(D,h); const m=[]; if(!x.estOK) m.push("I1 추정값 확인"); if(s.taN==null) m.push("기술동작 수"); if(s.borg==null) m.push("I2 평균 Borg"); return `${HAND[h]}: ${m.join(", ")||"입력 확인"}`; }); $("iRes").innerHTML=`<p class="missing">아직 계산할 수 없습니다.</p><ul>${why.map(t=>`<li>${t}</li>`).join("")}</ul>`; $("iAct").innerHTML=""; return; }
+  if(!ok.length){ const why=hs.map(h=>{ const x=D.H[h].idx, s=idxSide(D,h); const m=[]; if(!x.estOK) m.push("I1 추정값 확인"); if(s.taN==null) m.push("기술동작 수"); if(s.borg==null) m.push("I2 평균 Borg"); return `${HAND[h]}: ${m.join(", ")||"입력 확인"}`; }); $("iRes").innerHTML=`<p class="missing">아직 계산할 수 없습니다.</p><ul>${why.map(t=>`<li>${t}</li>`).join("")}</ul>`; $("iAct").innerHTML=""; $("iNextSlot").innerHTML=""; return; }
   const fin=ok.reduce((a,h)=>R[h].idxE>R[a].idxE?h:a,ok[0]); const F=R[fin], z=OC.izone(F.idxE);
   const adv=F.idxE<=2.2?["허용","기록하고 주기적으로 다시 평가합니다."]:F.idxE<=3.5?["경계","개선을 권합니다. 아래 개선방안을 참고하세요."]:F.idxE<=9?["개선 필요","아래 개선방안으로 개선하고 다시 평가합니다."]:["즉시 개선","아래 개선방안으로 바로 개선하고 다시 평가합니다."];
   const rows=[["실제 기술동작 수(ATA, 회/분)",r=>fA(r.ata)],["허용 기술동작 수(RTA, 회/분)",r=>fS(r.rtaE)],["힘 계수",r=>f2(r.ffEpm)],["자세 계수",r=>f2(r.pEpm)],["반복성 계수",r=>`${f2(r.rf)}${r.remAuto?"(자동)":""}`],["부가요인 계수",r=>f2(r.aEpm)],["회복 계수",r=>f2(r.rc)],["지속시간 계수",r=>f2(r.dc)],["OCRA Index",r=>`<b>${fI(r.idxE)}</b>`],["등급",r=>OC.izone(r.idxE).name],["예측 유병률",r=>r.pa?`${f1(r.pa[0])}~${f1(r.pa[2])}%`:"지수 2.2 이하"]];
@@ -1087,11 +1088,10 @@ function renderI(){ const hs=tHands(D); const R={}; hs.forEach(h=>R[h]=calcIdx(D
    <p class="help" style="margin:6px 0 0">${D.mode==="B"?"양손":`최종 = 높은 쪽(${HAND[fin]})`} · Index 등급: 2.2 이하 허용 · 3.5 이하 경계 · 4.5 이하 낮음 · 9 이하 중간 · 초과 높음</p>${bandIdxHTML(F.idxE)}
    ${miss.length?`<div class="note"><b>아직 저장되지 않는 손이 있습니다.</b> ${miss.map(h=>HAND[h]).join("·")}: I1~I3을 확인하세요.</div>`:""}
    ${isFinite(F.idxE)?"":`<div class="note"><b>Index 계산 불가</b> 평균 Borg 점수가 5를 넘어 EPM 계산표의 힘 계수가 0이 됩니다. 허용 기술동작 수가 0이라 Index 값을 낼 수 없습니다. 힘이 지나치게 커서 즉시 개선이 필요한 상태입니다.</div>`}
-   <div class="nextbox"><b>${adv[0]}</b>${adv[1]}${improveHTML(hs,R,ok,fin)}</div>
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${R[h].ok?fn(R[h]):"—"}</td>`).join("")}</tr>`).join("")}</table>
    <p class="help" style="margin:6px 0 0">계수가 작을수록 그 요인이 허용 기술동작 수를 많이 줄입니다.</p>${notes.map(t=>`<div class="note">${t}</div>`).join("")}${fxIdx(R,fin)}`;
   const ss=saveState(); $("iAct").innerHTML=`<button type="button" class="btn primary" id="iSave" ${ss.ok?"":"disabled"}>${ss.label}</button><button type="button" class="btn" id="iBack">Mini 결과로</button>`;
-  $("iSave").addEventListener("click",saveRecord); $("iBack").addEventListener("click",backToMini); }
+  $("iNextSlot").innerHTML=`<div class="nextbox"><b>${adv[0]}</b>${adv[1]}${improveHTML(hs,R,ok,fin)}</div>`; $("iSave").addEventListener("click",saveRecord); $("iBack").addEventListener("click",backToMini); }
 function bandIdxHTML(v){ const pos=OCM.bandPos(v); return `<div class="band">${["z1","z2","z3","z4","z5","z6"].map(c=>`<i style="background:var(--${c})"></i>`).join("")}<div class="marker" style="left:${pos}%"></div></div><div class="ticks"><span>0</span><span>1.5</span><span>2.2</span><span>3.5</span><span>4.5</span><span>9+</span></div>`; }
 
 /* ---- 백업(아이폰 고려): 공유 창으로 보내기, 글자로 복사·붙여넣기로 불러오기 ---- */
