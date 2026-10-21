@@ -260,6 +260,7 @@
     <h2><span class="no">6</span>결과</h2>
     <div id="resBox"></div>
     <div class="actions" id="resActions"></div>
+    <div id="nextSlot"></div>
     <div class="dbg" id="dbg" hidden></div>
   </section>
 
@@ -675,14 +676,14 @@ function diffs(r){ const d=[]; if(!r.ok||!r.epm) return d; const e=r.epm, sc=r.s
   else if(e.err==="E") d.push(`휴식·식사·중단 횟수(${sc.breaks}회)가 교대 기준값(${sc.base}시간)보다 많아 EPM 계산표에서는 오류가 납니다. 이 앱은 회복 없는 시간 0(승수 1.00)으로 계산했습니다.`);
   else if(Math.abs(e.score-r.score)>1e-9){ const why=[]; if(sc.shiftMin>=540&&sc.breaks>0) why.push(`교대 ${sc.shiftMin}분에서 휴식·식사 횟수를 빼지 않음`); if(e.unrec>=9) why.push("회복 없는 시간 9시간을 2.5로 계산"); d.push(`EPM 계산표 그대로라면 ${f1(e.score)}점입니다(${why.join(", ")}). 이 앱은 회복 없는 시간 ${sc.unrec}시간(승수 ${sc.rcm})으로 계산해 ${f1(r.score)}점입니다.`); }
   return d; }
-function toolButtons(A,nx){ if(toMulti) return `<p class="help" style="margin:8px 0 0">여러 작업 평가의 Checklist·Index 연결은 다음 단계에서 지원할 예정입니다.</p>`; if(!A.complete) return `<p class="help" style="margin:8px 0 0">두 손(또는 양손) 입력이 끝나면 OCRA Checklist·Index로 이어서 평가할 수 있습니다.</p>`;
+function toolButtons(A,nx){ if(toMulti) return `<p class="help" style="margin:8px 0 0">여러 작업 평가의 Checklist·Index 연결은 다음 단계에서 지원할 예정입니다.</p>`; if(!A.rng.ok) return `<p class="help" style="margin:8px 0 0">Mini 입력이 끝나면 OCRA Checklist·Index로 이어서 평가할 수 있습니다.</p>`; const oneH=!A.complete&&D.mode==="RL"?tHands(D):null;
   const cs=toolSummary(D,"chk"), is=toolSummary(D,"idx"); const recC=nx.key==="chk", recI=nx.key==="idx";
-  return `<div class="toolbtns"><button type="button" class="btn gochk${recC?" pick":""}" data-tool="chk">OCRA Checklist로 정밀평가${!cs&&recC?" 권장":""}${cs?`<small>완료 ${cs.score}점 · ${cs.zone}</small>`:""}</button><button type="button" class="btn goidx${recI?" pick":""}" data-tool="idx">OCRA Index로 정밀평가${!is&&recI?" 권장":""}${is?`<small>완료 ${is.score==null?"계산 불가":is.score} · ${is.zone}</small>`:""}</button></div><p class="help" style="margin:6px 0 0">Mini에서 넣은 값은 다시 묻지 않고 추가 항목만 묻습니다.</p>`; }
+  return `<div class="toolbtns"><button type="button" class="btn gochk${recC?" pick":""}" data-tool="chk">OCRA Checklist로 정밀평가${!cs&&recC?" 권장":""}${cs?`<small>완료 ${cs.score}점 · ${cs.zone}</small>`:""}</button><button type="button" class="btn goidx${recI?" pick":""}" data-tool="idx">OCRA Index로 정밀평가${!is&&recI?" 권장":""}${is?`<small>완료 ${is.score==null?"계산 불가":is.score} · ${is.zone}</small>`:""}</button></div><p class="help" style="margin:6px 0 0">Mini에서 넣은 값은 다시 묻지 않고 추가 항목만 묻습니다.${oneH&&oneH.length===1?` 지금은 ${HAND[oneH[0]]}만 입력되어 있어 ${HAND[oneH[0]]}만 정밀평가합니다(EPM: 부담이 큰 쪽 팔만 평가해도 됨).`:""}</p>`; }
 const secTag=(hh,k)=>hh[k]==="sec"?`(${hh["sec_"+k]}초)`:"";
 function postTxt(d,h,r){ const hh=d.H[h], b=sideOf(d,hh).bands; return `손 ${BAND_NAME[b.hand]}${secTag(hh,"bHand")}·어깨 ${BAND_NAME[b.sh]}${secTag(hh,"bSh")}·손목 ${BAND_NAME[b.wr]}${secTag(hh,"bWr")}·팔꿈치 ${BAND_NAME[b.el]}${secTag(hh,"bEl")}`; }
 function renderResult(){ const A=calcAll(D); const box=$("resBox"); const mc=missingCommon(D); const hs=handsOf(D);
   const miss=[...mc]; hs.forEach(h=>{ const m=missingHand(D,h); if(m.length) miss.push(`${HAND[h]}: ${m.join(", ")}`); });
-  if(!A.fin){ box.innerHTML=`<p class="missing">아직 계산할 수 없습니다. 다음을 넣어 주세요:</p><ul>${miss.map(x=>`<li>${x}</li>`).join("")}</ul>`; renderActions(A,miss); $("dbg").hidden=true; return; }
+  if(!A.fin){ box.innerHTML=`<p class="missing">아직 계산할 수 없습니다. 다음을 넣어 주세요:</p><ul>${miss.map(x=>`<li>${x}</li>`).join("")}</ul>`; $("nextSlot").innerHTML=""; renderActions(A,miss); $("dbg").hidden=true; return; }
   const F=A.res[A.fin], z=OCM.czone(F.score), nx=OCM.nextStep(A.rng), s=F.sc;
   const col=h=>A.res[h].ok?A.res[h]:null; const cell=(h,fn)=>{ const r=col(h); return r?fn(r):"—"; };
   const rows=[["빈도",r=>`${r.fr.score}${r.fr.apm!=null?`<br><small>${f1(r.fr.apm)}회/분</small>`:""}`],["자세(+정형성)",r=>`${r.post}+${r.st}`],["힘",r=>r.force],["부가요인",r=>r.add],["합계",r=>r.partial],["× 회복 승수",r=>r.sc.rcm],["× 지속시간 승수",r=>r.sc.du],["점수",r=>`<b>${f1(r.score)}</b>`],["등급",r=>OCM.czone(r.score).name],["예상 범위",r=>`${f1(r.min)}~${f1(r.max)}`]];
@@ -690,12 +691,11 @@ function renderResult(){ const A=calcAll(D); const box=$("resBox"); const mc=mis
    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px"><span class="resval">${f1(F.score)}<span style="font-size:18px;font-weight:700">점</span></span><span class="zone" style="background:var(--${z.color})">${z.name}</span></div>
    <p class="help" style="margin:6px 0 0">${D.mode==="B"?"양손":`최종 = 높은 쪽(${HAND[A.fin]})`} · Mini 점수로 본 예상 범위(Checklist 척도) ${f1(A.rng.min)}~${f1(A.rng.max)}</p>${bandHTML(F.score)}
    ${A.complete?"":(partialEdit()?`<div class="note"><b>한 손만 입력된 기록입니다.</b> 고친 내용은 지금 상태로 수정 저장할 수 있습니다. 두 손을 모두 평가하려면: ${miss.map(esc).join(" / ")}</div>`:`<div class="note"><b>아직 저장할 수 없습니다.</b> ${miss.map(esc).join(" / ")}</div>`)}
-   <div class="nextbox"><b>다음 단계: ${nx.label}</b>${toolButtons(A,nx)}</div>
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${cell(h,fn)}</td>`).join("")}</tr>`).join("")}</table>
    ${hs.map(h=>A.res[h].ok?`<p class="help" style="margin:6px 0 0">${HAND[h]} 자세: ${postTxt(D,h,A.res[h])}</p>`:"").join("")}
    <p class="help" style="margin:6px 0 0">공통: 회복 없는 시간 ${s.unrec}시간 · 순 반복작업 ${s.net}분 · 작업속도 ${F.org}점(부가요인에 포함)</p>
    ${[...new Set(hs.flatMap(h=>A.res[h].ok?diffs(A.res[h]):[]))].map(t=>`<div class="note"><b>EPM 계산표와 다르게 적용한 점</b> ${t}</div>`).join("")}${fxMini(A)}`;
-  renderActions(A,miss); $("resBox").querySelectorAll("[data-tool]").forEach(b=>b.addEventListener("click",()=>openTool(b.dataset.tool)));
+  renderActions(A,miss); $("nextSlot").innerHTML=`<div class="nextbox"><b>다음 단계: ${nx.label}</b>${toolButtons(A,nx)}</div>`; $("nextSlot").querySelectorAll("[data-tool]").forEach(b=>b.addEventListener("click",()=>openTool(b.dataset.tool)));
   $("dbg").hidden=!showDbg; $("dbg").textContent=hs.filter(h=>A.res[h].ok).map(h=>{ const r=A.res[h]; return `[${HAND[h]}] 빈도 ${r.fr.note} → ${r.fr.score}; 자세 ${r.post}+정형성 ${r.st}; 힘 ${r.mod}+${r.intense}; 부가 ${r.physScore}+${r.org}; (${r.partial}) × ${r.sc.rcm} × ${r.sc.du} = ${f1(r.score)}`; }).join("\n"); }
 /* ---- 계산 수식(접어 두는 칸) ---- */
 const FXO={}; document.addEventListener("toggle",e=>{ const t=e.target; if(t.matches&&t.matches("details.fx")) FXO[t.dataset.fx]=t.open; },true);
@@ -771,13 +771,17 @@ $("tcBtn").addEventListener("click",()=>dialog("테스트용 사례를 만들까
 /* 저장 기록이 완전한지(새 구조이고 두 손 또는 양손이 계산됨) */
 function recState(rec){ const d=upgrade(rec.inputs); const A=calcAll(d); const legacy=!rec.inputs.H; const ok=handsOf(d).every(h=>A.res[h].ok); return {d,A,ok,legacy}; }
 function openRecord(id){ const rec=recs().find(x=>x.id===id); if(!rec) return; if(rec.kind==="multi"){ if(!MULTI_ON){ dialog("여러 작업 평가 (개발 중…)","여러 작업 평가는 개발 중이라 지금은 열 수 없습니다. 저장된 결과는 목록에 그대로 남아 있습니다."); return; } openMulti(rec); return; } D=upgrade(rec.inputs); editId=id; baseSnap=snapOf(D); paintAll(); show("wiz"); goStep(6); onInput(); }
+/* 이어서 할 ‘작성 중인 평가’: 저장하지 않은 입력이 있을 때만. 저장된 기록을 열어 보기만 했으면(내용이 저장본과 같으면) 해당 없음 */
+function pendingDraft(){ const dr=store.get(KEY_DRAFT,null); if(!(dr&&dr.d&&(dr.d.jobName||dr.d.shiftH))) return null;
+  if(dr.editId){ const r0=recs().find(x=>x.id===dr.editId); if(r0&&snapOf(upgrade(r0.inputs))===snapOf(upgrade(dr.d))){ store.del(KEY_DRAFT); return null; } }
+  return dr; }
 function newEval(){ D=blank(); editId=null; paintAll(); show("wiz"); goStep(0); onInput(); }
 function recLine(rec){ const r=rec.result; if(rec.kind==="multi") return `여러 작업 통합 결과 · 오른손 ${f1(r.R)} / 왼손 ${f1(r.L)}`; const st=recState(rec); if(!st.ok){ const miss=handsOf(st.d).filter(h=>!st.A.res[h].ok).map(h=>HAND[h]); return `${miss.join("·")} 미입력 — 열어서 입력하면 저장됩니다`; } return st.d.mode==="B"?`양손 ${f1(st.A.res.B.score)}`:`오른손 ${f1(st.A.res.R.score)} / 왼손 ${f1(st.A.res.L.score)}`; }
 const NEXT_MAP={"OCRA Checklist로 등급 확정":"추가 정밀평가 필요","OCRA Index로 개선 설계":"개선 필요 — 추가 정밀평가 필요"};
 function nextOf(rec){ if(rec.kind!=="multi"){ const st=recState(rec); const nx=st.ok?OCM.nextStep(st.A.rng):null; if(nx) return nx.label; } return NEXT_MAP[rec.result.next]||rec.result.next; }
 function delRecord(rec){ const m=rec.kind==="multi"; dialog("삭제할까요?",`‘${esc(rec.inputs.jobName||"(작업명 없음)")}’ ${m?"여러 작업 평가":"평가"}를 삭제합니다. 되돌릴 수 없습니다.${m?"":`<br><span class="help">이 평가에서 가져온 여러 작업 평가 안의 작업은 남습니다.</span>`}`,()=>{ store.set(KEY_REC,recs().filter(r=>r.id!==rec.id)); renderHome(); toast("삭제했습니다."); }); $("dlgOk").textContent="삭제"; $("dlgOk").classList.add("danger"); }
 function shortZone(n){ n=String(n||""); const t=[["고도","고도"],["중등도","중등도"],["경도","경도"],["불확실","불확실"],["최적","최적"],["허용","허용"],["경계","경계"],["낮음","낮음"],["중간","중간"],["높음","높음"]]; for(const [k,v] of t) if(n.startsWith(k)) return v; return n; }
-function renderHome(){ const list=recs(); const el=$("recList"); el.innerHTML=""; $("recEmpty").hidden=list.length>0; $("recCount").textContent=list.length?`(${list.length}건)`:""; $("pairBox").hidden=true; const dr=store.get(KEY_DRAFT,null); $("resumeBtn").hidden=!(dr&&dr.d&&(dr.d.jobName||dr.d.shiftH)); $("lsNote").hidden=!list.length;
+function renderHome(){ const list=recs(); const el=$("recList"); el.innerHTML=""; $("recEmpty").hidden=list.length>0; $("recCount").textContent=list.length?`(${list.length}건)`:""; $("pairBox").hidden=true; const dr=pendingDraft(); $("resumeBtn").hidden=!dr; $("lsNote").hidden=!list.length;
   const groups=[["단일 작업 평가",list.filter(r=>r.kind!=="multi")],["여러 작업 평가",list.filter(r=>r.kind==="multi")]];
   groups.forEach(([title,arr])=>{ if(!arr.length) return; const isM=title==="여러 작업 평가"; const hd=document.createElement("h3"); hd.className="mh"+(isM?" mgrp":""); hd.textContent=`▶ ${title} (${arr.length}건)`; el.appendChild(hd);
     arr.forEach(rec=>{ const z=OCM.czone(rec.result.score); const m=rec.kind==="multi"; const st=m?null:recState(rec); const w=document.createElement("div"); w.className="recw"+(m?" mgrp":"");
@@ -895,15 +899,17 @@ function prefillIdx(d,h){ const hh=d.H[h], x=hh.idx; if(x.pre) return; const mid
   if(hh.others==="1"){ const k=hh.otherKinds||[]; if(k.includes("precision")) af.precision="2"; if(k.includes("compress")) af.compress="2"; if(!k.length||k.some(v=>["cold","glove","other"].includes(v))) af.other="2"; }
   x.durs=af; x.estAF=Object.keys(af); x.pre=true; x.estOK=false; }
 /* 요약(저장·목록용) */
-function toolSummary(d,tool){ const hs=handsOf(d); const done=hs.every(h=>tool==="chk"?chkDone(d,h):idxDone(d,h)); if(!done) return null; const hands={}; let fin=null, fv=-1;
+function toolSummary(d,tool){ const hs=tHands(d); const done=hs.every(h=>tool==="chk"?chkDone(d,h):idxDone(d,h)); if(!done) return null; const hands={}; let fin=null, fv=-1;
   hs.forEach(h=>{ const r=tool==="chk"?calcChk(d,h):calcIdx(d,h); const v=tool==="chk"?r.score:r.idxE; hands[h]=isFinite(v)?+f1(v):null; if(v>fv){ fv=v; fin=h; } });
   const z=tool==="chk"?OC.czone(fv):OC.izone(fv); return {hands,fin,score:isFinite(fv)?+f1(fv):null,inf:!isFinite(fv)||undefined,zone:z.name}; }
 /* ---- 화면 상태 ---- */
 let cStep=0, iStep=0, ciHand="R";
-const firstHand=d=>d.mode==="B"?"B":"R";
+/* Checklist·Index는 Mini가 계산된 손만 평가(EPM 계산표: 부담이 큰 쪽 팔만, 대칭이면 두 팔) */
+const tHands=d=>{ const hs=handsOf(d); const ok=hs.filter(h=>calcHand(d,h).ok); return ok.length?ok:hs; };
+const firstHand=d=>d.mode==="B"?"B":tHands(d)[0];
 function shareTaN(d){ handsOf(d).forEach(h=>{ const hh=d.H[h]; if(hh.canCount!=="0") return; const c=hh.chk, x=hh.idx; if(x.taN===""&&c.taN!=="") x.taN=c.taN; else if(c.taN===""&&x.taN!=="") c.taN=x.taN; }); }
-function openTool(tool){ writeHand(); ensureCI(D); shareTaN(D); ciHand=firstHand(D); if(tool==="chk"){ cStep=0; show("chk"); paintC(); } else { iStep=0; handsOf(D).forEach(h=>prefillIdx(D,h)); show("idx"); paintI(); } }
-function handBar2(el,tool){ const hs=handsOf(D); if(hs.length===1){ el.innerHTML=`<p class="help" style="margin:0">양손(같은 동작·같은 비율) — 한 번만 입력</p>`; return; }
+function openTool(tool){ writeHand(); ensureCI(D); shareTaN(D); ciHand=firstHand(D); if(tool==="chk"){ cStep=0; show("chk"); paintC(); } else { iStep=0; tHands(D).forEach(h=>prefillIdx(D,h)); show("idx"); paintI(); } }
+function handBar2(el,tool){ const hs=tHands(D); if(hs.length===1){ el.innerHTML=D.mode==="B"?`<p class="help" style="margin:0">양손(같은 동작·같은 비율) — 한 번만 입력</p>`:`<p class="help" style="margin:0">${HAND[hs[0]]}만 평가합니다. ${HAND[hs[0]==="R"?"L":"R"]}은 Mini 입력이 없어 제외했습니다(EPM: 부담이 큰 쪽 팔만 평가해도 됨).</p>`; return; }
   el.innerHTML=`<div class="hbt">▶ 입력하는 손</div><div class="chips hchips">${hs.map(h=>{ const ok=tool==="chk"?chkDone(D,h):idxDone(D,h); return `<button type="button" data-h2="${h}" aria-pressed="${h===ciHand}">${HAND[h]}<small>${ok?"입력 완료 ✓":"입력 필요"}</small></button>`; }).join("")}</div><p class="help" style="margin:6px 0 0">오른손과 왼손을 모두 입력해야 ${tool==="chk"?"Checklist":"Index"} 결과가 저장됩니다.</p>`;
   el.querySelectorAll("[data-h2]").forEach(b=>b.addEventListener("click",()=>{ ciHand=b.dataset.h2; tool==="chk"?paintC():paintI(); })); }
 const peakName=v=>({"0":"없음","1":"약 1%","5":"약 5%","10":"10% 이상"})[String(v)]||"없음";
@@ -919,14 +925,14 @@ function paintC(){ const hh=D.H[ciHand], c=hh.chk; document.querySelectorAll("#c
 function readC(){ const c=D.H[ciHand].chk; D.X.pauses=$("c_pauses").value; c.fast=$("c_fast").value; c.taN=$("c_taN").value; c.staticBand=$("c_static").value; c.maxPct=$("c_max").value; D.X.unrecHours=$("c_unrec").value; D.X.inCycle=$("c_incycle").value; }
 function cMaxWarnUI(){ const hh=D.H[ciHand], pk=Number(hh.peak)||0, v=num(hh.chk.maxPct); const over=pk>0&&v!=null&&v>pk; $("cMaxWarn").hidden=!over; if(over) $("cMaxWarn").textContent=`Mini에서 고른 강한 힘 비율(${pk}%)보다 커서 ${pk}%로 계산합니다. 강한 힘 비율이 더 크면 Mini 4단계를 고치세요.`; }
 document.querySelectorAll("#chkv input, #chkv select").forEach(e=>{ const f=()=>{ readC(); cMaxWarnUI(); const hh=D.H[ciHand]; $("cTaBox").hidden=!(hh.canCount==="0"&&!(hh.qual==="9"&&D.H[ciHand].chk.fast==="1")); const s=chkSide(D,ciHand), a=OC.apm(s); $("cApm").hidden=a==null; if(a!=null) $("cApm").textContent=`분당 기술동작 수: ${f1(a)}회/분`; paintCBar(); saveDraft(); }; e.addEventListener("input",f); e.addEventListener("change",f); });
-function paintCBar(){ const hs=handsOf(D); const rs=hs.map(h=>calcChk(D,h)); const ok=rs.filter(r=>r.ok); const fin=ok.length?Math.max(...ok.map(r=>r.score)):null; const z=fin!=null?OC.czone(fin):null;
+function paintCBar(){ const hs=tHands(D); const rs=hs.map(h=>calcChk(D,h)); const ok=rs.filter(r=>r.ok); const fin=ok.length?Math.max(...ok.map(r=>r.score)):null; const z=fin!=null?OC.czone(fin):null;
   $("cbarV").textContent=fin!=null?f1(fin)+"점":"—"; $("cbarZ").textContent=z?z.name:"입력 중"; $("cbarZ").style.background=z?`var(--${z.color})`:"#5F6B74"; $("cbarT").textContent="OCRA Checklist · "+hs.map((h,i)=>`${HAND[h]} ${rs[i].ok?f1(rs[i].score):"—"}`).join(" · ");
   $("cPrev").textContent=cStep===0?"Mini 결과":"이전"; if(cStep===0){ const o=hs.find(h=>h!==ciHand&&!D.H[h].chk.seen); $("cNext").textContent=o?`${HAND[o]} 입력`:"결과 보기"; $("cNext").disabled=false; } else { const ss=saveState(); $("cNext").textContent=ss.label; $("cNext").disabled=!ss.ok; } }
 $("cPrev").addEventListener("click",()=>{ if(cStep>0){ cStep--; paintC(); } else backToMini(); });
-$("cNext").addEventListener("click",()=>{ if(cStep===0){ const o=handsOf(D).find(h=>h!==ciHand&&!D.H[h].chk.seen); if(o){ ciHand=o; paintC(); window.scrollTo({top:0}); toast(`이어서 ${HAND[o]}을 입력하세요.`); return; } cStep=1; paintC(); window.scrollTo({top:0}); return; } saveRecord(); });
+$("cNext").addEventListener("click",()=>{ if(cStep===0){ const o=tHands(D).find(h=>h!==ciHand&&!D.H[h].chk.seen); if(o){ ciHand=o; paintC(); window.scrollTo({top:0}); toast(`이어서 ${HAND[o]}을 입력하세요.`); return; } cStep=1; paintC(); window.scrollTo({top:0}); return; } saveRecord(); });
 function backToMini(){ show("wiz"); goStep(6); onInput(); }
 /* Checklist·Index 계산 수식(접어 두는 칸) */
-function fxChk(R,fin){ const hs=handsOf(D); const T=OC.T.chk; let b="";
+function fxChk(R,fin){ const hs=tHands(D); const T=OC.T.chk; let b="";
   hs.forEach(h=>{ const r=R[h]; if(!r||!r.ok) return; const bd=chkSide(D,h).bands, sc=r.sc;
     b+=fxHand(hs,h)
      +fxL(`빈도 = 큰 값(동적 ${r.fr.score}점 — ${esc(r.fr.note)}, 정적 ${r.stat}점) = <b>${r.freq}</b>점`)
@@ -940,7 +946,7 @@ function fxChk(R,fin){ const hs=handsOf(D); const T=OC.T.chk; let b="";
   return fxBox("chk","계산 수식 보기",b+`<p class="fxs">기준: EPM OCRA Checklist 자동계산표(2020-10-19).</p>`); }
 const fS=v=>v==null||!isFinite(v)?"—":(Math.abs(v)>=1?f2(v):String(+(+v).toPrecision(3)));
 const fA=v=>v==null||!isFinite(v)?"—":(Math.abs(v)>=10?f1(v):String(+(+v).toPrecision(3)));
-function fxIdx(R,fin){ const hs=handsOf(D); let b="";
+function fxIdx(R,fin){ const hs=tHands(D); let b="";
   hs.forEach(h=>{ const r=R[h]; if(!r||!r.ok) return; const s=idxSide(D,h), sc=r.sc; const ffB=OC.fomEpm(r.borg), ffP=OC.look(OC.T.peakEpm,r.peakPct/100,OC.T.peakLast); const xi=D.H[h].idx, hAct=helperCalc(xi).active; const srcB=hAct?"(동작 표 계산)":"(직접 입력)", srcP=hAct?"(동작 표 계산)":(xi.estPeak?"(Mini 답 추정값)":"(직접 입력)");
     b+=fxHand(hs,h)
      +fxL(`실제 기술동작 수(ATA) = 사이클당 ${+(+r.perCycle).toFixed(2)}회 × 60 ÷ 사이클 ${s.taSec}초 = <b>${fA(r.ata)}</b>회/분${r.hold?` <br><small>정적 유지 ${r.hold.S}초 × 0.75 = ${f2(r.hold.imag)}회로 환산(정적 동작 ${r.hold.h}회 대신)</small>`:""}`)
@@ -955,7 +961,7 @@ function fxIdx(R,fin){ const hs=handsOf(D); let b="";
      +(r.pa?fxL(`예측 유병률 = 2.39 × ${f1(r.idxE)} = ${f1(r.pa[1])}% (범위 2.16~2.62배: ${f1(r.pa[0])}~${f1(r.pa[2])}%)`):""); });
   if(hs.length>1) b+=fxL(`최종 = 두 손 중 높은 값 = <b>${fI(R[fin].idxE)}</b>`,1);
   return fxBox("idx","계산 수식 보기",b+`<p class="fxs">기준: EPM OCRA Index classic 계산표(2017-09-01), 강한 힘 비율은 단계 분석 계산표(2017-11-07)의 피크 힘 표. 표시값은 반올림했으므로 곱한 결과와 끝자리가 조금 다를 수 있습니다.</p>`); }
-function renderC(){ const hs=handsOf(D); const R={}; hs.forEach(h=>R[h]=calcChk(D,h)); const miss=hs.filter(h=>!chkDone(D,h)); const ok=hs.filter(h=>R[h].ok);
+function renderC(){ const hs=tHands(D); const R={}; hs.forEach(h=>R[h]=calcChk(D,h)); const miss=hs.filter(h=>!chkDone(D,h)); const ok=hs.filter(h=>R[h].ok);
   if(!ok.length){ $("cRes").innerHTML=`<p class="missing">아직 계산할 수 없습니다. C1에서 ${miss.map(h=>HAND[h]).join("·")}의 추가 항목을 넣어 주세요.</p>`; $("cAct").innerHTML=""; return; }
   const fin=ok.reduce((a,h)=>R[h].score>R[a].score?h:a,ok[0]); const F=R[fin], z=OC.czone(F.score);
   const adv=F.score<=7.5?["허용","기록하고 주기적으로 다시 평가합니다."]:F.score<=11?["불확실","다시 평가하고, 가능하면 작업 조건을 개선합니다. 개선안을 수치로 비교하려면 OCRA Index를 쓸 수 있습니다(선택)."]:["개선 필요","OCRA Index로 요인별 원인을 따져 개선안을 정하세요."];
@@ -1015,13 +1021,13 @@ function borgWarnUI(){ const e=$("iBorgWarn"); if(!e) return; const b=num(D.H[ci
 const PEAK_CAT=p=>p<0.5?"0":p<2?"1":p<10?"5":"10";
 function peakMiniUI(){ const e=$("iPeakMini"); if(!e) return; const hh=D.H[ciHand], x=hh.idx, v=num(x.peak); const m=String(Number(hh.peak)||0);
   const show=v!=null&&!x.estPeak&&PEAK_CAT(v)!==m; e.hidden=!show; if(show) e.innerHTML=`<b>Mini 답과 다릅니다.</b> Mini 4단계에서는 강한 힘을 ‘${peakName(m)}’로 골랐는데, 여기 값은 ${f1(v)}%(${peakName(PEAK_CAT(v))})입니다. Index는 이 칸의 값으로 계산하고, Mini·Checklist 점수는 Mini 4단계 답으로 계산합니다. 어느 쪽이 맞는지 확인하고, Mini 답이 틀렸다면 Mini 4단계도 고치세요.`; }
-function paintIBar(){ const hs=handsOf(D); const rs=hs.map(h=>calcIdx(D,h)); const ok=rs.filter(r=>r.ok); const fin=ok.length?Math.max(...ok.map(r=>r.idxE)):null; const z=fin!=null?OC.izone(fin):null;
+function paintIBar(){ const hs=tHands(D); const rs=hs.map(h=>calcIdx(D,h)); const ok=rs.filter(r=>r.ok); const fin=ok.length?Math.max(...ok.map(r=>r.idxE)):null; const z=fin!=null?OC.izone(fin):null;
   $("ibarV").textContent=fin!=null?fI(fin):"—"; borgWarnUI(); $("ibarZ").textContent=z?z.name:"입력 중"; $("ibarZ").style.background=z?`var(--${z.color})`:"#5F6B74"; $("ibarT").textContent="OCRA Index · "+hs.map((h,i)=>`${HAND[h]} ${rs[i].ok?fI(rs[i].idxE):"—"}`).join(" · ");
   $("iPrev").textContent=iStep===0?"Mini 결과":"이전"; if(iStep<2){ $("iNext").textContent="다음"; $("iNext").disabled=false; } else if(iStep===2){ const o=hs.find(h=>h!==ciHand&&!idxDone(D,h)); $("iNext").textContent=o?`${HAND[o]} 입력`:"결과 보기"; $("iNext").disabled=false; } else { const ss=saveState(); $("iNext").textContent=ss.label; $("iNext").disabled=!ss.ok; } }
 $("iPrev").addEventListener("click",()=>{ if(iStep>0){ iStep--; paintI(); window.scrollTo({top:0}); } else backToMini(); });
 $("iNext").addEventListener("click",()=>{ const x=D.H[ciHand].idx; if(iStep===0&&!x.estOK){ toast("노란 추정값을 확인한 뒤 ‘확인했습니다’에 체크해 주세요."); $("i_estOK").focus(); return; }
-  if(iStep<2){ iStep++; paintI(); window.scrollTo({top:0}); return; } if(iStep===2){ const o=handsOf(D).find(h=>h!==ciHand&&!idxDone(D,h)); if(o){ ciHand=o; iStep=0; paintI(); window.scrollTo({top:0}); toast(`이어서 ${HAND[o]}을 입력하세요.`); return; } iStep=3; paintI(); window.scrollTo({top:0}); return; } saveRecord(); });
-function renderI(){ const hs=handsOf(D); const R={}; hs.forEach(h=>R[h]=calcIdx(D,h)); const ok=hs.filter(h=>R[h].ok); const miss=hs.filter(h=>!idxDone(D,h));
+  if(iStep<2){ iStep++; paintI(); window.scrollTo({top:0}); return; } if(iStep===2){ const o=tHands(D).find(h=>h!==ciHand&&!idxDone(D,h)); if(o){ ciHand=o; iStep=0; paintI(); window.scrollTo({top:0}); toast(`이어서 ${HAND[o]}을 입력하세요.`); return; } iStep=3; paintI(); window.scrollTo({top:0}); return; } saveRecord(); });
+function renderI(){ const hs=tHands(D); const R={}; hs.forEach(h=>R[h]=calcIdx(D,h)); const ok=hs.filter(h=>R[h].ok); const miss=hs.filter(h=>!idxDone(D,h));
   if(!ok.length){ const why=hs.map(h=>{ const x=D.H[h].idx, s=idxSide(D,h); const m=[]; if(!x.estOK) m.push("I1 추정값 확인"); if(s.taN==null) m.push("기술동작 수"); if(s.borg==null) m.push("I2 평균 Borg"); return `${HAND[h]}: ${m.join(", ")||"입력 확인"}`; }); $("iRes").innerHTML=`<p class="missing">아직 계산할 수 없습니다.</p><ul>${why.map(t=>`<li>${t}</li>`).join("")}</ul>`; $("iAct").innerHTML=""; return; }
   const fin=ok.reduce((a,h)=>R[h].idxE>R[a].idxE?h:a,ok[0]); const F=R[fin], z=OC.izone(F.idxE);
   const pri=[["힘",F.ffEpm],["자세",F.pEpm],["부가요인",F.aEpm],["반복성",F.rf],["회복",F.rc]].sort((a,b)=>a[1]-b[1]).slice(0,2).map(x=>`${x[0]}(${f2(x[1])})`).join(", ");
@@ -1080,7 +1086,7 @@ window.addEventListener("popstate",()=>{ if(navSkip){ navSkip=false; return; } n
   if(view==="chk"){ if(cStep>0){ cStep--; paintC(); } else backToMini(); navSync(); return; }
   if(view==="idx"){ if(iStep>0){ iStep--; paintI(); } else backToMini(); navSync(); return; }
   if(view==="multi"){ show("home"); return; } });
-$("newBtn").addEventListener("click",()=>{ const dr=store.get(KEY_DRAFT,null); if(dr&&dr.d&&(dr.d.jobName||dr.d.shiftH)) dialog("작성 중인 평가가 있습니다","새로 시작하면 작성 중이던 내용은 지워집니다. 새로 시작할까요?",newEval); else newEval(); });
+$("newBtn").addEventListener("click",()=>{ if(pendingDraft()) dialog("작성 중인 평가가 있습니다","새로 시작하면 작성 중이던 내용은 지워집니다. 새로 시작할까요?",newEval); else newEval(); });
 $("resumeBtn").addEventListener("click",()=>{ const dr=store.get(KEY_DRAFT,null); if(!dr){ toast("작성 중인 평가가 없습니다."); return; } D=upgrade(dr.d||{}); editId=dr.editId||null; { const r0=editId&&recs().find(x=>x.id===editId); baseSnap=r0?snapOf(upgrade(r0.inputs)):null; } paintAll(); show("wiz"); goStep(Math.min(6,dr.step||0)); onInput(); if(dr.view==="chk"||dr.view==="idx"){ ciHand=dr.ciHand||firstHand(D); if(dr.view==="chk"){ cStep=dr.cStep||0; show("chk"); paintC(); } else { iStep=dr.iStep||0; show("idx"); paintI(); } } });
 /* ---- 두 가지 중 하나를 고르는 질문: 목록 대신 버튼 두 개(선택된 것만 색) ---- */
 function buildSeg2(){ document.querySelectorAll("select.seg2").forEach(s=>{ if(s._seg) return; const opts=[...s.options].filter(o=>o.value!==""); if(/^아니요/.test(opts[0].textContent)) opts.reverse();
