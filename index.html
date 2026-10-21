@@ -100,6 +100,7 @@
   .ticks{display:grid;grid-template-columns:1.5fr .7fr 1.3fr 1fr 4.5fr 2fr;font-size:11px;color:var(--ink-3)}
   .marker{position:absolute;top:-7px;width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;border-top:10px solid var(--ink);transform:translateX(-50%)}
   table.kv{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px} table.kv td{padding:6px 4px;border-bottom:1px solid var(--rule)} table.kv td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700} table.kv tr.sum td{border-top:2px solid var(--rule-2);font-weight:800}
+  .imp{margin-top:10px;border-top:1px solid var(--rule);padding-top:8px} .imp .imph{display:block;font-size:16px;color:var(--acc-3)} .imp .impg{font-weight:700;margin-top:8px;font-size:14px;color:var(--ink-2)} .imp ol{margin:4px 0 0;padding-left:22px} .imp li{margin:0 0 6px} .imp .imphand{font-weight:700;margin-top:10px} .nextbox .imp b{display:inline;font-size:inherit;margin:0;color:inherit}
   .nextbox{border:2px solid var(--acc);border-radius:12px;padding:12px;margin-top:12px;background:var(--acc-2)} .nextbox b{display:block;font-size:16px;margin-bottom:4px;color:var(--acc-3)}
   .missing{color:#B3261E;font-weight:700;font-size:14px;margin:8px 0}
   /* 홈 */
@@ -1027,11 +1028,58 @@ function paintIBar(){ const hs=tHands(D); const rs=hs.map(h=>calcIdx(D,h)); cons
 $("iPrev").addEventListener("click",()=>{ if(iStep>0){ iStep--; paintI(); window.scrollTo({top:0}); } else backToMini(); });
 $("iNext").addEventListener("click",()=>{ const x=D.H[ciHand].idx; if(iStep===0&&!x.estOK){ toast("노란 추정값을 확인한 뒤 ‘확인했습니다’에 체크해 주세요."); $("i_estOK").focus(); return; }
   if(iStep<2){ iStep++; paintI(); window.scrollTo({top:0}); return; } if(iStep===2){ const o=tHands(D).find(h=>h!==ciHand&&!idxDone(D,h)); if(o){ ciHand=o; iStep=0; paintI(); window.scrollTo({top:0}); toast(`이어서 ${HAND[o]}을 입력하세요.`); return; } iStep=3; paintI(); window.scrollTo({top:0}); return; } saveRecord(); });
+/* ---- 개선방안: Mini·Checklist·Index에 입력된 모든 계산 항목에서 부담이 있는 요인을 찾아, 그 요인만 최적으로 바꿔 세 방법을 다시 계산함.
+   점수가 줄어드는 항목만 남기고 효과가 큰 순서로 정렬. 단기(작업장·공구: 힘·자세·부가요인·정적 유지)와 장기(근무조건: 반복성·중단·휴식·작업시간·빈도)로 나눔.
+   대책 문구 = 핸드북 16장(ISO 11228-3 위험 저감, Ergonomiesite.be의 구조적·조직적 대책)과 그 사례에 나온 대책만 사용 ---- */
+const JB={shoulder:"bSh",elbow:"bEl",wrist:"bWr",hand:"bHand"};
+const AF_MINI={vib:["vib"],strike:["strike"],impact:["impact"],precision:["precision"],compress:["compress"],other:["cold","glove","other"]};
+const J_MEAS={hand:"손: 파워 그립이 가능한 손잡이로 바꿉니다",shoulder:"어깨: 작업 높이와 도달 거리를 조정합니다",wrist:"손목: 지그나 손잡이 각도를 조정합니다",elbow:"팔꿈치: 작업 높이와 도달 범위를 조정합니다"};
+const AF_MEAS={vib:"진동 공구 사용을 줄입니다",strike:"반동·충격을 줄입니다",impact:"손을 망치처럼 쓰지 않게 합니다",precision:"정밀 요구를 완화합니다(예: 확대 카메라)",compress:"손에 닿는 국소 압박을 없앱니다",other:"저온·장갑 등 해당 조건을 개선합니다"};
+function simAll(h,mut){ const c=JSON.parse(JSON.stringify(D)); mut(c,c.H[h],c.H[h].idx); const i=calcIdx(c,h), k=chkDone(D,h)?calcChk(c,h):null, m=calcHand(c,h);
+  return {i:i.ok?i.idxE:null,c:k&&k.ok?k.score:null,m:m.ok?m.score:null}; }
+function improveList(h,r){ const hh=D.H[h], x=hh.idx, useC=chkDone(D,h), c0=useC?calcChk(D,h):null, m0=calcHand(D,h);
+  const base={i:r.idxE,c:c0&&c0.ok?c0.score:null,m:m0.ok?m0.score:null}; const S=[], Lg=[];
+  const add=(L,name,text,mut)=>L.push({name,text,eff:simAll(h,mut)});
+  /* 단기: 힘 */
+  { const fb=OC.fomEpm(r.borg), fp=OC.look(OC.T.peakEpm,r.peakPct/100,OC.T.peakLast);
+    if(fb<1||fp<1||(c0&&c0.force>0)||(m0.ok&&m0.force>0)) add(S,"힘","적절한 공구·자동화로 힘을 줄입니다(예: 공구 반력 흡수, 장력 조절, 지그·고정구).",(c,ch,cx)=>{ cx.borgRows=[]; cx.borg="0"; cx.borgDirect="0"; cx.peak="0"; cx.peakDirect="0"; cx.estPeak=false; ch.modBand="0"; ch.peak="0"; ch.chk.maxPct=""; }); }
+  /* 단기: 자세(부담 있는 관절을 함께 고칠 때의 효과. Index 자세 계수는 가장 나쁜 관절 하나로 정해지므로 관절을 묶어 봄) */
+  { const js=r.joints.filter(j=>{ const band=effBand(D,hh,JB[j.key])||0; const mS=OCM.T.mini[{shoulder:"sh",elbow:"el",wrist:"wr",hand:"hand"}[j.key]][band]; const cS=j.key==="shoulder"?(band?OC.T.chk.sh[band]:0):OC.T.chk[{elbow:"el",wrist:"wr",hand:"hand"}[j.key]][band]; return j.epm<1||mS>0||(c0&&cS>0); })
+      .sort((a,b)=>a.epm-b.epm||b.score-a.score);
+    const fixJ=set=>(c,ch,cx)=>{ set.forEach(j=>{ OC.JOINTS.find(q=>q.key===j.key).items.forEach(it=>delete cx.post[it.id]); ch[JB[j.key]]="0"; ch["sec_"+JB[j.key]]=""; }); };
+    /* 나쁜 관절부터 하나씩 더해 보며, 더했을 때 점수가 실제로 더 줄어드는 관절만 남김 */
+    const use=[]; let prev=base; js.forEach(j=>{ const e=simAll(h,fixJ([...use,j])); if(["i","c","m"].some(k=>e[k]!=null&&prev[k]!=null&&(e[k]<prev[k]-1e-9||(!isFinite(prev[k])&&isFinite(e[k]))))){ use.push(j); prev=e; } });
+    if(use.length) add(S,"자세",use.map(j=>J_MEAS[j.key]).join(". ")+".",fixJ(use)); }
+  /* 단기: 부가요인(작업속도 포함) */
+  { const kinds=hh.others==="1"?(hh.otherKinds||[]):[]; const ks=AF_IDX.map(([k])=>k).filter(k=>{ const dI=Number((x.durs||{})[k])||0; const inMini=k==="other"?(hh.others==="1"&&(!kinds.length||kinds.some(v=>AF_MINI.other.includes(v)))):(["vib","strike","impact"].includes(k)?hh[k]==="1":kinds.includes(k)); return dI||inMini; });
+    const t=ks.map(k=>AF_MEAS[k]); if(D.pace!=="0") t.push("라인에 버퍼를 두어 작업자가 속도를 조절하게 합니다");
+    if(t.length) add(S,"부가요인",t.join(". ")+".",(c,ch,cx)=>{ ks.forEach(k=>delete cx.durs[k]); ["vib","strike","impact","others"].forEach(k=>ch[k]="0"); ch.otherKinds=[]; c.pace="0"; }); }
+  /* 단기: 정적 유지 */
+  { const sb=Number(hh.chk.staticBand)||0; if(r.hold||(useC&&sb)) add(S,"정적 유지","지그·고정구로 물체를 손으로 붙잡는 시간을 줄입니다.",(c,ch,cx)=>{ cx.staticSec=""; cx.staticN=""; ch.chk.staticBand="0"; }); }
+  /* 장기: 반복성 */
+  if(r.rf<1||(m0.ok&&m0.st>0)) add(Lg,"반복성","과업 확대·재배분으로 같은 동작의 되풀이를 줄입니다.",(c,ch,cx)=>{ cx.remSel="0"; ch.same="0"; });
+  /* 장기: 짧은 중단(Checklist) */
+  if(useC&&D.X.pauses!=="1") add(Lg,"짧은 중단","사이클 안에 짧은 중단(휴지)이 생기도록 작업 흐름을 조정합니다.",c=>{ c.X.pauses="1"; });
+  /* 장기: 휴식 */
+  { const mu=m0.ok?m0.sc.unrec:0, n=Math.ceil(Math.max(r.sc.unrecIdx||0,mu)); if(r.rc<1||(c0&&c0.rcm>1)||(m0.ok&&m0.sc.rcm>1))
+    add(Lg,"휴식","시간당 8~10분 휴식을 둡니다.",c=>{ c.X.unrecHours="0"; c.X.inCycle="0"; c.break8N=String((num(c.break8N)||0)+n); c.breakTotal=String((num(c.breakTotal)||0)+10*n); }); }
+  /* 장기: 작업시간 */
+  { const net=r.sc.netIdx; if(net>240) add(Lg,"작업시간","직무 순환으로 반복작업을 하루 4시간 이하로 줄입니다(순환 상대는 상지 반복작업이 아닌 일).",c=>{ c.nonRepMin=String((num(c.nonRepMin)||0)+(net-240)); }); }
+  const gain=e=>[["i",base.i],["c",base.c],["m",base.m]].some(([k,b])=>e[k]!=null&&b!=null&&(e[k]<b-1e-9||(!isFinite(b)&&isFinite(e[k]))));
+  const key=e=>[e.i!=null&&isFinite(base.i)?e.i/base.i:(isFinite(base.i)?1:(isFinite(e.i)?0:1)),e.c!=null&&base.c?e.c/base.c:1,e.m!=null&&base.m?e.m/base.m:1];
+  const ord=L=>L.filter(it=>gain(it.eff)).sort((a,b)=>{ const A=key(a.eff),B=key(b.eff); return A[0]-B[0]||A[1]-B[1]||A[2]-B[2]; });
+  const long=ord(Lg); if(r.idxE>2.2) long.push({name:"빈도",text:"불필요한 집기·놓기·재배치 동작을 줄이거나(MTM 분석) 동작을 양손에 나눕니다(나누면 다른 손도 다시 평가)."});
+  return {short:ord(S),long}; }
+function improveHTML(hs,R,ok,fin){ const order=[fin,...ok.filter(h=>h!==fin)]; if(order.every(h=>R[h].idxE<=2.2)) return "";
+  const grp=(t,L)=>L.length?`<div class="impg">${t}</div><ol>${L.map(it=>`<li><strong>${it.name}</strong> ${it.text}</li>`).join("")}</ol>`:"";
+  const body=order.map(h=>{ if(R[h].idxE<=2.2) return (hs.length>1?`<div class="imphand">${HAND[h]}</div>`:"")+`<p class="fxs" style="margin:4px 0 0">허용 수준이라 개선 대상이 없습니다.</p>`;
+    const {short,long}=improveList(h,R[h]); const inner=grp("단기 — 작업장·공구 개선",short)+grp("장기 — 근무조건 개선",long);
+    return (hs.length>1?`<div class="imphand">${HAND[h]}</div>`:"")+(inner||`<p class="fxs" style="margin:4px 0 0">점수를 낮출 개선 대상이 없습니다.</p>`); }).join("");
+  return `<div class="imp"><strong class="imph">개선방안</strong>${body}<p class="fxs" style="margin:6px 0 0">결과를 낮추는 항목만, 효과가 큰 순서로 적었습니다. 대책은 실무핸드북의 위험 저감 대책(ISO 11228-3)에서 가져왔습니다.</p></div>`; }
 function renderI(){ const hs=tHands(D); const R={}; hs.forEach(h=>R[h]=calcIdx(D,h)); const ok=hs.filter(h=>R[h].ok); const miss=hs.filter(h=>!idxDone(D,h));
   if(!ok.length){ const why=hs.map(h=>{ const x=D.H[h].idx, s=idxSide(D,h); const m=[]; if(!x.estOK) m.push("I1 추정값 확인"); if(s.taN==null) m.push("기술동작 수"); if(s.borg==null) m.push("I2 평균 Borg"); return `${HAND[h]}: ${m.join(", ")||"입력 확인"}`; }); $("iRes").innerHTML=`<p class="missing">아직 계산할 수 없습니다.</p><ul>${why.map(t=>`<li>${t}</li>`).join("")}</ul>`; $("iAct").innerHTML=""; return; }
   const fin=ok.reduce((a,h)=>R[h].idxE>R[a].idxE?h:a,ok[0]); const F=R[fin], z=OC.izone(F.idxE);
-  const pri=[["힘",F.ffEpm],["자세",F.pEpm],["부가요인",F.aEpm],["반복성",F.rf],["회복",F.rc]].sort((a,b)=>a[1]-b[1]).slice(0,2).map(x=>`${x[0]}(${f2(x[1])})`).join(", ");
-  const adv=F.idxE<=2.2?["허용","기록하고 주기적으로 다시 평가합니다."]:F.idxE<=3.5?["경계","개선을 권합니다. 먼저 고칠 요인: "+pri]:F.idxE<=9?["개선 필요","먼저 고칠 요인: "+pri]:["즉시 개선","먼저 고칠 요인: "+pri];
+  const adv=F.idxE<=2.2?["허용","기록하고 주기적으로 다시 평가합니다."]:F.idxE<=3.5?["경계","개선을 권합니다. 아래 개선방안을 참고하세요."]:F.idxE<=9?["개선 필요","아래 개선방안으로 개선하고 다시 평가합니다."]:["즉시 개선","아래 개선방안으로 바로 개선하고 다시 평가합니다."];
   const rows=[["실제 기술동작 수(ATA, 회/분)",r=>fA(r.ata)],["허용 기술동작 수(RTA, 회/분)",r=>fS(r.rtaE)],["힘 계수",r=>f2(r.ffEpm)],["자세 계수",r=>f2(r.pEpm)],["반복성 계수",r=>`${f2(r.rf)}${r.remAuto?"(자동)":""}`],["부가요인 계수",r=>f2(r.aEpm)],["회복 계수",r=>f2(r.rc)],["지속시간 계수",r=>f2(r.dc)],["OCRA Index",r=>`<b>${fI(r.idxE)}</b>`],["등급",r=>OC.izone(r.idxE).name],["예측 유병률",r=>r.pa?`${f1(r.pa[0])}~${f1(r.pa[2])}%`:"지수 2.2 이하"]];
   const notes=[...new Set(ok.filter(h=>R[h].ffClassic!=null&&Math.abs(R[h].ffClassic-R[h].ffEpm)>1e-9).map(h=>`${hs.length>1?HAND[h]+": ":""}강한 힘 비율 ${f1(R[h].peakPct)}%에 EPM 단계 분석 계산표(2017-11)의 피크 힘 표를 적용했습니다(classic 계산표 그대로라면 힘 계수 ${f2(R[h].ffClassic)}).`))];
   $("iRes").innerHTML=`<p class="help" style="margin:0">${esc(D.jobName)} · ${D.mode==="B"?"양손(대칭)":"오른손·왼손 각각"}</p>
@@ -1039,7 +1087,7 @@ function renderI(){ const hs=tHands(D); const R={}; hs.forEach(h=>R[h]=calcIdx(D
    <p class="help" style="margin:6px 0 0">${D.mode==="B"?"양손":`최종 = 높은 쪽(${HAND[fin]})`} · Index 등급: 2.2 이하 허용 · 3.5 이하 경계 · 4.5 이하 낮음 · 9 이하 중간 · 초과 높음</p>${bandIdxHTML(F.idxE)}
    ${miss.length?`<div class="note"><b>아직 저장되지 않는 손이 있습니다.</b> ${miss.map(h=>HAND[h]).join("·")}: I1~I3을 확인하세요.</div>`:""}
    ${isFinite(F.idxE)?"":`<div class="note"><b>Index 계산 불가</b> 평균 Borg 점수가 5를 넘어 EPM 계산표의 힘 계수가 0이 됩니다. 허용 기술동작 수가 0이라 Index 값을 낼 수 없습니다. 힘이 지나치게 커서 즉시 개선이 필요한 상태입니다.</div>`}
-   <div class="nextbox"><b>${adv[0]}</b>${adv[1]}</div>
+   <div class="nextbox"><b>${adv[0]}</b>${adv[1]}${improveHTML(hs,R,ok,fin)}</div>
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${R[h].ok?fn(R[h]):"—"}</td>`).join("")}</tr>`).join("")}</table>
    <p class="help" style="margin:6px 0 0">계수가 작을수록 그 요인이 허용 기술동작 수를 많이 줄입니다.</p>${notes.map(t=>`<div class="note">${t}</div>`).join("")}${fxIdx(R,fin)}`;
   const ss=saveState(); $("iAct").innerHTML=`<button type="button" class="btn primary" id="iSave" ${ss.ok?"":"disabled"}>${ss.label}</button><button type="button" class="btn" id="iBack">Mini 결과로</button>`;
