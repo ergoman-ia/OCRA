@@ -52,6 +52,9 @@
   .rec{flex-direction:column !important;align-items:stretch !important;padding:10px !important;gap:8px !important} .rec .ri{display:flex;flex-direction:column;gap:2px;text-align:left} .rec .ri b{white-space:normal !important;overflow:visible !important;font-size:16px !important;line-height:1.3;word-break:keep-all;overflow-wrap:break-word} .rec .ri .rd{font-size:12px;color:var(--ink-3)} .rec .ri .badge{margin:2px 0 0;align-self:flex-start}
   .rcells{display:flex;gap:6px;width:100%} .rcell{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:9px;padding:6px 2px;color:#fff;text-align:center;line-height:1.15} .rcell small{font-size:11px;font-weight:700;opacity:.92} .rcell b{font-size:21px;font-weight:900;font-variant-numeric:tabular-nums;margin:1px 0} .rcell i{font-style:normal;font-size:11.5px;font-weight:700} .rcell.m{background:#1E6B4A} .rcell.c{background:#A3560C} .rcell.i{background:#5B2C8F} .rcell.gap{display:none}
   .recdel{min-width:0 !important;width:30px;flex:0 0 30px !important;padding:0 !important;writing-mode:vertical-rl;text-orientation:upright;letter-spacing:3px;font-size:13px !important}
+  @media (max-width:767px),(max-height:500px) and (pointer:coarse){.mgrp{display:none !important} .startgrid{grid-template-columns:1fr}}
+  details.fx{margin-top:10px;border:1px solid var(--rule);border-radius:10px;padding:0 10px;background:var(--sheet)} details.fx>summary{cursor:pointer;font-weight:700;font-size:14px;padding:10px 0;color:var(--acc)} details.fx[open]>summary{border-bottom:1px solid var(--rule);margin-bottom:6px}
+  .fxh{font-weight:800;font-size:14px;margin:8px 0 4px} .fxl{font-size:13px;line-height:1.55;margin:0 0 5px;padding-left:10px;border-left:3px solid var(--rule-2);word-break:keep-all;overflow-wrap:anywhere} .fxl b{font-variant-numeric:tabular-nums} .fxl.eq{border-left-color:var(--acc);background:var(--acc-2);padding:5px 8px;border-radius:0 6px 6px 0} .fxs{font-size:12px;color:var(--ink-3);margin:6px 0 8px}
   .lsnote{color:#C62828;font-size:12.5px;font-weight:600;margin:-2px 0 10px;line-height:1.45} @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsnote{color:#FF8A80}}
   .rec .rck{width:24px;height:24px;flex:none;accent-color:#C62828} .rec.sel{border-color:#C62828;background:rgba(198,40,40,.06)}
   /* OCRA Checklist(주황)·OCRA Index(보라) */
@@ -132,7 +135,7 @@
     <h2>평가 시작</h2>
     <div class="startgrid">
       <div class="startcard"><b>단일 작업 평가</b><span>하루 내내 한 가지 작업만 반복할 때. 근무 조건부터 결과까지 한 건으로 끝납니다.</span><button type="button" class="btn primary" id="newBtn">단일 작업 평가 시작</button><button type="button" class="btn small" id="resumeBtn" hidden>작성 중인 평가 이어서</button></div>
-      <div class="startcard off"><b>여러 작업 평가 <span class="devtag">(개발 중…)</span></b><span>하루에 여러 작업을 번갈아 할 때. 지금은 개발 중이라 쓸 수 없습니다. 단일 작업 평가로 OCRA Mini-Checklist·Checklist·Index를 먼저 써 보세요.</span><button type="button" class="btn primary" id="multiBtn" disabled>여러 작업 평가 시작 (개발 중…)</button></div>
+      <div class="startcard off mgrp"><b>여러 작업 평가 <span class="devtag">(개발 중…)</span></b><span>하루에 여러 작업을 번갈아 할 때. 지금은 개발 중이라 쓸 수 없습니다. 단일 작업 평가로 OCRA Mini-Checklist·Checklist·Index를 먼저 써 보세요.</span><button type="button" class="btn primary" id="multiBtn" disabled>여러 작업 평가 시작 (개발 중…)</button></div>
     </div>
     <p class="help" style="margin:10px 0 0">근무 조건·사이클은 한 번, 2단계부터는 오른손·왼손을 각각 입력합니다(두 손이 같은 동작이면 ‘양손’으로 한 번).</p>
   </div>
@@ -183,18 +186,18 @@
     <div class="learn">예: 08:00~17:00 근무, 점심 60분(무급), 오전·오후 휴식 각 10분, 청소·자재 운반 20분 → 근무시간 9, 비반복 작업 20분, 식사 1회·60분·미포함, 8분 이상 휴식 2회, 총 휴식 20분.</div>
     <div class="row2">
       <label class="f"><span class="lt">근무시간 <span class="u">시간</span> <button type="button" class="tip" data-tip="출근부터 퇴근까지, 식사시간을 포함한 교대 전체 시간입니다.">?</button></span><input type="number" id="shiftH" min="0" step="0.5" inputmode="decimal" placeholder="예: 9"></label>
-      <label class="f"><span class="lt">비반복 작업 <span class="u">분/하루</span> <button type="button" class="tip" data-tip="청소, 자재 운반, 회의, 육안 검사, 기계 대기 등 손을 반복해서 쓰지 않는 일의 하루 합계입니다.">?</button></span><input type="number" id="nonRepMin" min="0" step="5" inputmode="numeric" placeholder="예: 20"></label>
+      <label class="f"><span class="lt">비반복 작업 <span class="u">분/하루</span> <button type="button" class="tip" data-tip="청소, 자재 운반, 회의, 육안 검사, 기계 대기 등 손을 반복해서 쓰지 않는 일의 하루 합계입니다.">?</button></span><input type="number" id="nonRepMin" min="0" step="5" inputmode="numeric" placeholder="예: 20 · 없으면 0"></label>
     </div>
-    <label class="f"><span class="lt">식사 횟수 <span class="u">회</span></span><input type="number" id="mealN" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+    <label class="f"><span class="lt">식사 횟수 <span class="u">회</span></span><input type="number" id="mealN" min="0" step="1" inputmode="numeric" placeholder="없으면 0"></label>
     <div class="sub" id="mealBox" hidden>
-      <label class="f"><span class="lt">식사 시간 <span class="u">1회, 분</span> <button type="button" class="tip" data-tip="근무시간에 포함되지 않는(무급) 식사는 30분 이상일 때만 회복으로 셉니다. 이 값은 아래 ‘그 밖의 중단’ 칸에 다시 넣지 않습니다(자동으로 셈).">?</button></span><input type="number" id="mealLen" min="0" step="5" inputmode="numeric" placeholder="60"></label>
+      <label class="f"><span class="lt">식사 시간 <span class="u">1회, 분</span> <button type="button" class="tip" data-tip="근무시간에 포함되지 않는(무급) 식사는 30분 이상일 때만 회복으로 셉니다. 이 값은 아래 ‘그 밖의 중단’ 칸에 다시 넣지 않습니다(자동으로 셈).">?</button></span><input type="number" id="mealLen" min="0" step="5" inputmode="numeric" placeholder="예: 60"></label>
       <label class="f"><span class="lt">식사시간이 근무시간에 포함되나요? <button type="button" class="tip" data-tip="식사시간이 근무시간에 포함(유급)되면 ‘포함’을 고릅니다. 포함된 식사는 횟수와 관계없이 회복 1회로 셉니다.">?</button></span><select id="mealIn" class="seg2"><option value="0">미포함(무급)</option><option value="1">포함(유급)</option></select></label>
     </div>
     <div class="row2">
-      <label class="f"><span class="lt">8분 이상 휴식 <span class="u">회</span> <button type="button" class="tip" data-tip="식사시간을 뺀 휴식 가운데 8분 이상 이어지는 휴식의 횟수입니다(공식·비공식 모두). EPM 계산표: ‘점심시간 제외(excluding lunch break)’.">?</button></span><input type="number" id="break8N" min="0" step="1" inputmode="numeric" placeholder="2"></label>
-      <label class="f"><span class="lt">총 휴식 시간 <span class="u">분</span> <button type="button" class="tip" data-tip="식사시간을 뺀 모든 휴식의 합계입니다(8분 미만 휴식도 포함). EPM 계산표: ‘점심시간 제외(excluding lunch break)’. 순 반복작업 시간을 구할 때 뺍니다.">?</button></span><input type="number" id="breakTotal" min="0" step="1" inputmode="numeric" placeholder="20"></label>
+      <label class="f"><span class="lt">8분 이상 휴식 <span class="u">회</span> <button type="button" class="tip" data-tip="식사시간을 뺀 휴식 가운데 8분 이상 이어지는 휴식의 횟수입니다(공식·비공식 모두). EPM 계산표: ‘점심시간 제외(excluding lunch break)’.">?</button></span><input type="number" id="break8N" min="0" step="1" inputmode="numeric" placeholder="예: 2 · 없으면 0"></label>
+      <label class="f"><span class="lt">총 휴식 시간 <span class="u">분</span> <button type="button" class="tip" data-tip="식사시간을 뺀 모든 휴식의 합계입니다(8분 미만 휴식도 포함). EPM 계산표: ‘점심시간 제외(excluding lunch break)’. 순 반복작업 시간을 구할 때 뺍니다.">?</button></span><input type="number" id="breakTotal" min="0" step="1" inputmode="numeric" placeholder="예: 20 · 없으면 0"></label>
     </div>
-    <label class="f"><span class="lt">그 밖의 30분 이상 중단 <span class="u">회</span> <button type="button" class="tip" data-tip="식사가 아닌, 근무시간 밖의 30분 이상 중단(예: 사업장 간 이동)의 횟수입니다. 보통 0입니다. EPM 계산표는 이 칸에 ‘근무 밖 30분 이상 식사 또는 그 밖의 30분 이상 중단’ 횟수를 함께 적지만, 이 앱은 식사를 위 식사 칸에서 자동으로 세므로 식사는 넣지 않습니다.">?</button></span><input type="number" id="otherBreakN" min="0" step="1" inputmode="numeric" placeholder="0"></label>
+    <label class="f"><span class="lt">그 밖의 30분 이상 중단 <span class="u">회</span> <button type="button" class="tip" data-tip="식사가 아닌, 근무시간 밖의 30분 이상 중단(예: 사업장 간 이동)의 횟수입니다. 보통 0입니다. EPM 계산표는 이 칸에 ‘근무 밖 30분 이상 식사 또는 그 밖의 30분 이상 중단’ 횟수를 함께 적지만, 이 앱은 식사를 위 식사 칸에서 자동으로 세므로 식사는 넣지 않습니다.">?</button></span><input type="number" id="otherBreakN" min="0" step="1" inputmode="numeric" placeholder="없으면 0"></label>
     <div class="note" id="breakWarn" hidden>8분 이상 휴식 횟수에 비해 총 휴식 시간이 짧습니다(예: 2회면 16분 이상).</div>
     <div class="okbox" id="shiftInfo" hidden></div>
     </div>
@@ -277,11 +280,11 @@
     <div class="actions" style="margin-top:6px"><button type="button" class="btn small" id="mOrgToggle">공통 근무 조건 변경하기</button></div>
     <div class="mbox" id="mOrgBox" hidden>
     <div class="note" id="mOrgWarn"></div>
-    <div class="row2"><label class="f"><span class="lt">근무시간 <span class="u">시간</span> <button type="button" class="tip" data-tip="출근부터 퇴근까지, 식사시간을 포함한 교대 전체 시간입니다.">?</button></span><input type="number" id="m_shiftH" class="mo" min="0" step="any" inputmode="decimal" placeholder="예: 9"></label><label class="f"><span class="lt">비반복 작업 <span class="u">분/하루</span> <button type="button" class="tip" data-tip="청소, 자재 운반, 회의, 기계 대기 등 손을 반복해서 쓰지 않는 일의 하루 합계입니다.">?</button></span><input type="number" id="m_nonRepMin" class="mo" min="0" step="any" inputmode="decimal" placeholder="예: 20"></label></div>
-    <label class="f"><span class="lt">식사 횟수 <span class="u">회</span></span><input type="number" id="m_mealN" class="mo" min="0" step="any" inputmode="decimal" placeholder="0"></label>
-    <div class="sub" id="m_mealBox" hidden><label class="f"><span class="lt">식사 시간 <span class="u">1회, 분</span> <button type="button" class="tip" data-tip="근무시간에 포함되지 않는(무급) 식사는 30분 이상일 때만 회복으로 셉니다.">?</button></span><input type="number" id="m_mealLen" class="mo" min="0" step="any" inputmode="decimal" placeholder="60"></label><label class="f"><span class="lt">식사시간이 근무시간에 포함되나요?</span><select id="m_mealIn" class="seg2 mo"><option value="0">미포함(무급)</option><option value="1">포함(유급)</option></select></label></div>
-    <div class="row2"><label class="f"><span class="lt">8분 이상 휴식 <span class="u">회</span> <button type="button" class="tip" data-tip="식사시간을 뺀 휴식 가운데 8분 이상 이어지는 휴식의 횟수입니다.">?</button></span><input type="number" id="m_break8N" class="mo" min="0" step="any" inputmode="decimal" placeholder="2"></label><label class="f"><span class="lt">총 휴식 시간 <span class="u">분</span> <button type="button" class="tip" data-tip="식사시간을 뺀 모든 휴식의 합계입니다(8분 미만 휴식 포함).">?</button></span><input type="number" id="m_breakTotal" class="mo" min="0" step="any" inputmode="decimal" placeholder="20"></label></div>
-    <label class="f"><span class="lt">그 밖의 30분 이상 중단 <span class="u">회</span> <button type="button" class="tip" data-tip="식사가 아닌, 근무시간 밖의 30분 이상 중단(예: 사업장 간 이동)의 횟수입니다. 보통 0입니다.">?</button></span><input type="number" id="m_otherBreakN" class="mo" min="0" step="any" inputmode="decimal" placeholder="0"></label>
+    <div class="row2"><label class="f"><span class="lt">근무시간 <span class="u">시간</span> <button type="button" class="tip" data-tip="출근부터 퇴근까지, 식사시간을 포함한 교대 전체 시간입니다.">?</button></span><input type="number" id="m_shiftH" class="mo" min="0" step="any" inputmode="decimal" placeholder="예: 9"></label><label class="f"><span class="lt">비반복 작업 <span class="u">분/하루</span> <button type="button" class="tip" data-tip="청소, 자재 운반, 회의, 기계 대기 등 손을 반복해서 쓰지 않는 일의 하루 합계입니다.">?</button></span><input type="number" id="m_nonRepMin" class="mo" min="0" step="any" inputmode="decimal" placeholder="예: 20 · 없으면 0"></label></div>
+    <label class="f"><span class="lt">식사 횟수 <span class="u">회</span></span><input type="number" id="m_mealN" class="mo" min="0" step="any" inputmode="decimal" placeholder="없으면 0"></label>
+    <div class="sub" id="m_mealBox" hidden><label class="f"><span class="lt">식사 시간 <span class="u">1회, 분</span> <button type="button" class="tip" data-tip="근무시간에 포함되지 않는(무급) 식사는 30분 이상일 때만 회복으로 셉니다.">?</button></span><input type="number" id="m_mealLen" class="mo" min="0" step="any" inputmode="decimal" placeholder="예: 60"></label><label class="f"><span class="lt">식사시간이 근무시간에 포함되나요?</span><select id="m_mealIn" class="seg2 mo"><option value="0">미포함(무급)</option><option value="1">포함(유급)</option></select></label></div>
+    <div class="row2"><label class="f"><span class="lt">8분 이상 휴식 <span class="u">회</span> <button type="button" class="tip" data-tip="식사시간을 뺀 휴식 가운데 8분 이상 이어지는 휴식의 횟수입니다.">?</button></span><input type="number" id="m_break8N" class="mo" min="0" step="any" inputmode="decimal" placeholder="예: 2 · 없으면 0"></label><label class="f"><span class="lt">총 휴식 시간 <span class="u">분</span> <button type="button" class="tip" data-tip="식사시간을 뺀 모든 휴식의 합계입니다(8분 미만 휴식 포함).">?</button></span><input type="number" id="m_breakTotal" class="mo" min="0" step="any" inputmode="decimal" placeholder="예: 20 · 없으면 0"></label></div>
+    <label class="f"><span class="lt">그 밖의 30분 이상 중단 <span class="u">회</span> <button type="button" class="tip" data-tip="식사가 아닌, 근무시간 밖의 30분 이상 중단(예: 사업장 간 이동)의 횟수입니다. 보통 0입니다.">?</button></span><input type="number" id="m_otherBreakN" class="mo" min="0" step="any" inputmode="decimal" placeholder="없으면 0"></label>
     <div class="okbox" id="m_shiftInfo" hidden></div>
     </div>
     <h3 class="mh">▶ 평가 이름과 통합 결과</h3>
@@ -306,7 +309,7 @@
       <div id="cTaBox"><label class="f"><span class="lt">사이클당 기술동작 수 <span class="u">회</span> <button type="button" class="tip" data-tip="Mini에서 빠르기만 골랐기 때문에 Checklist는 실제 기술동작 수가 필요합니다. 한 사이클 동안 이 손의 기술동작을 모두 셉니다.">?</button></span><input type="number" id="c_taN" min="0" step="0.01" inputmode="decimal" placeholder="예: 40"></label><div class="okbox" id="cApm" hidden></div></div>
     </div>
     <label class="f"><span class="lt">정적 동작(물체를 5초 넘게 계속 쥠) 비율 <button type="button" class="tip" data-tip="물체를 5초 넘게 계속 쥐고 있는 시간이 사이클에서 차지하는 비율입니다. 약 2/3면 2.5점, 거의 내내면 4.5점이며 빈도 점수와 비교해 큰 값을 씁니다.">?</button></span><select id="c_static"><option value="0">거의 없음</option><option value="1">약 2/3(51~80%)</option><option value="2">거의 내내(80% 넘게)</option></select></label>
-    <div id="cMaxBox"><label class="f"><span class="lt">강한 힘 중 Borg 8 이상(거의 최대) 비율 <span class="u">%</span> <button type="button" class="tip" data-tip="Mini에서 고른 강한 힘(Borg 5 이상) 시간 가운데 거의 최대(Borg 8 이상)인 부분의 비율입니다. Borg 5~7은 4·8·16·24점, Borg 8 이상은 6·12·24·32점입니다.">?</button></span><input type="number" id="c_max" min="0" max="100" step="0.1" inputmode="decimal" placeholder="0"></label><p class="help" id="cMaxHelp"></p><div class="note" id="cMaxWarn" hidden></div></div>
+    <div id="cMaxBox"><label class="f"><span class="lt">강한 힘 중 Borg 8 이상(거의 최대) 비율 <span class="u">%</span> <button type="button" class="tip" data-tip="Mini에서 고른 강한 힘(Borg 5 이상) 시간 가운데 거의 최대(Borg 8 이상)인 부분의 비율입니다. Borg 5~7은 4·8·16·24점, Borg 8 이상은 6·12·24·32점입니다.">?</button></span><input type="number" id="c_max" min="0" max="100" step="0.1" inputmode="decimal" placeholder="없으면 0"></label><p class="help" id="cMaxHelp"></p><div class="note" id="cMaxWarn" hidden></div></div>
     <p class="help" id="cNoPeak" hidden>Mini에서 강한 힘(Borg 5 이상)이 ‘없음’이라 Borg 8 이상 비율은 묻지 않습니다.</p>
     <details class="more"><summary>회복 시간을 더 정확하게(선택, 두 손 공통)</summary>
       <label class="f" style="margin-top:8px"><span class="lt">회복 없는 시간 직접 입력 <span class="u">시간</span> <button type="button" class="tip" data-tip="근무 시간표에서 1시간마다 8~10분 휴식이 없는 시간을 0.5시간 단위로 센 값입니다. 넣으면 휴식 횟수 대신 이 값을 씁니다(Checklist·Index에만 적용).">?</button></span><input type="number" id="c_unrec" class="xunrec" min="0" max="9" step="0.5" inputmode="decimal" placeholder="비우면 휴식 횟수로 계산"></label>
@@ -347,7 +350,7 @@
     <label class="f"><span class="lt">강한 힘(Borg 5 이상) 시간 비율 <span class="u">%</span> <button type="button" class="tip" data-tip="Mini에서 고른 구간의 대표값이 들어 있습니다(노란 칸). Index는 이 비율이 1% 이상이면 힘 계수를 더 낮추므로 가능하면 정확한 값을 넣습니다.">?</button></span><input type="number" id="i_peak" min="0" max="100" step="0.1" inputmode="decimal"></label><p class="help" id="iPeakCalcNote" hidden>동작별 계산값이 자동으로 들어갑니다. 실제와 다르면 고칠 수 있습니다.</p>
     <div class="row2">
       <label class="f"><span class="lt">정적 유지 시간 <span class="u">초, 선택</span> <button type="button" class="tip" data-tip="한 사이클 안에서 물체를 5초 넘게 계속 쥐고 있는 시간의 합입니다. 유지 1초를 기술동작 0.75회로 환산합니다.">?</button></span><input type="number" id="i_staticSec" min="0" step="0.1" inputmode="decimal" placeholder="없으면 비움"></label>
-      <label class="f"><span class="lt">정적 동작 수 <span class="u">회</span></span><input type="number" id="i_staticN" min="1" step="1" inputmode="numeric" placeholder="1"></label>
+      <label class="f"><span class="lt">정적 동작 수 <span class="u">회</span></span><input type="number" id="i_staticN" min="1" step="1" inputmode="numeric" placeholder="비우면 1"></label>
     </div>
   </section>
   <section class="card istep" data-i="2" hidden>
@@ -376,7 +379,7 @@
 <li>점수 = (빈도 + 자세 + 힘 + 부가요인) × 회복 승수(1.00~3.0) × 지속시간 승수(순 반복작업 2시간 이하 0.5 … 7시간 1분~8시간 미만 1, 8시간 이상 1.5). OCRA Checklist 점수의 예상 범위 = 0.93 × 점수 − 0.31 ~ 1.07 × 점수 + 1.8.</li>
 <li>등급(OCRA Checklist 척도와 같음): 5 이하 최적 · 7.5 이하 허용 · 11 이하 불확실 · 14 이하 낮음 · 22.5 이하 중간 · 초과 높음.</li>
 <li>EPM 계산표와 다르게 적용하는 곳: ① 교대 540·600분에서도 휴식·식사 횟수를 뺌 ② 회복 없는 시간 9시간은 승수 3.0 ③ 회복 없는 시간이 음수면 0 ④ 분당 2.5회 미만은 빈도 0점. 해당하면 결과 화면에 표시합니다.</li>
-<li>여러 작업 평가(통합 결과): 작업 교대 간격 90분 이내는 시간 가중 평균(Occhipinti 1998, EN 1005-5), 90분 초과는 복합식(Occhipinti E, Colombini D, Occhipinti M. Med Lav 2008;99(3):234-241, EPM 멀티태스크 계산표 2014). Mini 부분점수(빈도+자세+힘+부가요인)에 첫 작업의 회복 승수와 총 반복시간의 지속시간 승수를 적용합니다.</li>
+<li class="mgrp">여러 작업 평가(통합 결과): 작업 교대 간격 90분 이내는 시간 가중 평균(Occhipinti 1998, EN 1005-5), 90분 초과는 복합식(Occhipinti E, Colombini D, Occhipinti M. Med Lav 2008;99(3):234-241, EPM 멀티태스크 계산표 2014). Mini 부분점수(빈도+자세+힘+부가요인)에 첫 작업의 회복 승수와 총 반복시간의 지속시간 승수를 적용합니다.</li>
 <li>다음 단계 안내(이 도구의 규칙, OCRA 공식 규칙은 아님): Mini 점수는 그 자체로 Mini의 결과입니다. Mini 계산표의 예상 범위식으로 최댓값이 7.5 이하면 ‘추가 평가 불필요’, 7.5나 11을 걸치면 ‘추가 정밀평가 필요(OCRA Checklist 또는 Index)’, 최솟값이 11을 넘으면 ‘개선 필요 — 추가 정밀평가 필요(OCRA Index 권장)’로 안내합니다. OCRA Checklist 결과가 7.5 이하면 기록하고 주기적으로 재평가, 7.6~11이면 재평가와 가능하면 작업 조건 개선(OCRA Index는 선택), 11을 넘으면 OCRA Index로 개선안을 설계하도록 안내합니다. EPM 계산표에는 다음 단계를 정하는 규칙이 없어, 이 순서는 실무핸드북의 단계 적용 제안을 따랐고 경계 구간의 조치는 OCRA 위험 등급표의 권고 조치(재평가, 가능하면 작업 조건 개선)를 따랐습니다.</li>
 <li>OCRA Checklist(주황): EPM OCRA Checklist 자동 계산표(2020년 10월). 프로젝트 V2 도구의 계산부를 그대로 쓰며, EPM 대조 140건 중 Checklist가 계산되는 129건이 모두 일치합니다. 어깨 자세가 ‘없음’이어도 기본 1점입니다.</li>
 <li>OCRA Index(보라): EPM OCRA Index 계산표(2017년 9월 classic). 강한 힘(Borg 5 이상) 비율이 1% 이상이면 같은 해 11월 단계 분석 계산표의 피크 힘 표로 힘 계수를 낮춥니다. 공개 사례 검산: 아이스크림 포장 11.2(사이트 11.2), Firdaus & Sahroni(E3S Web Conf 2023;426:01080) 작업자 3명.</li>
@@ -616,7 +619,7 @@ const speedOf=hh=>hh.canCount==="1"?"count":(hh.canCount==="0"?(hh.qual||""):"")
 function orgOf(d){ return {shiftH:num(d.shiftH),nonRep:num(d.nonRepMin)||0,mealN:num(d.mealN)||0,mealLen:num(d.mealLen)||0,mealIn:d.mealIn==="1",break8N:num(d.break8N)||0,breakTotal:num(d.breakTotal)||0,otherBreakN:num(d.otherBreakN)||0}; }
 function sideOf(d,hh){ const checked=[]; if(hh.vib==="1") checked.push("vib"); if(hh.strike==="1") checked.push("strike"); if(hh.impact==="1") checked.push("impact"); if(hh.others==="1") checked.push("other");
   return {speed:speedOf(hh),taN:num(hh.taN),taSec:num(d.cycleSec),sameLv:Number(hh.same)||0,bands:{hand:effBand(d,hh,"bHand")??0,sh:effBand(d,hh,"bSh")??0,wr:effBand(d,hh,"bWr")??0,el:effBand(d,hh,"bEl")??0},modBand:+hh.modBand||0,peakPct:Number(hh.peak)||0,checked}; }
-function calcHand(d,h){ const hh=d.H[h]; if(postMissing(d,hh).length) return {ok:false}; return OCM.mini(orgOf(d),{cyc:num(d.cycleSec),pace:Number(d.pace)||0},sideOf(d,hh)); }
+function calcHand(d,h){ const hh=d.H[h]; if(postMissing(d,hh).length) return {ok:false}; if(num(d.mealN)>0&&!(num(d.mealLen)>0)) return {ok:false}; return OCM.mini(orgOf(d),{cyc:num(d.cycleSec),pace:Number(d.pace)||0},sideOf(d,hh)); }
 /* 손 하나가 '입력 완료'인지: 계산되고 2~5단계를 모두 열어 봄 */
 const handDone=(d,h)=>{ const r=calcHand(d,h); return !!(r.ok&&[2,3,4,5].every(s=>(d.H[h].seen||[]).includes(s))); };
 function calcAll(d){ const res={}; handsOf(d).forEach(h=>res[h]=calcHand(d,h)); const ok=handsOf(d).filter(h=>res[h].ok); let fin=null; ok.forEach(h=>{ if(!fin||res[h].score>res[fin].score) fin=h; });
@@ -624,7 +627,7 @@ function calcAll(d){ const res={}; handsOf(d).forEach(h=>res[h]=calcHand(d,h)); 
   return {res,fin,complete,rng:{ok:ok.length>0,min:mn,max:mx}}; }
 function missingHand(d,h){ const hh=d.H[h], m=[]; if(!hh.canCount) m.push("기술동작 수를 셀 수 있는지(2단계)"); if(hh.canCount==="1"&&!(num(hh.taN)>=0&&num(d.cycleSec)>0)) m.push("사이클당 기술동작 수(2단계)와 사이클 타임(1단계)"); if(hh.canCount==="0"&&!hh.qual) m.push("기술동작 빠르기(2단계)");
   postMissing(d,hh).forEach(k=>m.push(`${POST_NAME[k]} 자세의 사이클당 지속 시간(3단계 ‘기타’)`)); const unseen=[3,4,5].filter(s=>!(hh.seen||[]).includes(s)); if(unseen.length) m.push(`${unseen.map(s=>STEPS[s]).join("·")} 단계 확인`); return m; }
-function missingCommon(d){ const m=[]; if(!(num(d.shiftH)>0)) m.push("근무시간(1단계)"); const sc=OCM.shift(orgOf(d)); if(sc&&sc.du==null) m.push("순 반복작업 시간이 0 이하 — 휴식·비반복 시간 확인(1단계)"); if(!(num(d.cycleSec)>0)) m.push("사이클 타임(1단계)"); return m; }
+function missingCommon(d){ const m=[]; if(!(num(d.shiftH)>0)) m.push("근무시간(1단계)"); if(num(d.mealN)>0&&!(num(d.mealLen)>0)) m.push("식사 시간(1단계)"); const sc=OCM.shift(orgOf(d)); if(sc&&sc.du==null) m.push("순 반복작업 시간이 0 이하 — 휴식·비반복 시간 확인(1단계)"); if(!(num(d.cycleSec)>0)) m.push("사이클 타임(1단계)"); return m; }
 /* ---- 화면 전환 ---- */
 function show(v){ if(v!=="wiz"){ if(toMulti&&typeof M!=="undefined"&&M.pending){ M.pending=null; saveMDraft(); } toMulti=false; mEditIdx=null; } view=v; navSync(); const VID={home:"home",wiz:"wiz",multi:"multi",chk:"chkv",idx:"idxv"}; Object.entries(VID).forEach(([k,id])=>$(id).hidden=v!==k); $("bar").hidden=v!=="wiz"; document.body.dataset.view=v; $("ttl").innerHTML=v==="chk"?"OCRA Checklist <small>추가 정밀평가</small>":v==="idx"?"OCRA Index <small>추가 정밀평가·개선 설계</small>":"OCRA Mini-Checklist <small>반복작업 간이 선별 — 스마트폰용</small>"; $("wizBan").hidden=!(v==="wiz"&&toMulti); $("homeBtn").hidden=v==="home"; $("homeBtn").textContent=(v==="wiz"&&toMulti)?"여러 작업으로":"처음으로"; window.scrollTo({top:0}); if(v==="home") renderHome();  if(v==="multi") renderMulti(); }
 function renderProg(){ const p=$("prog"); p.innerHTML=""; STEPS.forEach((n,i)=>{ const b=document.createElement("button"); b.type="button"; b.className=i<step?"done":i===step?"cur":""; b.innerHTML=`${i}<span> ${n}</span>`; b.title=n; b.addEventListener("click",()=>goStep(i)); p.appendChild(b); }); }
@@ -690,9 +693,28 @@ function renderResult(){ const A=calcAll(D); const box=$("resBox"); const mc=mis
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${cell(h,fn)}</td>`).join("")}</tr>`).join("")}</table>
    ${hs.map(h=>A.res[h].ok?`<p class="help" style="margin:6px 0 0">${HAND[h]} 자세: ${postTxt(D,h,A.res[h])}</p>`:"").join("")}
    <p class="help" style="margin:6px 0 0">공통: 회복 없는 시간 ${s.unrec}시간 · 순 반복작업 ${s.net}분 · 작업속도 ${F.org}점(부가요인에 포함)</p>
-   ${[...new Set(hs.flatMap(h=>A.res[h].ok?diffs(A.res[h]):[]))].map(t=>`<div class="note"><b>EPM 계산표와 다르게 적용한 점</b> ${t}</div>`).join("")}`;
+   ${[...new Set(hs.flatMap(h=>A.res[h].ok?diffs(A.res[h]):[]))].map(t=>`<div class="note"><b>EPM 계산표와 다르게 적용한 점</b> ${t}</div>`).join("")}${fxMini(A)}`;
   renderActions(A,miss); $("resBox").querySelectorAll("[data-tool]").forEach(b=>b.addEventListener("click",()=>openTool(b.dataset.tool)));
   $("dbg").hidden=!showDbg; $("dbg").textContent=hs.filter(h=>A.res[h].ok).map(h=>{ const r=A.res[h]; return `[${HAND[h]}] 빈도 ${r.fr.note} → ${r.fr.score}; 자세 ${r.post}+정형성 ${r.st}; 힘 ${r.mod}+${r.intense}; 부가 ${r.physScore}+${r.org}; (${r.partial}) × ${r.sc.rcm} × ${r.sc.du} = ${f1(r.score)}`; }).join("\n"); }
+/* ---- 계산 수식(접어 두는 칸) ---- */
+const FXO={}; document.addEventListener("toggle",e=>{ const t=e.target; if(t.matches&&t.matches("details.fx")) FXO[t.dataset.fx]=t.open; },true);
+const fxBox=(key,title,body)=>`<details class="more fx" data-fx="${key}"${FXO[key]?" open":""}><summary>${title}</summary>${body}</details>`;
+const fxL=(t,eq)=>`<p class="fxl${eq?" eq":""}">${t}</p>`;
+const fxHand=(hs,h)=>hs.length>1?`<p class="fxh">${HAND[h]}</p>`:"";
+const fxRec=sc=>{ const o=orgOf(D); return `교대 ${sc.shiftMin}분 → 기준 ${sc.base}시간 − 휴식 ${sc.breaks}회(8분 이상 휴식 ${o.break8N} + 식사 ${sc.mealBreaks} + 그 밖 30분 이상 중단 ${o.otherBreakN})`; };
+function fxMini(A){ const hs=handsOf(D); const T=OCM.T.mini; let b="";
+  hs.forEach(h=>{ const r=A.res[h]; if(!r||!r.ok) return; const s=sideOf(D,D.H[h]), bd=s.bands, sc=r.sc;
+    b+=fxHand(hs,h)
+     +fxL(`빈도 = ${esc(r.fr.note)} → <b>${r.fr.score}</b>점`)
+     +fxL(`자세 = 가장 큰 값(손 ${T.hand[bd.hand]}, 어깨 ${T.sh[bd.sh]}, 손목 ${T.wr[bd.wr]}, 팔꿈치 ${T.el[bd.el]}) ${r.post} + 정형성 ${r.st} = <b>${r.posture}</b>점`)
+     +fxL(`힘 = 중간 힘 ${r.mod} + 강한 힘 ${r.intense} = <b>${r.force}</b>점`)
+     +fxL(`부가요인 = 물리적 요인 ${r.physScore} + 작업속도 ${r.org} = <b>${r.add}</b>점`)
+     +fxL(`회복 승수: ${fxRec(sc)} = 회복 없는 시간 ${sc.unrec}시간 → <b>${sc.rcm}</b>`)
+     +fxL(`지속시간 승수: 순 반복작업 ${sc.net}분 → <b>${sc.du}</b>`)
+     +fxL(`Mini 점수 = (${r.fr.score} + ${r.posture} + ${r.force} + ${r.add}) × ${sc.rcm} × ${sc.du} = ${r.partial} × ${sc.rcm} × ${sc.du} = <b>${f1(r.score)}</b>`,1)
+     +fxL(`예상 범위(Checklist 척도) = 0.93 × ${f1(r.score)} − 0.31 ~ 1.07 × ${f1(r.score)} + 1.8 = ${f1(r.min)} ~ ${f1(r.max)}`); });
+  if(hs.length>1) b+=fxL(`최종 = 두 손 중 높은 값 = <b>${f1(A.res[A.fin].score)}</b>`,1);
+  return fxBox("mini","계산 수식 보기",b+`<p class="fxs">기준: EPM Mini-Checklist 계산표(2025-06-20). 점수표는 ‘출처와 계산 기준’에 있습니다.</p>`); }
 /* 저장할 내용이 있을 때만 저장 버튼을 켬: 새 평가는 입력이 끝났을 때, 불러온 평가는 입력이 끝났고 바뀐 내용이 있을 때 */
 const snapOf=d=>JSON.stringify(d,(k,v)=>(k==="seen"||k==="cur")?undefined:v); let baseSnap=null;
 function saveState(A){ A=A||calcAll(D); const label=toMulti?(mEditIdx!=null?"여러 작업 평가에 수정 반영":"여러 작업 평가에 넣기"):(editId?"수정 저장":"목록에 저장"); const editing=toMulti?mEditIdx!=null:!!editId; const dirty=!editing||snapOf(D)!==baseSnap;
@@ -728,8 +750,8 @@ function delRecord(rec){ const m=rec.kind==="multi"; dialog("삭제할까요?",`
 function shortZone(n){ n=String(n||""); const t=[["고도","고도"],["중등도","중등도"],["경도","경도"],["불확실","불확실"],["최적","최적"],["허용","허용"],["경계","경계"],["낮음","낮음"],["중간","중간"],["높음","높음"]]; for(const [k,v] of t) if(n.startsWith(k)) return v; return n; }
 function renderHome(){ const list=recs(); const el=$("recList"); el.innerHTML=""; $("recEmpty").hidden=list.length>0; $("recCount").textContent=list.length?`(${list.length}건)`:""; $("pairBox").hidden=true; const dr=store.get(KEY_DRAFT,null); $("resumeBtn").hidden=!(dr&&dr.d&&(dr.d.jobName||dr.d.shiftH)); $("lsNote").hidden=!list.length;
   const groups=[["단일 작업 평가",list.filter(r=>r.kind!=="multi")],["여러 작업 평가",list.filter(r=>r.kind==="multi")]];
-  groups.forEach(([title,arr])=>{ if(!arr.length) return; const hd=document.createElement("h3"); hd.className="mh"; hd.textContent=`▶ ${title} (${arr.length}건)`; el.appendChild(hd);
-    arr.forEach(rec=>{ const z=OCM.czone(rec.result.score); const m=rec.kind==="multi"; const st=m?null:recState(rec); const w=document.createElement("div"); w.className="recw";
+  groups.forEach(([title,arr])=>{ if(!arr.length) return; const isM=title==="여러 작업 평가"; const hd=document.createElement("h3"); hd.className="mh"+(isM?" mgrp":""); hd.textContent=`▶ ${title} (${arr.length}건)`; el.appendChild(hd);
+    arr.forEach(rec=>{ const z=OCM.czone(rec.result.score); const m=rec.kind==="multi"; const st=m?null:recState(rec); const w=document.createElement("div"); w.className="recw"+(m?" mgrp":"");
       const cells=[]; const cell=(cls,lab,v,zn)=>`<span class="rcell ${cls}"><small>${lab}</small><b>${v}</b><i>${esc(zn)}</i></span>`;
       if(m) cells.push(cell("m","여러 작업",f1(rec.result.score),shortZone(z.name)));
       else { cells.push(st.ok?cell("m","Mini",f1(rec.result.score),shortZone(z.name)):cell("m","Mini","—","미입력")); cells.push(rec.result.chk?cell("c","Checklist",f1(rec.result.chk.score),shortZone(rec.result.chk.zone)):'<span class="rcell gap" aria-hidden="true"></span>'); cells.push(rec.result.idx?cell("i","Index",rec.result.idx.score==null?"불가":f1(rec.result.idx.score),shortZone(rec.result.idx.zone)):'<span class="rcell gap" aria-hidden="true"></span>'); }
@@ -866,6 +888,36 @@ function paintCBar(){ const hs=handsOf(D); const rs=hs.map(h=>calcChk(D,h)); con
 $("cPrev").addEventListener("click",()=>{ if(cStep>0){ cStep--; paintC(); } else backToMini(); });
 $("cNext").addEventListener("click",()=>{ if(cStep===0){ const o=handsOf(D).find(h=>h!==ciHand&&!D.H[h].chk.seen); if(o){ ciHand=o; paintC(); window.scrollTo({top:0}); toast(`이어서 ${HAND[o]}을 입력하세요.`); return; } cStep=1; paintC(); window.scrollTo({top:0}); return; } saveRecord(); });
 function backToMini(){ show("wiz"); goStep(6); onInput(); }
+/* Checklist·Index 계산 수식(접어 두는 칸) */
+function fxChk(R,fin){ const hs=handsOf(D); const T=OC.T.chk; let b="";
+  hs.forEach(h=>{ const r=R[h]; if(!r||!r.ok) return; const bd=chkSide(D,h).bands, sc=r.sc;
+    b+=fxHand(hs,h)
+     +fxL(`빈도 = 큰 값(동적 ${r.fr.score}점 — ${esc(r.fr.note)}, 정적 ${r.stat}점) = <b>${r.freq}</b>점`)
+     +fxL(`자세 = 가장 큰 값(어깨 ${r.shs}, 팔꿈치 ${T.el[bd.el]}, 손목 ${T.wr[bd.wr]}, 손 ${T.hand[bd.hand]}) ${r.post} + 정형성 ${r.st} = <b>${r.posture}</b>점`)
+     +fxL(`힘 = 중간 힘 ${r.mod} + 강한 힘(Borg 5~7, ${f1(r.p57)}%) ${r.intense} + 거의 최대(Borg 8 이상, ${f1(r.mxp)}%) ${r.mx} = <b>${r.force}</b>점`)
+     +fxL(`부가요인 = 물리적 요인 ${r.physScore} + 작업속도 ${r.org} = <b>${r.add}</b>점`)
+     +fxL(`회복 승수: ${esc(sc.unrecSrc)}${sc.unrecSrc==="휴식 횟수 표"?` — ${fxRec(sc)}`:""} = 회복 없는 시간 ${sc.unrecChk}시간 → <b>${r.rcm}</b>`)
+     +fxL(`지속시간 승수: 순 반복작업 ${sc.net}분 → <b>${sc.du}</b>`)
+     +fxL(`Checklist 점수 = (${r.freq} + ${r.posture} + ${r.force} + ${r.add}) × ${r.rcm} × ${sc.du} = ${r.partial} × ${r.rcm} × ${sc.du} = <b>${f1(r.score)}</b>`,1); });
+  if(hs.length>1) b+=fxL(`최종 = 두 손 중 높은 값 = <b>${f1(R[fin].score)}</b>`,1);
+  return fxBox("chk","계산 수식 보기",b+`<p class="fxs">기준: EPM OCRA Checklist 자동계산표(2020-10-19).</p>`); }
+const fS=v=>v==null||!isFinite(v)?"—":(Math.abs(v)>=1?f2(v):String(+(+v).toPrecision(3)));
+const fA=v=>v==null||!isFinite(v)?"—":(Math.abs(v)>=10?f1(v):String(+(+v).toPrecision(3)));
+function fxIdx(R,fin){ const hs=handsOf(D); let b="";
+  hs.forEach(h=>{ const r=R[h]; if(!r||!r.ok) return; const s=idxSide(D,h), sc=r.sc; const ffB=OC.fomEpm(r.borg), ffP=OC.look(OC.T.peakEpm,r.peakPct/100,OC.T.peakLast);
+    b+=fxHand(hs,h)
+     +fxL(`실제 기술동작 수(ATA) = 사이클당 ${+(+r.perCycle).toFixed(2)}회 × 60 ÷ 사이클 ${s.taSec}초 = <b>${fA(r.ata)}</b>회/분${r.hold?` <br><small>정적 유지 ${r.hold.S}초 × 0.75 = ${f2(r.hold.imag)}회로 환산(정적 동작 ${r.hold.h}회 대신)</small>`:""}`)
+     +fxL(`힘 계수 = 작은 값(평균 Borg ${r.borg} → ${f2(ffB)}, 강한 힘 ${f1(r.peakPct)}% → ${f2(ffP)}) = <b>${f2(r.ffEpm)}</b>`)
+     +fxL(`자세 계수 = 관절별 계수 중 가장 작은 값(${r.joints.map(j=>`${j.name} ${j.score}점 → ${f2(j.epm)}`).join(", ")}) = <b>${f2(r.pEpm)}</b>`)
+     +fxL(`반복성 계수: ${["없음","보통","높음"][r.remLvl]}${r.remAuto?"(자동)":""} → <b>${f2(r.rf)}</b>`)
+     +fxL(`부가요인 계수: 점수 ${r.as} → <b>${f2(r.aEpm)}</b>`)
+     +fxL(`회복 계수: ${esc(sc.unrecSrc)} — 회복 없는 시간 ${sc.unrecIdx}시간 → <b>${f2(r.rc)}</b>`)
+     +fxL(`지속시간 계수: 순 반복작업 ${sc.netIdx}분 → <b>${f2(r.dc)}</b>`)
+     +fxL(`허용 기술동작 수(RTA) = 30 × ${f2(r.ffEpm)} × ${f2(r.pEpm)} × ${f2(r.rf)} × ${f2(r.aEpm)} × ${f2(r.rc)} × ${f2(r.dc)} = <b>${fS(r.rtaE)}</b>회/분`)
+     +fxL(`OCRA Index = ATA ÷ RTA = ${fA(r.ata)} ÷ ${fS(r.rtaE)} = <b>${fI(r.idxE)}</b>`,1)
+     +(r.pa?fxL(`예측 유병률 = 2.39 × ${f1(r.idxE)} = ${f1(r.pa[1])}% (범위 2.16~2.62배: ${f1(r.pa[0])}~${f1(r.pa[2])}%)`):""); });
+  if(hs.length>1) b+=fxL(`최종 = 두 손 중 높은 값 = <b>${fI(R[fin].idxE)}</b>`,1);
+  return fxBox("idx","계산 수식 보기",b+`<p class="fxs">기준: EPM OCRA Index classic 계산표(2017-09-01), 강한 힘 비율은 단계 분석 계산표(2017-11-07)의 피크 힘 표. 표시값은 반올림했으므로 곱한 결과와 끝자리가 조금 다를 수 있습니다.</p>`); }
 function renderC(){ const hs=handsOf(D); const R={}; hs.forEach(h=>R[h]=calcChk(D,h)); const miss=hs.filter(h=>!chkDone(D,h)); const ok=hs.filter(h=>R[h].ok);
   if(!ok.length){ $("cRes").innerHTML=`<p class="missing">아직 계산할 수 없습니다. C1에서 ${miss.map(h=>HAND[h]).join("·")}의 추가 항목을 넣어 주세요.</p>`; $("cAct").innerHTML=""; return; }
   const fin=ok.reduce((a,h)=>R[h].score>R[a].score?h:a,ok[0]); const F=R[fin], z=OC.czone(F.score);
@@ -876,10 +928,9 @@ function renderC(){ const hs=handsOf(D); const R={}; hs.forEach(h=>R[h]=calcChk(
    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px"><span class="resval">${f1(F.score)}<span style="font-size:18px;font-weight:700">점</span></span><span class="zone" style="background:var(--${z.color})">${z.name}</span></div>
    <p class="help" style="margin:6px 0 0">${D.mode==="B"?"양손":`최종 = 높은 쪽(${HAND[fin]})`} · 참고: Mini ${mini.fin?f1(mini.res[mini.fin].score)+"점":"—"}</p>${bandHTML(F.score)}
    ${miss.length?`<div class="note"><b>아직 저장되지 않는 손이 있습니다.</b> ${miss.map(h=>HAND[h]).join("·")}의 C1 추가 항목을 확인하세요.</div>`:""}
-   ${isFinite(F.idxE)?"":`<div class="note"><b>Index 계산 불가</b> 평균 Borg 점수가 5를 넘어 EPM 계산표의 힘 계수가 0이 됩니다. 허용 기술동작 수가 0이라 Index 값을 낼 수 없습니다. 힘이 지나치게 커서 즉시 개선이 필요한 상태입니다.</div>`}
    <div class="nextbox"><b>${adv[0]}</b>${adv[1]}</div>
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${R[h].ok?fn(R[h]):"—"}</td>`).join("")}</tr>`).join("")}</table>
-   <p class="help" style="margin:6px 0 0">회복: ${esc(F.sc.unrecSrc)} ${F.sc.unrecChk}시간 · 작업속도: ${esc(PACE_NAME[D.pace]||"")}(Checklist ${F.org}점) · 어깨 자세가 ‘없음’이어도 Checklist는 기본 1점</p>`;
+   <p class="help" style="margin:6px 0 0">회복: ${esc(F.sc.unrecSrc)} ${F.sc.unrecChk}시간 · 작업속도: ${esc(PACE_NAME[D.pace]||"")}(Checklist ${F.org}점) · 어깨 자세가 ‘없음’이어도 Checklist는 기본 1점</p>${fxChk(R,fin)}`;
   const ss=saveState(); $("cAct").innerHTML=`<button type="button" class="btn primary" id="cSave" ${ss.ok?"":"disabled"}>${ss.label}</button><button type="button" class="btn goidx" id="cToIdx">${F&&F.score<=11?"OCRA Index로 이어서(선택)":"OCRA Index로 개선안 설계"}</button><button type="button" class="btn" id="cBack">Mini 결과로</button>`;
   $("cSave").addEventListener("click",saveRecord); $("cToIdx").addEventListener("click",()=>openTool("idx")); $("cBack").addEventListener("click",backToMini); }
 /* ---- Index 화면 ---- */
@@ -890,7 +941,7 @@ function paintI(){ const hh=D.H[ciHand], x=hh.idx; document.querySelectorAll("#i
   $("iHandBar").hidden=iStep===3; if(iStep<3) handBar2($("iHandBar"),"idx"); document.querySelectorAll("#idxv .hname2").forEach(e=>e.textContent=`— ${HAND[ciHand]}`);
   $("iNeedCount").hidden=hh.canCount==="1"; $("i_taN").value=x.taN;
   OC.JOINTS.forEach(J=>J.items.forEach(it=>{ const e=$("ip_"+it.id); e.value=x.post[it.id]??""; e.classList.toggle("est",x.est.includes(it.id)); }));
-  $("i_estOK").checked=!!x.estOK; $("i_borg").value=x.borg; $("i_borgMode").value=x.borgMode||"direct"; $("i_peak").value=x.peak; $("i_peak").classList.toggle("est",!!x.estPeak); $("i_staticSec").value=x.staticSec; $("i_staticN").value=x.staticN; $("i_rem").value=x.remSel;
+  $("i_estOK").checked=!!x.estOK; $("i_borg").value=x.borg; $("i_borgMode").value=x.borgMode||"direct"; $("i_peak").value=x.peak; $("i_peak").placeholder=`비우면 Mini 값 ${Number(hh.peak)||0}%`; $("i_peak").classList.toggle("est",!!x.estPeak); $("i_staticSec").value=x.staticSec; $("i_staticN").value=x.staticN; $("i_rem").value=x.remSel;
   AF_IDX.forEach(([k])=>{ const e=$("ia_"+k); e.value=x.durs[k]||"0"; e.classList.toggle("est",x.estAF.includes(k)); });
   $("i_unrec").value=D.X.unrecHours; $("i_incycle").value=D.X.inCycle; $("iPace").textContent=`작업속도(두 손 공통): ${PACE_NAME[D.pace]||""} — Mini 답을 그대로 씁니다.`;
   borgModeUI(); paintBorgRows(); paintJointScores(); if(iStep===3) renderI(); paintIBar(); saveDraft(); }
@@ -924,7 +975,7 @@ function renderI(){ const hs=handsOf(D); const R={}; hs.forEach(h=>R[h]=calcIdx(
   const fin=ok.reduce((a,h)=>R[h].idxE>R[a].idxE?h:a,ok[0]); const F=R[fin], z=OC.izone(F.idxE);
   const pri=[["힘",F.ffEpm],["자세",F.pEpm],["부가요인",F.aEpm],["반복성",F.rf],["회복",F.rc]].sort((a,b)=>a[1]-b[1]).slice(0,2).map(x=>`${x[0]}(${f2(x[1])})`).join(", ");
   const adv=F.idxE<=2.2?["허용","기록하고 주기적으로 다시 평가합니다."]:F.idxE<=3.5?["경계","개선을 권합니다. 먼저 고칠 요인: "+pri]:F.idxE<=9?["개선 필요","먼저 고칠 요인: "+pri]:["즉시 개선","먼저 고칠 요인: "+pri];
-  const rows=[["실제 기술동작 수(ATA, 회/분)",r=>f1(r.ata)],["허용 기술동작 수(RTA, 회/분)",r=>f2(r.rtaE)],["힘 계수",r=>f2(r.ffEpm)],["자세 계수",r=>f2(r.pEpm)],["반복성 계수",r=>`${f2(r.rf)}${r.remAuto?"(자동)":""}`],["부가요인 계수",r=>f2(r.aEpm)],["회복 계수",r=>f2(r.rc)],["지속시간 계수",r=>f2(r.dc)],["OCRA Index",r=>`<b>${fI(r.idxE)}</b>`],["등급",r=>OC.izone(r.idxE).name],["예측 유병률",r=>r.pa?`${f1(r.pa[0])}~${f1(r.pa[2])}%`:"지수 2.2 이하"]];
+  const rows=[["실제 기술동작 수(ATA, 회/분)",r=>fA(r.ata)],["허용 기술동작 수(RTA, 회/분)",r=>fS(r.rtaE)],["힘 계수",r=>f2(r.ffEpm)],["자세 계수",r=>f2(r.pEpm)],["반복성 계수",r=>`${f2(r.rf)}${r.remAuto?"(자동)":""}`],["부가요인 계수",r=>f2(r.aEpm)],["회복 계수",r=>f2(r.rc)],["지속시간 계수",r=>f2(r.dc)],["OCRA Index",r=>`<b>${fI(r.idxE)}</b>`],["등급",r=>OC.izone(r.idxE).name],["예측 유병률",r=>r.pa?`${f1(r.pa[0])}~${f1(r.pa[2])}%`:"지수 2.2 이하"]];
   const notes=[...new Set(ok.filter(h=>R[h].ffClassic!=null&&Math.abs(R[h].ffClassic-R[h].ffEpm)>1e-9).map(h=>`${hs.length>1?HAND[h]+": ":""}강한 힘 비율 ${f1(R[h].peakPct)}%에 EPM 단계 분석 계산표(2017-11)의 피크 힘 표를 적용했습니다(classic 계산표 그대로라면 힘 계수 ${f2(R[h].ffClassic)}).`))];
   $("iRes").innerHTML=`<p class="help" style="margin:0">${esc(D.jobName)} · ${D.mode==="B"?"양손(대칭)":"오른손·왼손 각각"}</p>
    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:4px"><span class="resval">${fI(F.idxE)}</span><span class="zone" style="background:var(--${z.color})">${z.name}</span></div>
@@ -933,7 +984,7 @@ function renderI(){ const hs=handsOf(D); const R={}; hs.forEach(h=>R[h]=calcIdx(
    ${isFinite(F.idxE)?"":`<div class="note"><b>Index 계산 불가</b> 평균 Borg 점수가 5를 넘어 EPM 계산표의 힘 계수가 0이 됩니다. 허용 기술동작 수가 0이라 Index 값을 낼 수 없습니다. 힘이 지나치게 커서 즉시 개선이 필요한 상태입니다.</div>`}
    <div class="nextbox"><b>${adv[0]}</b>${adv[1]}</div>
    <table class="kv"><tr><th></th>${hs.map(h=>`<th>${HAND[h]}</th>`).join("")}</tr>${rows.map(([k,fn])=>`<tr><td>${k}</td>${hs.map(h=>`<td class="n">${R[h].ok?fn(R[h]):"—"}</td>`).join("")}</tr>`).join("")}</table>
-   <p class="help" style="margin:6px 0 0">계수가 작을수록 그 요인이 허용 기술동작 수를 많이 줄입니다.</p>${notes.map(t=>`<div class="note">${t}</div>`).join("")}`;
+   <p class="help" style="margin:6px 0 0">계수가 작을수록 그 요인이 허용 기술동작 수를 많이 줄입니다.</p>${notes.map(t=>`<div class="note">${t}</div>`).join("")}${fxIdx(R,fin)}`;
   const ss=saveState(); $("iAct").innerHTML=`<button type="button" class="btn primary" id="iSave" ${ss.ok?"":"disabled"}>${ss.label}</button><button type="button" class="btn" id="iBack">Mini 결과로</button>`;
   $("iSave").addEventListener("click",saveRecord); $("iBack").addEventListener("click",backToMini); }
 function bandIdxHTML(v){ const pos=OCM.bandPos(v); return `<div class="band">${["z1","z2","z3","z4","z5","z6"].map(c=>`<i style="background:var(--${c})"></i>`).join("")}<div class="marker" style="left:${pos}%"></div></div><div class="ticks"><span>0</span><span>1.5</span><span>2.2</span><span>3.5</span><span>4.5</span><span>9+</span></div>`; }
