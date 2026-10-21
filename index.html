@@ -87,6 +87,8 @@
   .sub{margin-left:12px;border-left:3px solid var(--rule-2);padding-left:10px}
   /* 같은 항목(질문과 그 하위 입력·도우미)을 한 묶음으로: 아주 옅은 회색 바탕 */
   .grp{background:var(--grp);border:1px solid var(--rule);border-radius:12px;padding:12px 12px 0;margin:0 0 12px} .grp>.sub,.grp>div>.sub{margin-bottom:12px} .grp>.sub:last-child{padding-bottom:12px;margin-bottom:0} .grp>.yn{background:transparent;border:0;padding:0 0 10px;margin:0} .grp>details.more{padding-bottom:12px} .grp>details.more>summary{cursor:pointer;font-weight:700} .grp>.note{margin:0 0 12px} .grp>.okbox:last-child{margin-bottom:12px} .pcard{background:var(--grp) !important}
+  /* Mini에서 고른 값(관련 항목의 입력 칸 바로 아래) */
+  .mref{font-size:12.5px;line-height:1.45;color:var(--ink-2);background:var(--sheet);border:1px dashed var(--rule-2);border-radius:8px;padding:4px 8px;margin:-6px 0 12px} .mref b{display:inline-block;font-size:11px;font-weight:800;color:var(--on-acc);background:var(--acc);border-radius:999px;padding:0 6px;margin-right:4px} .jh+.mref{margin:0 0 10px}
   /* 진행 표시 */
   .prog{display:flex;gap:4px;margin:0 0 12px} .prog button{flex:1 1 0;height:34px;border:0;border-radius:8px;background:var(--rule);color:var(--ink-2);font-size:12.5px;font-weight:700;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .prog button.done{background:var(--acc-2);color:var(--acc-3)} .prog button.cur{background:var(--acc);color:var(--on-acc)}
   @media (max-width:560px){ .prog button span{display:none} }
@@ -920,12 +922,41 @@ function handBar2(el,tool){ const hs=tHands(D); if(hs.length===1){ el.innerHTML=
   el.querySelectorAll("[data-h2]").forEach(b=>b.addEventListener("click",()=>{ ciHand=b.dataset.h2; tool==="chk"?paintC():paintI(); })); }
 const peakName=v=>({"0":"없음","1":"약 1%","5":"약 5%","10":"10% 이상"})[String(v)]||"없음";
 /* ---- Checklist 화면 ---- */
+/* ---- Mini에서 고른 값을 Checklist·Index의 관련 항목에 표시 ---- */
+const QUAL_SHORT={"1":"느림","5":"중간","9":"매우 빠름"}, QUAL_FULL={"1":"느림(2초에 1회 미만)","5":"중간, 또는 물체를 오래 쥐고 있음","9":"매우 빠름(초당 1회 초과)"};
+const SAME_NAME={"0":"절반 이하","1":"절반 넘게(51~80%)","2":"거의 내내(80% 넘게)"}, PEAK_FULL={"0":"없음(0.5% 미만)","1":"약 1%(0.5~2% 미만)","5":"약 5%(2~9%)","10":"10% 이상"};
+const B6N=v=>(B6.find(b=>b[0]===String(v))||B6[0])[1];
+function miniBandTxt(d,hh,k){ if(hh[k]==="sec"){ const p=secPct(d,hh,k); return `사이클당 ${esc(String(hh["sec_"+k]??""))}초 입력(${p==null?"—":Math.round(p)+"%"})`; } return `‘${B6N(hh[k]||"0")}’ 선택`; }
+const ynTxt=v=>v==="1"?"‘예’ 선택":"‘아니요’ 선택";
+function setRef(anchor,html){ if(!anchor) return; let r=anchor.nextElementSibling; if(!(r&&r.classList.contains("mref"))){ r=document.createElement("div"); r.className="mref"; anchor.after(r); } r.hidden=!html; if(html) r.innerHTML=`<b>Mini</b>${html}`; }
+const refAt=(id,html)=>{ const e=$(id); setRef(e.closest(".row2")||e.closest("label.f")||e,html); };
+const qualPh=(hh,dflt)=>hh.canCount==="0"&&QUAL_SHORT[hh.qual]?`Mini: 빠르기 ‘${QUAL_SHORT[hh.qual]}’ 선택`:dflt;
+function miniUnrecPh(){ const sc=OC.shift(Object.assign(ocOrg(D),{unrecHours:"",inCycle:false})); return sc?`Mini 휴식 입력 → ${sc.unrec}시간`:"비우면 휴식 횟수로 계산"; }
+function paintCRef(){ const hh=D.H[ciHand];
+  refAt("c_fast",hh.qual==="9"?`빠르기 ‘${QUAL_FULL["9"]}’ 선택`:"");
+  $("c_taN").placeholder=qualPh(hh,"예: 40");
+  refAt("c_static",hh.canCount==="0"&&hh.qual==="5"?`빠르기 ‘${QUAL_FULL["5"]}’ 선택`:"");
+  $("c_max").placeholder=Number(hh.peak)>0?`Mini: 강한 힘 ‘${peakName(hh.peak)}’ 선택`:"없으면 0";
+  $("c_unrec").placeholder=miniUnrecPh(); }
+function paintIRef(){ const hh=D.H[ciHand];
+  $("i_taN").placeholder=qualPh(hh,"예: 40");
+  const JB={shoulder:["어깨","bSh"],elbow:["팔꿈치","bEl"],wrist:["손목","bWr"],hand:["손","bHand"]};
+  OC.JOINTS.forEach(J=>{ const m=JB[J.key]; const h=$("ij_"+J.key); if(m&&h) setRef(h.closest(".jh"),`${m[0]} ${miniBandTxt(D,hh,m[1])}`); });
+  refAt("i_borg",`중간 힘 ‘${B6N(hh.modBand||"0")}’ · 강한 힘 ‘${PEAK_FULL[String(Number(hh.peak)||0)]||PEAK_FULL["0"]}’ 선택`);
+  refAt("i_peak",`강한 힘 ‘${PEAK_FULL[String(Number(hh.peak)||0)]||PEAK_FULL["0"]}’ 선택`);
+  refAt("i_staticSec",hh.canCount==="0"&&hh.qual==="5"?`빠르기 ‘${QUAL_FULL["5"]}’ 선택`:"");
+  const KN={cold:"추위",glove:"장갑",precision:"정밀작업",compress:"국소 압박",other:"기타"};
+  const oth=hh.others==="1"?`그 밖의 요인 ‘예’ 선택${(hh.otherKinds||[]).length?`(해당 요인: ${(hh.otherKinds||[]).map(k=>KN[k]||k).join(", ")})`:""}`:`그 밖의 요인 ${ynTxt(hh.others)}`;
+  refAt("ia_vib",`진동 공구 사용 ${ynTxt(hh.vib)}`); refAt("ia_strike",`반동·충격이 있는 공구 사용 ${ynTxt(hh.strike)}`); refAt("ia_impact",`손을 망치처럼 사용 ${ynTxt(hh.impact)}`);
+  ["precision","compress","other"].forEach(k=>refAt("ia_"+k,oth));
+  refAt("i_rem",`같은 동작 비율 ‘${SAME_NAME[String(hh.same||"0")]}’ 선택 · 사이클 타임 ${esc(String(D.cycleSec??""))}초`);
+  $("i_unrec").placeholder=miniUnrecPh(); }
 function paintC(){ const hh=D.H[ciHand], c=hh.chk; document.querySelectorAll("#chkv .cstep").forEach(s=>s.hidden=Number(s.dataset.c)!==cStep);
   $("cprog").innerHTML=["C1 추가 항목","C2 결과"].map((n,i)=>`<button type="button" class="${i<cStep?"done":i===cStep?"cur":""}" data-cs="${i}">${n}</button>`).join(""); $("cprog").querySelectorAll("[data-cs]").forEach(b=>b.addEventListener("click",()=>{ cStep=+b.dataset.cs; paintC(); }));
   if(cStep===0){ c.seen=true; handBar2($("cHandBar"),"chk"); document.querySelectorAll("#chkv .hname2").forEach(e=>e.textContent=`— ${HAND[ciHand]}`);
     $("c_pauses").value=D.X.pauses; const need=hh.canCount==="0"; $("cNeedCount").hidden=!need; $("cFastBox").hidden=!(need&&hh.qual==="9"); $("c_fast").value=c.fast;
     $("cTaBox").hidden=!(need&&!(hh.qual==="9"&&c.fast==="1")); $("c_taN").value=c.taN; $("c_static").value=c.staticBand; const pk=Number(hh.peak)||0; $("cMaxBox").hidden=!(pk>0); $("cNoPeak").hidden=pk>0; $("c_max").value=c.maxPct; $("c_max").max=pk;
-    $("cMaxHelp").textContent=pk>0?`Mini에서 고른 강한 힘: ${peakName(hh.peak)}(대표값 ${pk}%). 이보다 크게 넣을 수 없습니다.`:""; $("c_unrec").value=D.X.unrecHours; $("c_incycle").value=D.X.inCycle; cMaxWarnUI();
+    $("cMaxHelp").textContent=pk>0?`Mini에서 고른 강한 힘: ${peakName(hh.peak)}(대표값 ${pk}%). 이보다 크게 넣을 수 없습니다.`:""; $("c_unrec").value=D.X.unrecHours; $("c_incycle").value=D.X.inCycle; cMaxWarnUI(); paintCRef();
     const s=chkSide(D,ciHand), a=OC.apm(s); $("cApm").hidden=a==null; if(a!=null) $("cApm").textContent=`분당 기술동작 수: ${f1(a)}회/분`; }
   if(cStep===1) renderC(); paintCBar(); saveDraft(); }
 function readC(){ const c=D.H[ciHand].chk; D.X.pauses=$("c_pauses").value; c.fast=$("c_fast").value; c.taN=$("c_taN").value; c.staticBand=$("c_static").value; c.maxPct=$("c_max").value; D.X.unrecHours=$("c_unrec").value; D.X.inCycle=$("c_incycle").value; }
@@ -992,7 +1023,7 @@ function paintI(){ const hh=D.H[ciHand], x=hh.idx; document.querySelectorAll("#i
   $("i_estOK").checked=!!x.estOK; $("i_borg").value=x.borg; $("i_peak").value=x.peak; $("i_peak").placeholder=`비우면 Mini 값 ${Number(hh.peak)||0}%`; $("i_peak").classList.toggle("est",!!x.estPeak); $("i_staticSec").value=x.staticSec; $("i_staticN").value=x.staticN; $("i_rem").value=x.remSel;
   AF_IDX.forEach(([k])=>{ const e=$("ia_"+k); e.value=x.durs[k]||"0"; e.classList.toggle("est",x.estAF.includes(k)); });
   $("i_unrec").value=D.X.unrecHours; $("i_incycle").value=D.X.inCycle; $("iPace").textContent=`작업속도(두 손 공통): ${PACE_NAME[D.pace]||""} — Mini 답을 그대로 씁니다.`;
-  paintBorgRows(); paintJointScores(); if(iStep===3) renderI(); paintIBar(); saveDraft(); }
+  paintBorgRows(); paintJointScores(); if(iStep<3) paintIRef(); if(iStep===3) renderI(); paintIBar(); saveDraft(); }
 function readI(){ const x=D.H[ciHand].idx; x.taN=$("i_taN").value; OC.JOINTS.forEach(J=>J.items.forEach(it=>{ const v=$("ip_"+it.id).value; if(v==="") delete x.post[it.id]; else x.post[it.id]=v; }));
   x.estOK=$("i_estOK").checked; x.borg=$("i_borg").value; if(!helperCalc(x).active) x.borgDirect=x.borg; x.peak=$("i_peak").value; x.staticSec=$("i_staticSec").value; x.staticN=$("i_staticN").value; x.remSel=$("i_rem").value; AF_IDX.forEach(([k])=>{ const v=$("ia_"+k).value; if(v==="0") delete x.durs[k]; else x.durs[k]=v; });
   D.X.unrecHours=$("i_unrec").value; D.X.inCycle=$("i_incycle").value; }
