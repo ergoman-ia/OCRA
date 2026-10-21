@@ -55,6 +55,7 @@
   @media (max-width:767px),(max-height:500px) and (pointer:coarse){.mgrp{display:none !important} .startgrid{grid-template-columns:1fr}}
   details.fx{margin-top:10px;border:1px solid var(--rule);border-radius:10px;padding:0 10px;background:var(--sheet)} details.fx>summary{cursor:pointer;font-weight:700;font-size:14px;padding:10px 0;color:var(--acc)} details.fx[open]>summary{border-bottom:1px solid var(--rule);margin-bottom:6px}
   .fxh{font-weight:800;font-size:14px;margin:8px 0 4px} .fxl{font-size:13px;line-height:1.55;margin:0 0 5px;padding-left:10px;border-left:3px solid var(--rule-2);word-break:keep-all;overflow-wrap:anywhere} .fxl b{font-variant-numeric:tabular-nums} .fxl.eq{border-left-color:var(--acc);background:var(--acc-2);padding:5px 8px;border-radius:0 6px 6px 0} .fxs{font-size:12px;color:var(--ink-3);margin:6px 0 8px}
+  .rechead{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap} .rechead h2{margin:0}
   .lsnote{color:#C62828;font-size:12.5px;font-weight:600;margin:-2px 0 10px;line-height:1.45} @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .lsnote{color:#FF8A80}}
   .rec .rck{width:24px;height:24px;flex:none;accent-color:#C62828} .rec.sel{border-color:#C62828;background:rgba(198,40,40,.06)}
   /* OCRA Checklist(주황)·OCRA Index(보라) */
@@ -140,7 +141,7 @@
     <p class="help" style="margin:10px 0 0">근무 조건·사이클은 한 번, 2단계부터는 오른손·왼손을 각각 입력합니다(두 손이 같은 동작이면 ‘양손’으로 한 번).</p>
   </div>
   <div class="card">
-    <h2>저장된 평가 <span class="help" id="recCount" style="font-weight:500"></span></h2>
+    <div class="rechead"><h2>저장된 평가 <span class="help" id="recCount" style="font-weight:500"></span></h2><button type="button" class="btn small" id="tcBtn">테스트용 사례 생성</button></div>
     <p class="lsnote" id="lsNote" hidden>이 목록은 이 기기의 이 브라우저에만 저장됩니다. 브라우저를 바꾸거나 방문 기록·쿠키·사이트 데이터를 지우면 사라질 수 있습니다.</p>
     <div id="recList"></div>
     <p class="help" id="recEmpty">아직 저장된 평가가 없습니다.</p>
@@ -338,16 +339,16 @@
   </section>
   <section class="card istep" data-i="1" hidden>
     <h2><span class="no">I2</span>힘·정적 동작 <span class="help hname2" style="font-weight:500"></span></h2>
-    <label class="f"><span class="lt">평균 Borg 점수 넣는 방법 <button type="button" class="tip" data-tip="평균 Borg 점수는 힘을 쓰는 동작마다 ‘Borg 점수 × 지속 시간’을 더해 사이클 타임으로 나눈 값입니다(힘을 쓰지 않는 시간은 0). 이미 계산한 평균값이 있으면 직접 넣고, 없으면 동작별로 적어 계산합니다. 둘 중 하나만 씁니다.">?</button></span><select id="i_borgMode" class="seg2"><option value="direct">평균값 직접 입력</option><option value="calc">동작별로 계산</option></select></label>
-    <div id="iBorgDirect"><label class="f"><span class="lt">평균 Borg 점수 <span class="u">0~10</span></span><input type="number" id="i_borg" min="0" max="10" step="0.01" inputmode="decimal" placeholder="예: 1.5"></label></div>
-    <div id="iBorgCalc" class="sub" hidden>
-      <p class="help" style="margin:0 0 8px">힘을 쓰는 동작마다 Borg 점수와 한 사이클 안의 지속 시간(초)을 적습니다. 평균 Borg 점수와 강한 힘(Borg 5 이상) 비율을 자동으로 계산해 씁니다.</p>
+    <label class="f"><span class="lt">평균 Borg 점수 <span class="u">0~10</span> <button type="button" class="tip" data-tip="힘을 쓰는 동작마다 ‘Borg 점수 × 지속 시간’을 더해 사이클 타임으로 나눈 값입니다(힘을 쓰지 않는 시간은 0). 평균을 알면 여기에 직접 넣고, 모르면 아래 ‘동작별 계산 도우미’에 동작을 적습니다. 동작 표에 값이 있으면 그 계산값이 우선합니다.">?</button></span><input type="number" id="i_borg" min="0" max="10" step="0.01" inputmode="decimal" placeholder="예: 1.5"></label>
+    <p class="help" id="iBorgSrc" hidden>아래 동작 표에서 계산한 값입니다(동작 표 우선). 직접 넣으려면 ‘동작 표 비우기’를 누르세요.</p>
+    <details class="more" id="iBorgHelp"><summary>동작별 계산 도우미(평균을 모를 때)</summary>
+      <p class="help" style="margin:8px 0">힘을 쓰는 동작마다 Borg 점수와 한 사이클 안의 지속 시간(초)을 적으면 평균 Borg 점수와 강한 힘(Borg 5 이상) 비율을 계산해 두 칸에 넣습니다.</p>
       <div id="iBorgRows"></div>
-      <div class="actions"><button type="button" class="btn small" id="iBorgAdd">줄 추가</button></div>
+      <div class="actions"><button type="button" class="btn small" id="iBorgAdd">줄 추가</button><button type="button" class="btn small" id="iBorgClear">동작 표 비우기</button></div>
       <div class="okbox" id="iBorgOut" hidden></div>
-    </div>
+    </details>
     <div class="note" id="iBorgWarn" hidden>평균 Borg 점수가 5를 넘으면 EPM 계산표의 힘 계수가 0이 되어 Index를 계산할 수 없습니다(힘이 지나치게 큼 — 즉시 개선 대상). 값이 맞는지 확인하세요.</div>
-    <label class="f"><span class="lt">강한 힘(Borg 5 이상) 시간 비율 <span class="u">%</span> <button type="button" class="tip" data-tip="Mini에서 고른 구간의 대표값이 들어 있습니다(노란 칸). Index는 이 비율이 1% 이상이면 힘 계수를 더 낮추므로 가능하면 정확한 값을 넣습니다.">?</button></span><input type="number" id="i_peak" min="0" max="100" step="0.1" inputmode="decimal"></label><p class="help" id="iPeakCalcNote" hidden>동작별 계산값이 자동으로 들어갑니다. 실제와 다르면 고칠 수 있습니다.</p>
+    <label class="f"><span class="lt">강한 힘(Borg 5 이상) 시간 비율 <span class="u">%</span> <button type="button" class="tip" data-tip="Mini에서 고른 구간의 대표값이 들어 있습니다(노란 칸). Index는 이 비율이 1% 이상이면 힘 계수를 더 낮추므로 가능하면 정확한 값을 넣습니다.">?</button></span><input type="number" id="i_peak" min="0" max="100" step="0.1" inputmode="decimal"></label><p class="help" id="iPeakCalcNote" hidden>‘동작별로 계산’에서는 위 동작 표의 Borg 5 이상 시간으로 자동 계산합니다. 바꾸려면 동작 표의 Borg 점수나 시간을 고치세요.</p><div class="note" id="iPeakMini" hidden></div>
     <div class="row2">
       <label class="f"><span class="lt">정적 유지 시간 <span class="u">초, 선택</span> <button type="button" class="tip" data-tip="한 사이클 안에서 물체를 5초 넘게 계속 쥐고 있는 시간의 합입니다. 유지 1초를 기술동작 0.75회로 환산합니다.">?</button></span><input type="number" id="i_staticSec" min="0" step="0.1" inputmode="decimal" placeholder="없으면 비움"></label>
       <label class="f"><span class="lt">정적 동작 수 <span class="u">회</span></span><input type="number" id="i_staticN" min="1" step="1" inputmode="numeric" placeholder="비우면 1"></label>
@@ -731,14 +732,40 @@ function renderActions(A,miss){ const btns=[]; const ss=saveState(A); btns.push(
 function resultText(d,A){ const F=A.res[A.fin], z=OCM.czone(F.score), nx=OCM.nextStep(A.rng); return [`OCRA Mini-Checklist — ${d.jobName||"(작업 이름 없음)"}`,d.company||d.dept?`${d.company||""} ${d.dept||""}`.trim():null,...handsOf(d).map(h=>A.res[h].ok?`${HAND[h]}: ${f1(A.res[h].score)}점(${OCM.czone(A.res[h].score).name}) = (빈도 ${A.res[h].fr.score} + 자세 ${A.res[h].posture} + 힘 ${A.res[h].force} + 부가요인 ${A.res[h].add}) × 회복 ${A.res[h].sc.rcm} × 지속시간 ${A.res[h].sc.du}`:`${HAND[h]}: 미입력`),`최종(높은 쪽): ${f1(F.score)}점 (${z.name}), 예상 범위 ${f1(A.rng.min)}~${f1(A.rng.max)}`,`다음 단계: ${nx.label}`].filter(Boolean).join("\n"); }
 /* ---- 저장·불러오기 ---- */
 function handSummary(r){ return r&&r.ok?{score:+f1(r.score),min:+f1(r.min),max:+f1(r.max),zone:OCM.czone(r.score).name,freq:r.fr.score,posture:r.posture,force:r.force,add:r.add,partial:r.partial}:null; }
+function recFromD(d,id){ const A=calcAll(d); const F=A.res[A.fin], z=OCM.czone(F.score), nx=OCM.nextStep(A.rng); const hands={}; handsOf(d).forEach(h=>hands[h]=handSummary(A.res[h]));
+  return {id,kind:"task",savedAt:new Date().toISOString(),inputs:JSON.parse(JSON.stringify(d)),result:{mode:d.mode,hands,fin:A.fin,score:+f1(F.score),min:+f1(A.rng.min),max:+f1(A.rng.max),zone:z.name,next:nx.label,rcm:F.sc.rcm,du:F.sc.du,unrec:F.sc.unrec,net:F.sc.net,chk:toolSummary(d,"chk"),idx:toolSummary(d,"idx")}}; }
 function saveRecord(){ writeHand(); const A=calcAll(D); if(!D.jobName.trim()){ dialog("작업 이름이 없습니다","작업 이름을 넣은 뒤 저장해 주세요.",()=>goStep(0)); return; }
   if(!A.complete){ const left=D.mode==="RL"?["R","L"].filter(h=>!handDone(D,h)):["B"]; dialog("아직 저장할 수 없습니다",`${left.map(h=>HAND[h]).join("·")} 입력이 끝나지 않았습니다. ${D.mode==="RL"?"두 손의 동작이 다르면 오른손과 왼손을 모두 입력해야 저장할 수 있습니다. 두 손이 같은 동작을 같은 비율로 하면 ‘양손’을 고르세요.":""}`,null); return; }
   if(toMulti){ const before=JSON.stringify(M.org), had=num(M.org.shiftH)>0; M.org=orgFrom(D); const chg=had&&before!==JSON.stringify(M.org); const d=JSON.parse(JSON.stringify(D)); if(mEditIdx!=null&&M.tasks[mEditIdx]){ M.tasks[mEditIdx].d=d; } else M.tasks.push({tid:tid(),min:null,d}); toMulti=false; mEditIdx=null; M.pending=null; store.del(KEY_DRAFT); saveMDraft(); show("multi"); toast(`‘${D.jobName}’을(를) 넣었습니다.${chg?" 바뀐 공통 근무 조건을 모든 작업에 적용했습니다.":""} 하루 수행 시간(분)을 넣으세요.`); return; }
-  const F=A.res[A.fin], z=OCM.czone(F.score), nx=OCM.nextStep(A.rng); const list=recs(); const id=editId||("r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6));
-  const hands={}; handsOf(D).forEach(h=>hands[h]=handSummary(A.res[h]));
-  const rec={id,kind:"task",savedAt:new Date().toISOString(),inputs:JSON.parse(JSON.stringify(D)),result:{mode:D.mode,hands,fin:A.fin,score:+f1(F.score),min:+f1(A.rng.min),max:+f1(A.rng.max),zone:z.name,next:nx.label,rcm:F.sc.rcm,du:F.sc.du,unrec:F.sc.unrec,net:F.sc.net,chk:toolSummary(D,"chk"),idx:toolSummary(D,"idx")}};
+  const list=recs(); const id=editId||("r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)); const rec=recFromD(D,id);
   const i=list.findIndex(x=>x.id===id); if(i>=0) list[i]=rec; else list.unshift(rec); if(!store.set(KEY_REC,list)){ dialog("저장 실패","브라우저 저장소에 쓸 수 없습니다(저장 공간 부족 또는 비공개 모드).",null); return; }
   editId=id; store.del(KEY_DRAFT); toast(`‘${D.jobName}’을(를) 목록에 저장했습니다.`); show("home"); }
+/* ---- 테스트용 사례(ocra_staged_evaluator_V2.html의 예시를 그대로 옮김) ----
+   한 손 사례 2건: 오른손 값만 있음(왼손은 비워 둠 → ‘한 손 미입력’). 양손 사례 6건: E3S(2023년) 작업자 1~3, 개선 전·후 */
+const TC_E3S={org:{before:{shiftH:"9",mealN:"1",mealLen:"50",mealIn:"1",break8N:"1",breakTotal:"10",nonRepMin:"20",unrec:"3.5"},after:{shiftH:"9",mealN:"1",mealLen:"40",mealIn:"1",break8N:"2",breakTotal:"20",nonRepMin:"20",unrec:"2.5"}},
+  cyc:{1:"114.75",2:"99.8",3:"108.15"}, name:{1:"작업자 1 CNC 선반",2:"작업자 2 드릴",3:"작업자 3 태핑"},
+  hands:{"1-before-L":{taN:23,borg:1.5,peak:0,same:0,stat:0,band:{},post:{}},"1-before-R":{taN:53,borg:2.5,peak:1.6,same:0,stat:0,band:{bHand:2},post:{sh80:3.85,elPro:0.66,wrUln:0.72,wrExt:2.58,hdPower:26.74,hdNarrow:18.89,hdPinch:7.44,hdHook:14.97}},
+   "1-after-L":{taN:23,borg:1.5,peak:0,same:0,stat:0,band:{},post:{}},"1-after-R":{taN:53,borg:2.0,peak:0,same:0,stat:0,band:{bHand:2},post:{sh80:3.85,elPro:0.66,wrUln:0.72,wrExt:2.58,hdPower:26.74,hdNarrow:18.89,hdPinch:7.44,hdHook:14.97}},
+   "2-before-L":{taN:17,borg:1.5,peak:0,same:0,stat:0,band:{},post:{}},"2-before-R":{taN:32,borg:2.0,peak:0,same:0,stat:0,band:{bHand:2},post:{hdPalm:30}},
+   "2-after-L":{taN:17,borg:1.5,peak:0,same:0,stat:0,band:{},post:{}},"2-after-R":{taN:32,borg:1.5,peak:0,same:0,stat:0,band:{bHand:2},post:{hdPalm:30}},
+   "3-before-L":{taN:5,borg:0.5,peak:0,same:0,stat:0,band:{},post:{}},"3-before-R":{taN:31,borg:1.5,peak:0,same:2,stat:2,band:{bHand:5},post:{hdPower:83.14,hdNarrow:25}},
+   "3-after-L":{taN:5,borg:0.5,peak:0,same:0,stat:0,band:{},post:{}},"3-after-R":{taN:31,borg:1.5,peak:0,same:0,stat:0,band:{bHand:2},post:{hdNarrow:25}}}};
+const peakCat=p=>p<0.5?"0":p<2?"1":p<10?"5":"10";
+function tcHand(d,h,o){ const hh=d.H[h]; Object.assign(hh,{same:String(o.same||0),canCount:"1",taN:String(o.taN),bHand:String(o.band.bHand||0),bSh:String(o.band.bSh||0),bWr:String(o.band.bWr||0),bEl:String(o.band.bEl||0),modBand:String(o.modBand||0),peak:peakCat(o.peak||0),others:o.cold?"1":"0",otherKinds:o.cold?["cold"]:[],seen:[2,3,4,5]});
+  Object.assign(hh.chk,{staticBand:String(o.stat||0),maxPct:"",seen:true});
+  const post={}; Object.entries(o.post||{}).forEach(([k,v])=>post[k]=String(v));
+  Object.assign(hh.idx,{post,est:[],estOK:true,borg:String(o.borg),borgDirect:String(o.borg),peak:String(o.peak||0),peakDirect:String(o.peak||0),peakMini:peakCat(o.peak||0),estPeak:false,durs:o.cold?{other:"3"}:{},estAF:[],pre:true,borgRows:[],seen:[0,1,2]}); }
+function testCases(){ const out=[];
+  { const d=blank(); Object.assign(d,{jobName:"[테스트] 아이스크림 포장(오른손만)",jobDesc:"V2 한 손 사례(Ergonomiesite). 사이트 값: OCRA Checklist 32점, OCRA Index 11.2. 왼손은 원자료가 없어 비워 둠.",shiftH:"9",mealN:"1",mealLen:"60",mealIn:"0",break8N:"2",breakTotal:"20",nonRepMin:"20",otherBreakN:"0",cycleSec:"37",pace:"2",mode:"RL",cur:"R"}); d.X.pauses="0";
+    tcHand(d,"R",{taN:40,same:2,band:{bHand:5,bSh:1,bWr:3,bEl:3},peak:0,cold:true,borg:0.63,post:{hdPalm:60,hdPower:19,elFlex:48,wrRad:41,sh80:15}}); out.push(d); }
+  { const d=blank(); Object.assign(d,{jobName:"[테스트] 테이핑(오른손만)",jobDesc:"V2 한 손 사례(핸드북 사례 6-4 와이어링 하네스 테이핑). 핸드북 값 11.8은 ISO 간이표 기준이고 EPM 기준으로는 6.4. 왼손은 원자료가 없어 비워 둠.",shiftH:"8",mealN:"1",mealLen:"60",mealIn:"0",break8N:"1",breakTotal:"10",nonRepMin:"30",otherBreakN:"0",cycleSec:"8",pace:"0",mode:"RL",cur:"R"}); d.X.pauses="1";
+    tcHand(d,"R",{taN:5.33,same:2,band:{bEl:2},modBand:5,peak:0,borg:3,post:{elPro:40}}); out.push(d); }
+  for(const op of [1,2,3]) for(const ph of ["before","after"]){ const O=TC_E3S.org[ph]; const d=blank();
+    Object.assign(d,{jobName:`[테스트] E3S ${TC_E3S.name[op]} ${ph==="before"?"개선 전":"개선 후"}`,jobDesc:"V2 양손 사례: Firdaus & Sahroni, E3S Web Conf 2023;426:01080. 원문은 OCRA Index만 있음(Mini·Checklist는 참고용). 회복 없는 시간은 원문이 시간표로 따진 값.",shiftH:O.shiftH,mealN:O.mealN,mealLen:O.mealLen,mealIn:O.mealIn,break8N:O.break8N,breakTotal:O.breakTotal,nonRepMin:O.nonRepMin,otherBreakN:"0",cycleSec:TC_E3S.cyc[op],pace:"0",mode:"RL",cur:"R"});
+    d.X.pauses="1"; d.X.unrecHours=O.unrec; ["R","L"].forEach(h=>tcHand(d,h,TC_E3S.hands[`${op}-${ph}-${h}`])); out.push(d); }
+  return out; }
+$("tcBtn").addEventListener("click",()=>dialog("테스트용 사례를 만들까요?","V2 파일의 예시 8건을 목록에 추가합니다.<br>· 한 손 사례 2건(아이스크림 포장, 테이핑): 오른손만 입력, 왼손은 비어 있음<br>· 양손 사례 6건(E3S 2023 작업자 1~3, 개선 전·후)<br><span class='help'>이미 만든 테스트용 사례는 같은 이름끼리 새로 바꿉니다.</span>",()=>{
+  const list=recs().filter(r=>!r.test); const add=testCases().map((d,i)=>Object.assign(recFromD(d,"t"+Date.now().toString(36)+i),{test:true})); store.set(KEY_REC,add.concat(list)); renderHome(); toast(`테스트용 사례 ${add.length}건을 목록에 추가했습니다.`); }));
 /* 저장 기록이 완전한지(새 구조이고 두 손 또는 양손이 계산됨) */
 function recState(rec){ const d=upgrade(rec.inputs); const A=calcAll(d); const legacy=!rec.inputs.H; const ok=handsOf(d).every(h=>A.res[h].ok); return {d,A,ok,legacy}; }
 function openRecord(id){ const rec=recs().find(x=>x.id===id); if(!rec) return; if(rec.kind==="multi"){ if(!MULTI_ON){ dialog("여러 작업 평가 (개발 중…)","여러 작업 평가는 개발 중이라 지금은 열 수 없습니다. 저장된 결과는 목록에 그대로 남아 있습니다."); return; } openMulti(rec); return; } D=upgrade(rec.inputs); editId=id; baseSnap=snapOf(D); paintAll(); show("wiz"); goStep(6); onInput(); }
@@ -830,9 +857,12 @@ const PACE_NAME={"0":"작업자가 정함","1.5":"기계가 정하지만 버퍼�
 const AF_IDX=[["vib","진동 공구"],["strike","반동·충격(망치질 등)"],["impact","손을 망치처럼 사용"],["precision","정밀작업(2~3 mm)"],["compress","국소 압박(피부 자국·굳은살)"],["other","그 밖(추위·부적합한 장갑·미끄러운 물체 등)"]];
 const AF_LV=[["0","없음 또는 조금(25% 미만)"],["1","약 1/3(25~50%)"],["2","절반 넘게(51~80%)"],["3","거의 내내(80% 넘게)"]];
 function blankChk(){ return {staticBand:"0",maxPct:"",fast:"1",taN:"",seen:false}; }
-function blankIdx(){ return {taN:"",post:{},est:[],estOK:false,borg:"",borgMode:"direct",peak:"",estPeak:false,staticSec:"",staticN:"",remSel:"auto",durs:{},estAF:[],pre:false,borgRows:[],seen:[]}; }
+function blankIdx(){ return {taN:"",post:{},est:[],estOK:false,borg:"",borgDirect:"",peakDirect:null,peakMini:null,peak:"",estPeak:false,staticSec:"",staticN:"",remSel:"auto",durs:{},estAF:[],pre:false,borgRows:[],seen:[]}; }
 function ensureCI(d){ d.X=Object.assign({pauses:"",unrecHours:"",inCycle:"0"},d.X||{}); if(d.X.pauses==="") d.X.pauses=d.pace==="2"?"0":"1";
-  ["R","L","B"].forEach(h=>{ const hh=d.H[h]; hh.chk=Object.assign(blankChk(),hh.chk||{}); hh.idx=Object.assign(blankIdx(),hh.idx||{}); }); return d; }
+  ["R","L","B"].forEach(h=>{ const hh=d.H[h]; hh.chk=Object.assign(blankChk(),hh.chk||{}); const had=hh.idx||{}; hh.idx=Object.assign(blankIdx(),had); const x=hh.idx;
+    /* 예전 기록(넣는 방법 선택 버튼 시절): 직접 입력이었으면 쓰지 않던 동작 표는 비우고 그 값을 직접 입력값으로 */
+    if(had.borgMode!==undefined){ if(had.borgMode==="direct"){ x.borgRows=[]; x.borgDirect=x.borg; if(!x.estPeak&&x.peak!=="") x.peakDirect=x.peak; } delete x.borgMode; }
+    if(x.pre&&x.peakMini==null) x.peakMini=String(Number(hh.peak)||0); }); return d; }
 const ocOrg=d=>Object.assign(orgOf(d),{unrecHours:d.X.unrecHours,inCycle:d.X.inCycle==="1"});
 const ocShared=d=>({cyc:num(d.cycleSec),pace:PACE_OC[d.pace]??0});
 /* Checklist 손별 입력 */
@@ -853,7 +883,7 @@ function prefillIdx(d,h){ const hh=d.H[h], x=hh.idx; if(x.pre) return; const mid
   const set=(id,v)=>{ if(v>0){ x.post[id]=String(v); x.est.push(id); } };
   set("hdPinch",pctOf("bHand")); set("wrFlex",pctOf("bWr")); set("elFlex",pctOf("bEl"));
   { const shB=hh.bSh==="sec"?null:Number(hh.bSh)||0; set("sh80",shB==null?pctOf("bSh"):[0,10,20,30,40,50][shB]); }
-  x.peak=String(Number(hh.peak)||0); x.estPeak=Number(hh.peak)>0;
+  x.peak=String(Number(hh.peak)||0); x.peakMini=x.peak; x.estPeak=Number(hh.peak)>0;
   const af={}; if(hh.vib==="1") af.vib="1"; if(hh.strike==="1") af.strike="2"; if(hh.impact==="1") af.impact="1";
   if(hh.others==="1"){ const k=hh.otherKinds||[]; if(k.includes("precision")) af.precision="2"; if(k.includes("compress")) af.compress="2"; if(!k.length||k.some(v=>["cold","glove","other"].includes(v))) af.other="2"; }
   x.durs=af; x.estAF=Object.keys(af); x.pre=true; x.estOK=false; }
@@ -904,10 +934,10 @@ function fxChk(R,fin){ const hs=handsOf(D); const T=OC.T.chk; let b="";
 const fS=v=>v==null||!isFinite(v)?"—":(Math.abs(v)>=1?f2(v):String(+(+v).toPrecision(3)));
 const fA=v=>v==null||!isFinite(v)?"—":(Math.abs(v)>=10?f1(v):String(+(+v).toPrecision(3)));
 function fxIdx(R,fin){ const hs=handsOf(D); let b="";
-  hs.forEach(h=>{ const r=R[h]; if(!r||!r.ok) return; const s=idxSide(D,h), sc=r.sc; const ffB=OC.fomEpm(r.borg), ffP=OC.look(OC.T.peakEpm,r.peakPct/100,OC.T.peakLast);
+  hs.forEach(h=>{ const r=R[h]; if(!r||!r.ok) return; const s=idxSide(D,h), sc=r.sc; const ffB=OC.fomEpm(r.borg), ffP=OC.look(OC.T.peakEpm,r.peakPct/100,OC.T.peakLast); const xi=D.H[h].idx, hAct=helperCalc(xi).active; const srcB=hAct?"(동작 표 계산)":"(직접 입력)", srcP=hAct?"(동작 표 계산)":(xi.estPeak?"(Mini 답 추정값)":"(직접 입력)");
     b+=fxHand(hs,h)
      +fxL(`실제 기술동작 수(ATA) = 사이클당 ${+(+r.perCycle).toFixed(2)}회 × 60 ÷ 사이클 ${s.taSec}초 = <b>${fA(r.ata)}</b>회/분${r.hold?` <br><small>정적 유지 ${r.hold.S}초 × 0.75 = ${f2(r.hold.imag)}회로 환산(정적 동작 ${r.hold.h}회 대신)</small>`:""}`)
-     +fxL(`힘 계수 = 작은 값(평균 Borg ${r.borg} → ${f2(ffB)}, 강한 힘 ${f1(r.peakPct)}% → ${f2(ffP)}) = <b>${f2(r.ffEpm)}</b>`)
+     +fxL(`힘 계수 = 작은 값(평균 Borg ${r.borg}${srcB} → ${f2(ffB)}, 강한 힘 ${f1(r.peakPct)}%${srcP} → ${f2(ffP)}) = <b>${f2(r.ffEpm)}</b>`)
      +fxL(`자세 계수 = 관절별 계수 중 가장 작은 값(${r.joints.map(j=>`${j.name} ${j.score}점 → ${f2(j.epm)}`).join(", ")}) = <b>${f2(r.pEpm)}</b>`)
      +fxL(`반복성 계수: ${["없음","보통","높음"][r.remLvl]}${r.remAuto?"(자동)":""} → <b>${f2(r.rf)}</b>`)
      +fxL(`부가요인 계수: 점수 ${r.as} → <b>${f2(r.aEpm)}</b>`)
@@ -941,29 +971,43 @@ function paintI(){ const hh=D.H[ciHand], x=hh.idx; document.querySelectorAll("#i
   $("iHandBar").hidden=iStep===3; if(iStep<3) handBar2($("iHandBar"),"idx"); document.querySelectorAll("#idxv .hname2").forEach(e=>e.textContent=`— ${HAND[ciHand]}`);
   $("iNeedCount").hidden=hh.canCount==="1"; $("i_taN").value=x.taN;
   OC.JOINTS.forEach(J=>J.items.forEach(it=>{ const e=$("ip_"+it.id); e.value=x.post[it.id]??""; e.classList.toggle("est",x.est.includes(it.id)); }));
-  $("i_estOK").checked=!!x.estOK; $("i_borg").value=x.borg; $("i_borgMode").value=x.borgMode||"direct"; $("i_peak").value=x.peak; $("i_peak").placeholder=`비우면 Mini 값 ${Number(hh.peak)||0}%`; $("i_peak").classList.toggle("est",!!x.estPeak); $("i_staticSec").value=x.staticSec; $("i_staticN").value=x.staticN; $("i_rem").value=x.remSel;
+  $("i_estOK").checked=!!x.estOK; $("i_borg").value=x.borg; $("i_peak").value=x.peak; $("i_peak").placeholder=`비우면 Mini 값 ${Number(hh.peak)||0}%`; $("i_peak").classList.toggle("est",!!x.estPeak); $("i_staticSec").value=x.staticSec; $("i_staticN").value=x.staticN; $("i_rem").value=x.remSel;
   AF_IDX.forEach(([k])=>{ const e=$("ia_"+k); e.value=x.durs[k]||"0"; e.classList.toggle("est",x.estAF.includes(k)); });
   $("i_unrec").value=D.X.unrecHours; $("i_incycle").value=D.X.inCycle; $("iPace").textContent=`작업속도(두 손 공통): ${PACE_NAME[D.pace]||""} — Mini 답을 그대로 씁니다.`;
-  borgModeUI(); paintBorgRows(); paintJointScores(); if(iStep===3) renderI(); paintIBar(); saveDraft(); }
+  paintBorgRows(); paintJointScores(); if(iStep===3) renderI(); paintIBar(); saveDraft(); }
 function readI(){ const x=D.H[ciHand].idx; x.taN=$("i_taN").value; OC.JOINTS.forEach(J=>J.items.forEach(it=>{ const v=$("ip_"+it.id).value; if(v==="") delete x.post[it.id]; else x.post[it.id]=v; }));
-  x.estOK=$("i_estOK").checked; x.borg=$("i_borg").value; x.borgMode=$("i_borgMode").value; x.peak=$("i_peak").value; x.staticSec=$("i_staticSec").value; x.staticN=$("i_staticN").value; x.remSel=$("i_rem").value; AF_IDX.forEach(([k])=>{ const v=$("ia_"+k).value; if(v==="0") delete x.durs[k]; else x.durs[k]=v; });
+  x.estOK=$("i_estOK").checked; x.borg=$("i_borg").value; if(!helperCalc(x).active) x.borgDirect=x.borg; x.peak=$("i_peak").value; x.staticSec=$("i_staticSec").value; x.staticN=$("i_staticN").value; x.remSel=$("i_rem").value; AF_IDX.forEach(([k])=>{ const v=$("ia_"+k).value; if(v==="0") delete x.durs[k]; else x.durs[k]=v; });
   D.X.unrecHours=$("i_unrec").value; D.X.inCycle=$("i_incycle").value; }
-document.querySelectorAll("#idxv input, #idxv select").forEach(e=>{ const f=()=>{ const x=D.H[ciHand].idx; if(e.dataset.post){ x.est=x.est.filter(k=>k!==e.dataset.post); e.classList.remove("est"); } if(e.id==="i_peak"){ x.estPeak=false; e.classList.remove("est"); } if(e.dataset.af){ x.estAF=x.estAF.filter(k=>k!==e.dataset.af); e.classList.remove("est"); }
+document.querySelectorAll("#idxv input, #idxv select").forEach(e=>{ const f=()=>{ const x=D.H[ciHand].idx; if(e.dataset.post){ x.est=x.est.filter(k=>k!==e.dataset.post); e.classList.remove("est"); } if(e.id==="i_peak"&&!e.readOnly){ x.estPeak=false; x.peakDirect=e.value; e.classList.remove("est"); } if(e.dataset.af){ x.estAF=x.estAF.filter(k=>k!==e.dataset.af); e.classList.remove("est"); }
   readI(); paintJointScores(); paintIBar(); if(iStep<3) handBar2($("iHandBar"),"idx"); saveDraft(); }; e.addEventListener("input",f); e.addEventListener("change",f); });
 function paintJointScores(){ const P=OC.postureIdx(idxSide(D,ciHand).post); P.joints.forEach(j=>{ $("ij_"+j.key).textContent=`${j.score}점 → 계수 ${f2(j.epm)}`; }); }
-function paintBorgRows(){ const x=D.H[ciHand].idx; const el=$("iBorgRows"); if(!x.borgRows.length) x.borgRows=[["",""],["",""]];
-  el.innerHTML=x.borgRows.map((r,i)=>`<div class="row2 brow"><label class="f"><span class="lt">Borg 점수</span><input type="number" min="0" max="10" step="0.5" inputmode="decimal" data-br="${i}" data-bk="0" value="${r[0]}"></label><label class="f"><span class="lt">시간 <span class="u">초</span></span><input type="number" min="0" step="0.1" inputmode="decimal" data-br="${i}" data-bk="1" value="${r[1]}"></label></div>`).join("");
-  el.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",()=>{ x.borgRows[+inp.dataset.br][+inp.dataset.bk]=inp.value; borgCalc(true); saveDraft(); })); borgCalc(); }
-function borgCalc(fromRows){ const x=D.H[ciHand].idx, cyc=num(D.cycleSec), out=$("iBorgOut"); let sum=0,t5=0,tAll=0; x.borgRows.forEach(([b,t])=>{ b=Number(b)||0; t=Number(t)||0; sum+=b*t; tAll+=t; if(b>=5) t5+=t; });
-  const clr=()=>{ if((x.borgMode||"direct")==="calc"){ x.borg=""; $("i_borg").value=""; paintIBar(); } };
-  if(!tAll){ out.hidden=true; clr(); return; } out.hidden=false; if(!(cyc>0)){ out.textContent="Mini 1단계의 사이클 타임이 필요합니다."; clr(); return; } if(tAll>cyc){ out.textContent=`적은 시간의 합(${f1(tAll)}초)이 사이클 타임(${f1(cyc)}초)보다 깁니다. 시간을 고쳐 주세요.`; clr(); return; }
-  const avg=sum/cyc, pk=t5/cyc*100; out.innerHTML=`평균 Borg <b>${f2(avg)}</b> · 강한 힘(Borg 5 이상) 비율 <b>${f1(pk)}%</b><br><small>평균 Borg 점수는 이 값을 쓰고, 강한 힘 비율은 아래 칸에 넣어 둡니다(고칠 수 있음).</small>`;
-  if((x.borgMode||"direct")==="calc"){ x.borg=String(Math.round(avg*100)/100); $("i_borg").value=x.borg; if(fromRows){ x.peak=String(Math.round(pk*10)/10); x.estPeak=false; $("i_peak").value=x.peak; $("i_peak").classList.remove("est"); } paintIBar(); } }
-$("iBorgAdd").addEventListener("click",()=>{ D.H[ciHand].idx.borgRows.push(["",""]); paintBorgRows(); });
-function borgModeUI(){ const x=D.H[ciHand].idx, calc=(x.borgMode||"direct")==="calc"; $("iBorgDirect").hidden=calc; $("iBorgCalc").hidden=!calc; $("iPeakCalcNote").hidden=!calc; }
-$("i_borgMode").addEventListener("change",()=>{ const x=D.H[ciHand].idx; x.borgMode=$("i_borgMode").value; borgModeUI(); if(x.borgMode==="calc") borgCalc(true); paintIBar(); saveDraft(); });
+const rowsOf=x=>x.borgRows||[];
+function helperCalc(x){ const cyc=num(D.cycleSec); let sum=0,t5=0,tAll=0; rowsOf(x).forEach(([b,t])=>{ b=Number(b)||0; t=Number(t)||0; sum+=b*t; tAll+=t; if(b>=5) t5+=t; });
+  if(!tAll) return {active:false};
+  if(!(cyc>0)) return {active:true,err:"Mini 1단계의 사이클 타임이 필요합니다."};
+  if(tAll>cyc) return {active:true,err:`적은 시간의 합(${f1(tAll)}초)이 사이클 타임(${f1(cyc)}초)보다 깁니다. 시간을 고쳐 주세요.`};
+  return {active:true,avg:Math.round(sum/cyc*100)/100,pk:Math.round(t5/cyc*1000)/10}; }
+/* 동작 표(도우미)에 값이 있으면 그 계산값이 우선: 평균 Borg·강한 힘 비율 칸에 넣고 잠금(EPM 계산표와 같은 방식).
+   동작 표가 비어 있으면 직접 넣은 값을 쓰고, 강한 힘 비율을 직접 넣지 않았으면 Mini 4단계 답(추정값)을 씀 */
+function applyHelper(x){ const r=helperCalc(x);
+  if(r.active){ if(r.err) x.borg=""; else { x.borg=String(r.avg); x.peak=String(r.pk); x.estPeak=false; } }
+  else { x.borg=x.borgDirect??""; if(x.peakDirect!=null&&x.peakDirect!==""){ x.peak=x.peakDirect; x.estPeak=false; } else if(x.peakMini!=null){ x.peak=x.peakMini; x.estPeak=Number(x.peakMini)>0; } }
+  return r; }
+function borgUI(){ const x=D.H[ciHand].idx, r=helperCalc(x), out=$("iBorgOut");
+  $("i_borg").readOnly=r.active; $("i_peak").readOnly=r.active; $("iBorgSrc").hidden=!r.active; $("iPeakCalcNote").hidden=!r.active; if(r.active) $("iBorgHelp").open=true;
+  if(!r.active) out.hidden=true; else { out.hidden=false; out.innerHTML=r.err?esc(r.err):`평균 Borg <b>${f2(r.avg)}</b> · 강한 힘(Borg 5 이상) 비율 <b>${f1(r.pk)}%</b><br><small>두 값을 위 평균 Borg 칸과 아래 강한 힘 칸에 넣어 Index에 씁니다(EPM 계산표와 같은 방식).</small>`; }
+  $("i_borg").value=x.borg; $("i_peak").value=x.peak; $("i_peak").classList.toggle("est",!!x.estPeak); }
+function borgSync(){ applyHelper(D.H[ciHand].idx); borgUI(); paintIBar(); }
+function paintBorgRows(){ const x=D.H[ciHand].idx; const el=$("iBorgRows"); if(!x.borgRows) x.borgRows=[]; const shown=x.borgRows.length?x.borgRows:[["",""],["",""]];
+  el.innerHTML=shown.map((r,i)=>`<div class="row2 brow"><label class="f"><span class="lt">Borg 점수</span><input type="number" min="0" max="10" step="0.5" inputmode="decimal" data-br="${i}" data-bk="0" value="${r[0]}"></label><label class="f"><span class="lt">시간 <span class="u">초</span></span><input type="number" min="0" step="0.1" inputmode="decimal" data-br="${i}" data-bk="1" value="${r[1]}"></label></div>`).join("");
+  el.querySelectorAll("input").forEach(inp=>inp.addEventListener("input",()=>{ if(!x.borgRows.length) x.borgRows=shown.map(r=>[...r]); x.borgRows[+inp.dataset.br][+inp.dataset.bk]=inp.value; borgSync(); saveDraft(); })); borgSync(); }
+$("iBorgAdd").addEventListener("click",()=>{ const x=D.H[ciHand].idx; if(!x.borgRows.length) x.borgRows=[["",""],["",""]]; x.borgRows.push(["",""]); paintBorgRows(); });
+$("iBorgClear").addEventListener("click",()=>{ const x=D.H[ciHand].idx; x.borgRows=[]; paintBorgRows(); saveDraft(); toast("동작 표를 비웠습니다. 직접 넣은 평균값을 씁니다."); });
 const fI=v=>v==null?"—":(isFinite(v)?f1(v):"계산 불가");
-function borgWarnUI(){ const e=$("iBorgWarn"); if(!e) return; const b=num(D.H[ciHand].idx.borg); e.hidden=!(b!=null&&b>5); }
+function borgWarnUI(){ const e=$("iBorgWarn"); if(!e) return; const b=num(D.H[ciHand].idx.borg); e.hidden=!(b!=null&&b>5); peakMiniUI(); }
+const PEAK_CAT=p=>p<0.5?"0":p<2?"1":p<10?"5":"10";
+function peakMiniUI(){ const e=$("iPeakMini"); if(!e) return; const hh=D.H[ciHand], x=hh.idx, v=num(x.peak); const m=String(Number(hh.peak)||0);
+  const show=v!=null&&!x.estPeak&&PEAK_CAT(v)!==m; e.hidden=!show; if(show) e.innerHTML=`<b>Mini 답과 다릅니다.</b> Mini 4단계에서는 강한 힘을 ‘${peakName(m)}’로 골랐는데, 여기 값은 ${f1(v)}%(${peakName(PEAK_CAT(v))})입니다. Index는 이 칸의 값으로 계산하고, Mini·Checklist 점수는 Mini 4단계 답으로 계산합니다. 어느 쪽이 맞는지 확인하고, Mini 답이 틀렸다면 Mini 4단계도 고치세요.`; }
 function paintIBar(){ const hs=handsOf(D); const rs=hs.map(h=>calcIdx(D,h)); const ok=rs.filter(r=>r.ok); const fin=ok.length?Math.max(...ok.map(r=>r.idxE)):null; const z=fin!=null?OC.izone(fin):null;
   $("ibarV").textContent=fin!=null?fI(fin):"—"; borgWarnUI(); $("ibarZ").textContent=z?z.name:"입력 중"; $("ibarZ").style.background=z?`var(--${z.color})`:"#5F6B74"; $("ibarT").textContent="OCRA Index · "+hs.map((h,i)=>`${HAND[h]} ${rs[i].ok?fI(rs[i].idxE):"—"}`).join(" · ");
   $("iPrev").textContent=iStep===0?"Mini 결과":"이전"; if(iStep<2){ $("iNext").textContent="다음"; $("iNext").disabled=false; } else if(iStep===2){ const o=hs.find(h=>h!==ciHand&&!idxDone(D,h)); $("iNext").textContent=o?`${HAND[o]} 입력`:"결과 보기"; $("iNext").disabled=false; } else { const ss=saveState(); $("iNext").textContent=ss.label; $("iNext").disabled=!ss.ok; } }
