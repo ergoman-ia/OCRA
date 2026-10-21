@@ -13,9 +13,9 @@
 -->
 <style>
   :root{--on-acc:#fff;--paper:#F4F6F8;--sheet:#FFFFFF;--ink:#1E2B33;--ink-2:#4A5A66;--ink-3:#5F6B74;--rule:#D9DFE3;--rule-2:#BFC9D0;--acc:#1E6B4A;--acc-2:#E4F1EA;--acc-3:#124A33;
-    --z1:#2E8B57;--z2:#9ACD32;--z3:#E6B800;--z4:#F08A5D;--z5:#D63B3B;--z6:#7B2CBF;--warn-bg:#FFF6DD;--warn-ink:#6B4F00;--ok-bg:#E7F2EC;--ok-ink:#1E5A3A;--admin:#0F5C45}
-  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#131A1F;--sheet:#1B2328;--ink:#EEF2F4;--ink-2:#B8C3CA;--ink-3:#8696A0;--rule:#2C373E;--rule-2:#3B474F;--acc:#7FCBA4;--on-acc:#0E1A14;--acc-2:#16302A;--acc-3:#B8E6CC;--warn-bg:#3A2E10;--warn-ink:#F3D98A;--ok-bg:#163A2A;--ok-ink:#BFE6CF}}
-  :root[data-theme="dark"]{--paper:#131A1F;--sheet:#1B2328;--ink:#EEF2F4;--ink-2:#B8C3CA;--ink-3:#8696A0;--rule:#2C373E;--rule-2:#3B474F;--acc:#7FCBA4;--on-acc:#0E1A14;--acc-2:#16302A;--acc-3:#B8E6CC;--warn-bg:#3A2E10;--warn-ink:#F3D98A;--ok-bg:#163A2A;--ok-ink:#BFE6CF}
+    --z1:#2E8B57;--z2:#9ACD32;--z3:#E6B800;--z4:#F08A5D;--z5:#D63B3B;--z6:#7B2CBF;--grp:#F2F4F5;--warn-bg:#FFF6DD;--warn-ink:#6B4F00;--ok-bg:#E7F2EC;--ok-ink:#1E5A3A;--admin:#0F5C45}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#131A1F;--sheet:#1B2328;--ink:#EEF2F4;--ink-2:#B8C3CA;--ink-3:#8696A0;--rule:#2C373E;--rule-2:#3B474F;--acc:#7FCBA4;--on-acc:#0E1A14;--acc-2:#16302A;--acc-3:#B8E6CC;--grp:#222A30;--warn-bg:#3A2E10;--warn-ink:#F3D98A;--ok-bg:#163A2A;--ok-ink:#BFE6CF}}
+  :root[data-theme="dark"]{--paper:#131A1F;--sheet:#1B2328;--ink:#EEF2F4;--ink-2:#B8C3CA;--ink-3:#8696A0;--rule:#2C373E;--rule-2:#3B474F;--acc:#7FCBA4;--on-acc:#0E1A14;--acc-2:#16302A;--acc-3:#B8E6CC;--grp:#222A30;--warn-bg:#3A2E10;--warn-ink:#F3D98A;--ok-bg:#163A2A;--ok-ink:#BFE6CF}
   *,*::before,*::after{box-sizing:border-box}
   html{-webkit-text-size-adjust:100%} body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;font-size:16px;line-height:1.55;word-break:keep-all;-webkit-font-smoothing:antialiased}
   [hidden]{display:none !important}
@@ -85,6 +85,8 @@
   .yn{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--rule);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--sheet)} .yn .q{font-size:15px;font-weight:600;flex:1 1 auto} .yn .q .bul{color:var(--acc);font-size:12px;font-weight:800} .yn .q .tip{margin-left:4px;vertical-align:middle} .yn .q small{display:block;font-size:12.5px;font-weight:500;color:var(--ink-2)}
   .yn .chips{flex:0 0 auto} .yn .chips button{min-width:58px;flex:0 0 auto}
   .sub{margin-left:12px;border-left:3px solid var(--rule-2);padding-left:10px}
+  /* 같은 항목(질문과 그 하위 입력·도우미)을 한 묶음으로: 아주 옅은 회색 바탕 */
+  .grp{background:var(--grp);border:1px solid var(--rule);border-radius:12px;padding:12px 12px 0;margin:0 0 12px} .grp>.sub,.grp>div>.sub{margin-bottom:12px} .grp>.sub:last-child{padding-bottom:12px;margin-bottom:0} .grp>.yn{background:transparent;border:0;padding:0 0 10px;margin:0} .grp>details.more{padding-bottom:12px} .grp>details.more>summary{cursor:pointer;font-weight:700} .grp>.note{margin:0 0 12px} .grp>.okbox:last-child{margin-bottom:12px} .pcard{background:var(--grp) !important}
   /* 진행 표시 */
   .prog{display:flex;gap:4px;margin:0 0 12px} .prog button{flex:1 1 0;height:34px;border:0;border-radius:8px;background:var(--rule);color:var(--ink-2);font-size:12.5px;font-weight:700;padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .prog button.done{background:var(--acc-2);color:var(--acc-3)} .prog button.cur{background:var(--acc);color:var(--on-acc)}
   @media (max-width:560px){ .prog button span{display:none} }
@@ -172,12 +174,12 @@
     <label class="f"><span class="lt">반복작업인가요? <button type="button" class="tip" data-tip="정해진 작업 순서(사이클)가 반복되거나, 같은 기술동작이 근무시간의 절반 넘게 반복되면 ‘예’입니다. ‘예’가 곧 위험하다는 뜻은 아닙니다. 한 사이클 안에서 여러 동작(어깨를 쓰는 동작, 손목을 쓰는 동작 등)이 섞여 반복되어도 한 작업입니다. 하루 중 서로 다른 작업을 번갈아 하면 작업마다 따로 평가합니다.">?</button></span><select id="isRep" class="seg2"><option value="1">예</option><option value="0">아니요</option></select></label>
     <div class="note" id="notRep" hidden><b>반복작업이 아니면 OCRA 평가 대상이 아닙니다.</b> 다른 평가 방법을 쓰세요.</div>
     <div id="rep1">
-    <details><summary style="font-weight:700;cursor:pointer;margin-bottom:8px">▶ 작업장 정보(선택)</summary>
+    <div class="grp"><details><summary style="font-weight:700;cursor:pointer;margin-bottom:8px">▶ 작업장 정보(선택)</summary>
       <div class="row2"><label class="f"><span class="lt">회사</span><input type="text" id="company"></label><label class="f"><span class="lt">부서</span><input type="text" id="dept"></label></div>
       <label class="f"><span class="lt">라인·작업장·직무</span><input type="text" id="station"></label>
       <div class="row2"><label class="f"><span class="lt">작업자 수(남)</span><input type="number" id="workersM" min="0" step="1" inputmode="numeric"></label><label class="f"><span class="lt">작업자 수(여)</span><input type="number" id="workersF" min="0" step="1" inputmode="numeric"></label></div>
       <label class="f"><span class="lt">작업 설명</span><textarea id="jobDesc" placeholder="작업 내용, 사용 공구, 근무·휴식 시간표 등"></textarea></label>
-    </details>
+    </details></div>
     </div>
   </section>
 
@@ -190,17 +192,17 @@
       <label class="f"><span class="lt">근무시간 <span class="u">시간</span> <button type="button" class="tip" data-tip="출근부터 퇴근까지, 식사시간을 포함한 교대 전체 시간입니다.">?</button></span><input type="number" id="shiftH" min="0" step="0.5" inputmode="decimal" placeholder="예: 9"></label>
       <label class="f"><span class="lt">비반복 작업 <span class="u">분/하루</span> <button type="button" class="tip" data-tip="청소, 자재 운반, 회의, 육안 검사, 기계 대기 등 손을 반복해서 쓰지 않는 일의 하루 합계입니다. 점심(식사)시간과 휴식 시간은 넣지 않습니다. 아래 식사·휴식 칸에 따로 넣으면 앱이 순 반복작업 시간에서 각각 뺍니다(EPM 계산표도 비반복 작업, 휴식, 근무시간 안 식사를 따로 받음).">?</button></span><input type="number" id="nonRepMin" min="0" step="5" inputmode="numeric" placeholder="예: 20 · 없으면 0"></label>
     </div>
-    <label class="f"><span class="lt">식사 횟수 <span class="u">회</span></span><input type="number" id="mealN" min="0" step="1" inputmode="numeric" placeholder="없으면 0"></label>
+    <div class="grp"><label class="f"><span class="lt">식사 횟수 <span class="u">회</span></span><input type="number" id="mealN" min="0" step="1" inputmode="numeric" placeholder="없으면 0"></label>
     <div class="sub" id="mealBox" hidden>
       <label class="f"><span class="lt">식사 시간 <span class="u">1회, 분</span> <button type="button" class="tip" data-tip="근무시간에 포함되지 않는(무급) 식사는 30분 이상일 때만 회복으로 셉니다. 이 값은 아래 ‘그 밖의 중단’ 칸에 다시 넣지 않습니다(자동으로 셈).">?</button></span><input type="number" id="mealLen" min="0" step="5" inputmode="numeric" placeholder="예: 60"></label>
       <label class="f"><span class="lt">식사시간이 근무시간에 포함되나요? <button type="button" class="tip" data-tip="식사시간이 근무시간에 포함(유급)되면 ‘포함’을 고릅니다. 포함된 식사는 횟수와 관계없이 회복 1회로 셉니다.">?</button></span><select id="mealIn" class="seg2"><option value="0">미포함(무급)</option><option value="1">포함(유급)</option></select></label>
-    </div>
-    <div class="row2">
+    </div></div>
+    <div class="grp"><div class="row2">
       <label class="f"><span class="lt">8분 이상 휴식 <span class="u">회</span> <button type="button" class="tip" data-tip="식사시간을 뺀 휴식 가운데 8분 이상 이어지는 휴식의 횟수입니다(공식·비공식 모두). EPM 계산표: ‘점심시간 제외(excluding lunch break)’.">?</button></span><input type="number" id="break8N" min="0" step="1" inputmode="numeric" placeholder="예: 2 · 없으면 0"></label>
       <label class="f"><span class="lt">총 휴식 시간 <span class="u">분</span> <button type="button" class="tip" data-tip="식사시간을 뺀 모든 휴식의 합계입니다(8분 미만 휴식도 포함). EPM 계산표: ‘점심시간 제외(excluding lunch break)’. 순 반복작업 시간을 구할 때 뺍니다.">?</button></span><input type="number" id="breakTotal" min="0" step="1" inputmode="numeric" placeholder="예: 20 · 없으면 0"></label>
     </div>
+    <div class="note" id="breakWarn" hidden>8분 이상 휴식 횟수에 비해 총 휴식 시간이 짧습니다(예: 2회면 16분 이상).</div></div>
     <label class="f"><span class="lt">그 밖의 30분 이상 중단 <span class="u">회</span> <button type="button" class="tip" data-tip="식사가 아닌, 근무시간 밖의 30분 이상 중단(예: 사업장 간 이동)의 횟수입니다. 보통 0입니다. EPM 계산표는 이 칸에 ‘근무 밖 30분 이상 식사 또는 그 밖의 30분 이상 중단’ 횟수를 함께 적지만, 이 앱은 식사를 위 식사 칸에서 자동으로 세므로 식사는 넣지 않습니다.">?</button></span><input type="number" id="otherBreakN" min="0" step="1" inputmode="numeric" placeholder="없으면 0"></label>
-    <div class="note" id="breakWarn" hidden>8분 이상 휴식 횟수에 비해 총 휴식 시간이 짧습니다(예: 2회면 16분 이상).</div>
     <div class="okbox" id="shiftInfo" hidden></div>
     </div>
     <label class="f"><span class="lt">사이클 타임 <span class="u">초</span> <button type="button" class="tip" data-tip="한 사이클에 걸리는 시간입니다. 두 손에 공통입니다(EPM 계산표도 왼손 시트가 오른손 시트의 사이클 타임을 그대로 씀). 정해진 사이클이 없으면 대표 관찰 시간(초)을 넣고, 기술동작 수도 그 시간 동안 셉니다.">?</button></span><input type="number" id="cycleSec" min="0.1" step="0.1" inputmode="decimal" placeholder="예: 30"></label>
@@ -210,14 +212,14 @@
     <h2><span class="no">2</span>반복(빈도) <span class="help hname" style="font-weight:500"></span></h2>
     <div class="learn">기술동작은 집기·놓기·돌리기·밀기·당기기처럼 손으로 하는 기본 조작입니다. 한 사이클에 여러 동작(어깨 동작 4회, 손목 동작 8회 등)이 섞여 있으면 그 손의 기술동작을 모두 더해서 셉니다. 셀 수 없으면 빠르기만 골라도 계산됩니다.</div>
     <label class="f"><span class="lt">같은 동작이 사이클에서 차지하는 비율 <button type="button" class="tip" data-tip="같은 기술동작이 되풀이되는 비율입니다. 사이클이 짧거나(8초 이하 3점, 9~15초 1.5점) 이 비율이 높으면(51~80% 1.5점, 80% 초과 3점) 정형성 점수가 붙습니다. 둘 중 큰 값을 씁니다.">?</button></span><select id="same"><option value="0">절반 이하</option><option value="1">절반 넘게(51~80%)</option><option value="2">거의 내내(80% 넘게)</option></select></label>
-    <label class="f"><span class="lt">기술동작 수를 셀 수 있나요? <button type="button" class="tip" data-tip="영상을 느리게 재생하거나 현장에서 한 사이클 동안 이 손의 기술동작 수를 셀 수 있으면 ‘예’를 고릅니다. 세는 쪽이 더 정확합니다.">?</button></span><select id="canCount" class="seg2"><option value="">— 고르세요 —</option><option value="1" data-short="예(동작 수 입력)">예 — 사이클당 기술동작 수를 넣음</option><option value="0" data-short="아니요(빠르기만)">아니요 — 빠르기만 고름</option></select></label>
+    <div class="grp"><label class="f"><span class="lt">기술동작 수를 셀 수 있나요? <button type="button" class="tip" data-tip="영상을 느리게 재생하거나 현장에서 한 사이클 동안 이 손의 기술동작 수를 셀 수 있으면 ‘예’를 고릅니다. 세는 쪽이 더 정확합니다.">?</button></span><select id="canCount" class="seg2"><option value="">— 고르세요 —</option><option value="1" data-short="예(동작 수 입력)">예 — 사이클당 기술동작 수를 넣음</option><option value="0" data-short="아니요(빠르기만)">아니요 — 빠르기만 고름</option></select></label>
     <div id="taBox" class="sub" hidden>
       <label class="f"><span class="lt">사이클당 기술동작 수 <span class="u">회</span> <button type="button" class="tip" data-tip="한 사이클(사이클이 없으면 관찰 시간) 동안 이 손의 기술동작 수입니다. 힘을 쓰는 동작만이 아니라 모든 기술동작을 셉니다. 4사이클에 한 번 하는 동작은 0.25처럼 소수로 더합니다.">?</button></span><input type="number" id="taN" min="0" step="0.01" inputmode="decimal" placeholder="예: 40"></label>
       <div class="okbox" id="apmShow">분당 기술동작 수: —</div>
     </div>
     <div id="qualBox" class="sub" hidden>
       <label class="f"><span class="lt">기술동작 빠르기 <button type="button" class="tip" data-tip="EPM 계산표의 세 칸입니다. 느림: 2초에 1회 미만(1점). 중간: 그 사이, 또는 물체를 손에 오래 쥐고 있음(정적 동작, 5점). 매우 빠름: 초당 1회 초과로 셀 수 없음(9점).">?</button></span><select id="qual"><option value="">— 고르세요 —</option><option value="1">느림 — 2초에 1회 미만(1점)</option><option value="5">중간, 또는 물체를 오래 쥐고 있음(5점)</option><option value="9">매우 빠름 — 초당 1회 초과(9점)</option></select></label>
-    </div>
+    </div></div>
   </section>
 
   <section class="card step" data-step="3" hidden>
@@ -252,8 +254,8 @@
     <div class="yn"><div class="q"><span class="bul">▶</span> 반동·충격이 있는 공구 사용 <button type="button" class="tip" data-tip="망치질, 임팩트 공구처럼 반동·충격이 손에 전달되는 작업이 사이클의 절반 넘게 있으면 ‘예’(2점).">?</button><small>망치질, 임팩트 공구 등 — 사이클의 절반 넘게</small></div><div class="chips" data-chip="strike" data-single="1"><button type="button" data-v="1">예</button><button type="button" data-v="0">아니요</button></div></div>
     <div class="yn"><div class="q"><span class="bul">▶</span> 손을 망치처럼 사용 <button type="button" class="tip" data-tip="손바닥이나 주먹으로 부품을 쳐서 끼우는 등 손을 공구 대신 쓰는 동작이 시간당 10회쯤 이상이면 ‘예’(2점).">?</button><small>손바닥·주먹으로 쳐서 끼움 등 — 시간당 10회쯤 이상</small></div><div class="chips" data-chip="impact" data-single="1"><button type="button" data-v="1">예</button><button type="button" data-v="0">아니요</button></div></div>
     <div class="yn"><div class="q"><span class="bul">▶</span> 진동 공구 사용 <button type="button" class="tip" data-tip="진동 공구를 사이클의 약 1/3 이상 쓰면 ‘예’(4점). 진동이 있으면 다른 물리적 요인 점수는 더하지 않습니다(EPM 계산표 규칙).">?</button><small>사이클의 약 1/3 이상</small></div><div class="chips" data-chip="vib" data-single="1"><button type="button" data-v="1">예</button><button type="button" data-v="0">아니요</button></div></div>
-    <div class="yn"><div class="q"><span class="bul">▶</span> 그 밖의 요인 <button type="button" class="tip" data-tip="추위(0 °C 미만), 부적합한 장갑, 정밀작업(2~3 mm), 국소 압박(피부 자국·굳은살), 미끄러운 물체 등이 사이클의 절반 넘게 있으면 ‘예’(2점). 여러 개여도 2점입니다.">?</button><small>추위(0 °C 미만), 부적합한 장갑, 정밀작업(2~3 mm), 국소 압박(피부 자국·굳은살), 미끄러운 물체 등 — 사이클의 절반 넘게</small></div><div class="chips" data-chip="others" data-single="1"><button type="button" data-v="1">예</button><button type="button" data-v="0">아니요</button></div></div>
-    <div class="sub" id="othersBox" hidden><label class="f"><span class="lt">해당 요인(기록용, 여러 개 선택 가능)</span><div class="chips" data-chip="otherKinds" data-multi="1"><button type="button" data-v="cold">추위</button><button type="button" data-v="glove">장갑</button><button type="button" data-v="precision">정밀작업</button><button type="button" data-v="compress">국소 압박</button><button type="button" data-v="other">기타</button></div></label></div>
+    <div class="grp"><div class="yn"><div class="q"><span class="bul">▶</span> 그 밖의 요인 <button type="button" class="tip" data-tip="추위(0 °C 미만), 부적합한 장갑, 정밀작업(2~3 mm), 국소 압박(피부 자국·굳은살), 미끄러운 물체 등이 사이클의 절반 넘게 있으면 ‘예’(2점). 여러 개여도 2점입니다.">?</button><small>추위(0 °C 미만), 부적합한 장갑, 정밀작업(2~3 mm), 국소 압박(피부 자국·굳은살), 미끄러운 물체 등 — 사이클의 절반 넘게</small></div><div class="chips" data-chip="others" data-single="1"><button type="button" data-v="1">예</button><button type="button" data-v="0">아니요</button></div></div>
+    <div class="sub" id="othersBox" hidden><label class="f"><span class="lt">해당 요인(기록용, 여러 개 선택 가능)</span><div class="chips" data-chip="otherKinds" data-multi="1"><button type="button" data-v="cold">추위</button><button type="button" data-v="glove">장갑</button><button type="button" data-v="precision">정밀작업</button><button type="button" data-v="compress">국소 압박</button><button type="button" data-v="other">기타</button></div></label></div></div>
     <label class="f" style="margin-top:12px"><span class="lt">작업속도(두 손 공통) <button type="button" class="tip" data-tip="기계·라인이 속도를 정하면 점수를 더합니다. 버퍼(완충 공간)가 있어 속도를 늦출 수 있으면 1.5점, 라인이 움직여 완전히 기계가 정하면 2점입니다.">?</button></span><select id="pace"><option value="0">작업자가 정함(0점)</option><option value="1.5">기계가 정하지만 버퍼로 늦출 수 있음(1.5점)</option><option value="2">라인이 움직여 기계가 완전히 정함(2점)</option></select></label>
   </section>
 
@@ -307,17 +309,17 @@
     <h2><span class="no">C1</span>추가 항목 <span class="help hname2" style="font-weight:500"></span></h2>
     <label class="f"><span class="lt">작업 중 짧은 중단(두 손 공통) <button type="button" class="tip" data-tip="작업자가 속도를 조절해 잠깐씩 멈출 수 있으면 ‘중단 가능’입니다. 중단할 수 없으면 분당 기술동작 수가 같아도 빈도 점수가 더 높습니다(EPM Checklist 계산표의 두 빈도표).">?</button></span><select id="c_pauses" class="seg2"><option value="1">중단 가능</option><option value="0">중단 불가</option></select></label>
     <div class="handbar2" id="cHandBar"></div>
-    <div id="cNeedCount" class="sub" hidden>
+    <div id="cNeedCount" class="grp" hidden>
       <div id="cFastBox" hidden><label class="f"><span class="lt">분당 70회를 넘어 셀 수 없나요? <button type="button" class="tip" data-tip="Mini에서 ‘매우 빠름(초당 1회 초과)’을 골랐습니다. Checklist는 분당 70회 초과로 셀 수 없으면 분당 72회로 계산하고, 그렇지 않으면 사이클당 기술동작 수가 필요합니다.">?</button></span><select id="c_fast" class="seg2"><option value="1" data-short="예(72회로 계산)">예 — 분당 72회로 계산</option><option value="0" data-short="아니요(동작 수 셈)">아니요 — 동작 수를 셈</option></select></label></div>
       <div id="cTaBox"><label class="f"><span class="lt">사이클당 기술동작 수 <span class="u">회</span> <button type="button" class="tip" data-tip="Mini에서 빠르기만 골랐기 때문에 Checklist는 실제 기술동작 수가 필요합니다. 한 사이클 동안 이 손의 기술동작을 모두 셉니다.">?</button></span><input type="number" id="c_taN" min="0" step="0.01" inputmode="decimal" placeholder="예: 40"></label><div class="okbox" id="cApm" hidden></div></div>
     </div>
     <label class="f"><span class="lt">정적 동작(물체를 5초 넘게 계속 쥠) 비율 <button type="button" class="tip" data-tip="물체를 5초 넘게 계속 쥐고 있는 시간이 사이클에서 차지하는 비율입니다. 약 2/3면 2.5점, 거의 내내면 4.5점이며 빈도 점수와 비교해 큰 값을 씁니다.">?</button></span><select id="c_static"><option value="0">거의 없음</option><option value="1">약 2/3(51~80%)</option><option value="2">거의 내내(80% 넘게)</option></select></label>
     <div id="cMaxBox"><label class="f"><span class="lt">강한 힘 중 Borg 8 이상(거의 최대) 비율 <span class="u">%</span> <button type="button" class="tip" data-tip="Mini에서 고른 강한 힘(Borg 5 이상) 시간 가운데 거의 최대(Borg 8 이상)인 부분의 비율입니다. Borg 5~7은 4·8·16·24점, Borg 8 이상은 6·12·24·32점입니다.">?</button></span><input type="number" id="c_max" min="0" max="100" step="0.1" inputmode="decimal" placeholder="없으면 0"></label><p class="help" id="cMaxHelp"></p><div class="note" id="cMaxWarn" hidden></div></div>
     <p class="help" id="cNoPeak" hidden>Mini에서 강한 힘(Borg 5 이상)이 ‘없음’이라 Borg 8 이상 비율은 묻지 않습니다.</p>
-    <details class="more"><summary>회복 시간을 더 정확하게(선택, 두 손 공통)</summary>
+    <div class="grp"><details class="more"><summary>회복 시간을 더 정확하게(선택, 두 손 공통)</summary>
       <label class="f" style="margin-top:8px"><span class="lt">회복 없는 시간 직접 입력 <span class="u">시간</span> <button type="button" class="tip" data-tip="근무 시간표에서 1시간마다 8~10분 휴식이 없는 시간을 0.5시간 단위로 센 값입니다. 넣으면 휴식 횟수 대신 이 값을 씁니다(Checklist·Index에만 적용).">?</button></span><input type="number" id="c_unrec" class="xunrec" min="0" max="9" step="0.5" inputmode="decimal" placeholder="비우면 휴식 횟수로 계산"></label>
       <label class="f"><span class="lt">사이클 안에 회복이 있나요? <button type="button" class="tip" data-tip="매 사이클 10초 넘게 이어지는 휴지가 있고 작업:휴지 비가 6.5:1 이하(EPM Index 계산표 기준. ISO/PDTR 12295 양식은 5:1)이면 ‘예’입니다(예: 기계 가공 30초 동안 대기). ‘예’면 회복 없는 시간을 0으로 봅니다.">?</button></span><select id="c_incycle" class="seg2 xincycle"><option value="0">아니요</option><option value="1">예</option></select></label>
-    </details>
+    </details></div>
   </section>
   <section class="card cstep" data-c="1" hidden>
     <h2><span class="no">C2</span>OCRA Checklist 결과</h2>
@@ -342,7 +344,7 @@
   </section>
   <section class="card istep" data-i="1" hidden>
     <h2><span class="no">I2</span>힘·정적 동작 <span class="help hname2" style="font-weight:500"></span></h2>
-    <label class="f"><span class="lt">평균 Borg 점수 <span class="u">0~10</span> <button type="button" class="tip" data-tip="힘을 쓰는 동작마다 ‘Borg 점수 × 지속 시간’을 더해 사이클 타임으로 나눈 값입니다(힘을 쓰지 않는 시간은 0). 평균을 알면 여기에 직접 넣고, 모르면 아래 ‘동작별 계산 도우미’에 동작을 적습니다. 동작 표에 값이 있으면 그 계산값이 우선합니다.">?</button></span><input type="number" id="i_borg" min="0" max="10" step="0.01" inputmode="decimal" placeholder="예: 1.5"></label>
+    <div class="grp"><label class="f"><span class="lt">평균 Borg 점수 <span class="u">0~10</span> <button type="button" class="tip" data-tip="힘을 쓰는 동작마다 ‘Borg 점수 × 지속 시간’을 더해 사이클 타임으로 나눈 값입니다(힘을 쓰지 않는 시간은 0). 평균을 알면 여기에 직접 넣고, 모르면 아래 ‘동작별 계산 도우미’에 동작을 적습니다. 동작 표에 값이 있으면 그 계산값이 우선합니다.">?</button></span><input type="number" id="i_borg" min="0" max="10" step="0.01" inputmode="decimal" placeholder="예: 1.5"></label>
     <p class="help" id="iBorgSrc" hidden>아래 동작 표에서 계산한 값입니다(동작 표 우선). 직접 넣으려면 ‘동작 표 비우기’를 누르세요.</p>
     <details class="more" id="iBorgHelp"><summary>동작별 계산 도우미(평균을 모를 때)</summary>
       <p class="help" style="margin:8px 0">힘을 쓰는 동작마다 Borg 점수와 한 사이클 안의 지속 시간(초)을 적으면 평균 Borg 점수와 강한 힘(Borg 5 이상) 비율을 계산해 두 칸에 넣습니다.</p>
@@ -351,11 +353,11 @@
       <div class="okbox" id="iBorgOut" hidden></div>
     </details>
     <div class="note" id="iBorgWarn" hidden>평균 Borg 점수가 5를 넘으면 EPM 계산표의 힘 계수가 0이 되어 Index를 계산할 수 없습니다(힘이 지나치게 큼 — 즉시 개선 대상). 값이 맞는지 확인하세요.</div>
-    <label class="f"><span class="lt">강한 힘(Borg 5 이상) 시간 비율 <span class="u">%</span> <button type="button" class="tip" data-tip="Mini에서 고른 구간의 대표값이 들어 있습니다(노란 칸). Index는 이 비율이 1% 이상이면 힘 계수를 더 낮추므로 가능하면 정확한 값을 넣습니다.">?</button></span><input type="number" id="i_peak" min="0" max="100" step="0.1" inputmode="decimal"></label><p class="help" id="iPeakCalcNote" hidden>‘동작별로 계산’에서는 위 동작 표의 Borg 5 이상 시간으로 자동 계산합니다. 바꾸려면 동작 표의 Borg 점수나 시간을 고치세요.</p><div class="note" id="iPeakMini" hidden></div>
-    <div class="row2">
+    <label class="f"><span class="lt">강한 힘(Borg 5 이상) 시간 비율 <span class="u">%</span> <button type="button" class="tip" data-tip="Mini에서 고른 구간의 대표값이 들어 있습니다(노란 칸). Index는 이 비율이 1% 이상이면 힘 계수를 더 낮추므로 가능하면 정확한 값을 넣습니다.">?</button></span><input type="number" id="i_peak" min="0" max="100" step="0.1" inputmode="decimal"></label><p class="help" id="iPeakCalcNote" hidden>‘동작별로 계산’에서는 위 동작 표의 Borg 5 이상 시간으로 자동 계산합니다. 바꾸려면 동작 표의 Borg 점수나 시간을 고치세요.</p><div class="note" id="iPeakMini" hidden></div></div>
+    <div class="grp"><div class="row2">
       <label class="f"><span class="lt">정적 유지 시간 <span class="u">초, 선택</span> <button type="button" class="tip" data-tip="한 사이클 안에서 물체를 5초 넘게 계속 쥐고 있는 시간의 합입니다. 유지 1초를 기술동작 0.75회로 환산합니다.">?</button></span><input type="number" id="i_staticSec" min="0" step="0.1" inputmode="decimal" placeholder="없으면 비움"></label>
       <label class="f"><span class="lt">정적 동작 수 <span class="u">회</span></span><input type="number" id="i_staticN" min="1" step="1" inputmode="numeric" placeholder="비우면 1"></label>
-    </div>
+    </div></div>
   </section>
   <section class="card istep" data-i="2" hidden>
     <h2><span class="no">I3</span>부가요인·반복성 <span class="help hname2" style="font-weight:500"></span></h2>
@@ -363,10 +365,10 @@
     <div id="iAF"></div>
     <label class="f"><span class="lt">반복성(정형성) <button type="button" class="tip" data-tip="‘자동’이면 Mini의 사이클 타임·같은 동작 비율로 정합니다(정형성 0 → 없음, 1.5 → 보통, 3 → 높음).">?</button></span><select id="i_rem"><option value="auto">자동(사이클·같은 동작으로)</option><option value="0">없음</option><option value="1">보통</option><option value="2">높음</option></select></label>
     <p class="help" id="iPace"></p>
-    <details class="more"><summary>회복 시간을 더 정확하게(선택, 두 손 공통)</summary>
+    <div class="grp"><details class="more"><summary>회복 시간을 더 정확하게(선택, 두 손 공통)</summary>
       <label class="f" style="margin-top:8px"><span class="lt">회복 없는 시간 직접 입력 <span class="u">시간</span></span><input type="number" id="i_unrec" class="xunrec" min="0" max="9" step="0.5" inputmode="decimal" placeholder="비우면 휴식 횟수로 계산"></label>
       <label class="f"><span class="lt">사이클 안에 회복이 있나요?</span><select id="i_incycle" class="seg2 xincycle"><option value="0">아니요</option><option value="1">예</option></select></label>
-    </details>
+    </details></div>
   </section>
   <section class="card istep" data-i="3" hidden>
     <h2><span class="no">I4</span>OCRA Index 결과</h2>
