@@ -737,8 +737,12 @@ function renderActions(A,miss){ const btns=[]; const ss=saveState(A); btns.push(
   $("resActions").innerHTML=btns.join(""); $("saveBtn").addEventListener("click",saveRecord);
   $("resActions").querySelectorAll("[data-goh]").forEach(b=>b.addEventListener("click",()=>{ writeHand(); D.cur=b.dataset.goh; paintAll(); goStep(2); onInput(); }));
   if($("cancelAdd")) $("cancelAdd").addEventListener("click",()=>show("multi"));
-  if($("printBtn")) $("printBtn").addEventListener("click",()=>window.print());
+  if($("printBtn")) $("printBtn").addEventListener("click",printResult);
   if($("copyBtn")) $("copyBtn").addEventListener("click",async()=>{ const t=resultText(D,A); try{ await navigator.clipboard.writeText(t); toast("결과를 복사했습니다."); }catch(e){ dialog("결과",esc(t).replace(/\n/g,"<br>"),null); } }); }
+/* 인쇄: PDF로 저장할 때의 파일 이름 = 문서 제목(작업명 + 저장 일시, 저장 전이면 지금 일시) */
+function printResult(){ const r0=editId?recs().find(x=>x.id===editId):null; const t=r0&&snapOf(D)===baseSnap?r0.savedAt:null;
+  const old=document.title; document.title=`OCRA_Mini_${fnSafe(D.jobName)}_${fnStamp(t)}`;
+  const back=()=>{ document.title=old; window.removeEventListener("afterprint",back); }; window.addEventListener("afterprint",back); window.print(); setTimeout(back,60000); }
 function resultText(d,A){ const F=A.res[A.fin], z=OCM.czone(F.score), nx=OCM.nextStep(A.rng); return [`OCRA Mini-Checklist — ${d.jobName||"(작업명 없음)"}`,d.company||d.dept?`${d.company||""} ${d.dept||""}`.trim():null,...handsOf(d).map(h=>A.res[h].ok?`${HAND[h]}: ${f1(A.res[h].score)}점(${OCM.czone(A.res[h].score).name}) = (빈도 ${A.res[h].fr.score} + 자세 ${A.res[h].posture} + 힘 ${A.res[h].force} + 부가요인 ${A.res[h].add}) × 회복 ${A.res[h].sc.rcm} × 지속시간 ${A.res[h].sc.du}`:`${HAND[h]}: 미입력`),`최종(높은 쪽): ${f1(F.score)}점 (${z.name}), 예상 범위 ${f1(A.rng.min)}~${f1(A.rng.max)}`,`다음 단계: ${nx.label}`].filter(Boolean).join("\n"); }
 /* ---- 저장·불러오기 ---- */
 function handSummary(r){ return r&&r.ok?{score:+f1(r.score),min:+f1(r.min),max:+f1(r.max),zone:OCM.czone(r.score).name,freq:r.fr.score,posture:r.posture,force:r.force,add:r.add,partial:r.partial}:null; }
@@ -1175,11 +1179,13 @@ function bandIdxHTML(v){ const pos=OCM.bandPos(v); return `<div class="band">${[
 
 /* ---- 백업(아이폰 고려): 공유 창으로 보내기, 글자로 복사·붙여넣기로 불러오기 ---- */
 function backupText(){ return JSON.stringify({app:"ocra-mini",version:4,exported:new Date().toISOString(),records:recs()}); }
-const stamp=()=>new Date().toISOString().slice(0,10);
+/* 파일 이름: 작업명 + 날짜_시각(YYYYMMDD_HHMM, 기기 시각) */
+const fnSafe=s=>String(s||"").trim().replace(/[\\/:*?"<>|\u0000-\u001f\s]+/g,"_").replace(/^_+|_+$/g,"").slice(0,40)||"작업명없음";
+const fnStamp=t=>{ const d=t?new Date(t):new Date(), p=n=>String(n).padStart(2,"0"); return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`; };
 async function copyText(t){ try{ await navigator.clipboard.writeText(t); return true; }catch(e){ return false; } }
 function showCopyBox(t){ dialog("백업 내용(글자)",`<p class="help">아래 글을 모두 길게 눌러 복사한 뒤 메모·카카오톡·메일 등에 붙여 두세요. 불러올 때 이 글을 그대로 붙여 넣습니다.</p><textarea id="bkOut" readonly style="min-height:160px;font-size:12px">${esc(t)}</textarea>`,null); setTimeout(()=>{ const e=$("bkOut"); if(e){ e.focus(); e.select(); } },100); }
-$("bkSend").addEventListener("click",async()=>{ const list=recs(); if(!list.length){ toast("백업할 평가가 없습니다."); return; } const t=backupText(); const name=`ocra_backup_${stamp()}.json`;
-  try{ const f=new File([t],name,{type:"application/json"}); if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:"OCRA 평가 백업",text:`OCRA 평가 백업 ${list.length}건`}); return; } }catch(e){ if(e&&e.name==="AbortError") return; }
+$("bkSend").addEventListener("click",async()=>{ const list=recs(); if(!list.length){ toast("백업할 평가가 없습니다."); return; } const t=backupText(); const name=`OCRA_백업_${fnSafe(list[0].inputs&&list[0].inputs.jobName||list[0].name)}${list.length>1?`_외${list.length-1}건`:""}_${fnStamp()}.json`;
+  try{ const f=new File([t],name,{type:"application/json"}); if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f]}); return; } }catch(e){ if(e&&e.name==="AbortError") return; }
   if(await copyText(t)){ dialog("백업을 복사했습니다",`평가 ${list.length}건의 백업 내용을 복사했습니다. 메모·카카오톡·메일 등에 붙여 넣어 보관하세요. 불러올 때는 ‘백업 불러오기’에 이 글을 붙여 넣습니다.`,null); return; }
   showCopyBox(t); });
 $("bkCopy").addEventListener("click",async()=>{ const list=recs(); if(!list.length){ toast("백업할 평가가 없습니다."); return; } const t=backupText(); if(await copyText(t)) toast(`평가 ${list.length}건의 백업 내용을 복사했습니다.`); else showCopyBox(t); });
